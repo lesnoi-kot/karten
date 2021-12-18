@@ -1,0 +1,39 @@
+.board {}
+
+.boardPreview {
+  width: 200px;
+  height: 100px;
+  padding: 8px;
+
+  border-radius: 3px;
+  background-color: rgb(0, 121, 191);
+}
+
+.boardPreview:hover {
+  filter: brightness(110%);
+}
+
+.boardPreviewName {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  word-wrap: break-word;
+}
+
+.newBoardStub {
+  width: 200px;
+  height: 100px;
+  padding: 8px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  background-color: rgb(220, 220, 220);
+  cursor: pointer;
+  transition: background-color;
+}
+
+.newBoardStub:hover {
+  filter: brightness(110%);
+}

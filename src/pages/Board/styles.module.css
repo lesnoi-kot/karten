@@ -1,0 +1,15 @@
+.dashboard {
+  width: auto;
+  height: calc(100vh - 155px);
+  padding-left: 16px;
+  overflow-x: auto;
+}
+
+.boardName {
+  text-align: center;
+  font-size: 42px;
+}
+
+.boardMenu {
+  width: 350px;
+}

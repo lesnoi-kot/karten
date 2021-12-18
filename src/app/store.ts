@@ -1,17 +1,33 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
+import { createEpicMiddleware } from "redux-observable";
+import { createLogger } from "redux-logger";
+import { createBrowserHistory } from "history";
 
-export const store = configureStore({
-  reducer: {
-    counter: counterReducer,
-  },
-});
+import { rootReducer } from "./reducers";
+import { rootEpic } from "./epics";
+import { apiService } from "./services";
 
-export type AppDispatch = typeof store.dispatch;
-export type RootState = ReturnType<typeof store.getState>;
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState,
-  unknown,
-  Action<string>
->;
+export function createStore() {
+  const reduxLogger = createLogger({
+    level: "info",
+    collapsed: true,
+    logErrors: false,
+  });
+
+  const epicMiddleware = createEpicMiddleware({
+    dependencies: {
+      api: apiService,
+      history: createBrowserHistory(),
+    },
+  });
+
+  const store = configureStore({
+    reducer: rootReducer,
+    middleware: [...getDefaultMiddleware(), reduxLogger, epicMiddleware],
+  });
+
+  // @ts-ignore
+  epicMiddleware.run(rootEpic);
+
+  return store;
+}

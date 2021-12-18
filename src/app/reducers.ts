@@ -1,0 +1,58 @@
+import { combineReducers } from "@reduxjs/toolkit";
+
+import {
+  reducer as projectsReducer,
+  sliceName as projectsPageSliceName,
+} from "pages/Projects/slice";
+
+import {
+  reducer as boardPageReducer,
+  sliceName as boardPageSliceName,
+} from "pages/Board/slice";
+
+import {
+  reducer as confirmDialogReducer,
+  sliceName as confirmDialogSliceName,
+} from "components/ConfirmDialog/slice";
+
+import {
+  reducer as taskListsReducer,
+  sliceName as taskListsSliceName,
+} from "./taskLists";
+
+import { reducer as tasksReducer, sliceName as tasksSliceName } from "./tasks";
+
+import {
+  reducer as commentsReducer,
+  sliceName as commentsSliceName,
+} from "./comments";
+
+import {
+  reducer as boardsReducer,
+  sliceName as boardsSliceName,
+} from "./boards";
+
+import {
+  reducer as apiInteractionReducer,
+  sliceName as apiInteractionSliceName,
+} from "./apiInteraction";
+
+export const rootReducer = combineReducers({
+  [apiInteractionSliceName]: apiInteractionReducer,
+
+  entities: combineReducers({
+    [boardsSliceName]: boardsReducer,
+    [taskListsSliceName]: taskListsReducer,
+    [tasksSliceName]: tasksReducer,
+    [commentsSliceName]: commentsReducer,
+  }),
+
+  pages: combineReducers({
+    [projectsPageSliceName]: projectsReducer,
+    [boardPageSliceName]: boardPageReducer,
+  }),
+
+  widgets: combineReducers({
+    [confirmDialogSliceName]: confirmDialogReducer,
+  }),
+});
