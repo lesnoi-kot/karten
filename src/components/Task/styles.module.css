@@ -54,6 +54,8 @@
 
 .commentText {
   padding: 10px;
+  white-space: pre;
+  line-height: 18px;
 }
 
 .comment {

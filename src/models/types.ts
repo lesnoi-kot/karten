@@ -8,6 +8,7 @@ export type DateString = string;
 
 export type Comment = {
   id: ID;
+  taskId: ID;
   author: string;
   text: string;
   dateCreated: DateString;

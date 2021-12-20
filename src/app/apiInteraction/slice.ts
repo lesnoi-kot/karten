@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
 
 import { ID } from "models/types";
 import { FetchState } from "utils/types";
@@ -18,6 +18,9 @@ import {
   UpdateCommentPayload,
   UpdateTaskPayload,
   WithError,
+  APIAction,
+  RequestKey,
+  RequestInfo,
 } from "./types";
 
 export type TaskListMetaInfo = {
@@ -28,18 +31,53 @@ export type APISlice = {
   boardAddRequestState: FetchState;
   taskListAddRequestState: FetchState;
   taskLists: Record<ID, TaskListMetaInfo>;
+  requestsInfo: Record<string, RequestInfo>;
 };
 
 const initialState: APISlice = {
   taskListAddRequestState: FetchState.INITIAL,
   boardAddRequestState: FetchState.INITIAL,
   taskLists: {},
+  requestsInfo: {},
 };
 
-export const { actions, reducer, name: sliceName } = createSlice({
+// const injectRequestId = <T>(payload: T) => ({
+//   payload,
+//   meta: {
+//     requestId: nanoid(),
+//   },
+// });
+
+const setRequestInitiated = <T>(state: APISlice, action: APIAction<T>) => {
+  if (action.payload.requestKey) {
+    state.requestsInfo[action.payload.requestKey] = {
+      state: FetchState.PENDING,
+      error: null,
+      action,
+    };
+  }
+};
+
+export const {
+  actions,
+  reducer,
+  name: sliceName,
+} = createSlice({
   name: "apiInteraction",
   initialState,
   reducers: {
+    requestLoaded: (state, { payload }: PayloadAction<RequestKey>) => {
+      if (payload.requestKey) {
+        delete state.requestsInfo[payload.requestKey];
+      }
+    },
+    requestFailed: (state, action: PayloadAction<RequestKey & WithError>) => {
+      const { requestKey, error } = action.payload;
+      if (requestKey) {
+        state.requestsInfo[requestKey].error = error;
+        state.requestsInfo[requestKey].state = FetchState.FAILED;
+      }
+    },
     /*
       Tasks
     */
@@ -155,9 +193,8 @@ export const { actions, reducer, name: sliceName } = createSlice({
     /*
       Comments
     */
-    addCommentRequest: (state, action: PayloadAction<AddCommentPayload>) => {},
-    addCommentRequestLoaded: (state) => {},
-    addCommentRequestFailed: (state, action: PayloadAction<string>) => {},
+    addCommentRequest: (state, action: APIAction<AddCommentPayload>) =>
+      setRequestInitiated(state, action),
 
     deleteCommentRequest: (
       state,
@@ -166,12 +203,8 @@ export const { actions, reducer, name: sliceName } = createSlice({
     deleteCommentRequestLoaded: (state) => {},
     deleteCommentRequestFailed: (state, action: PayloadAction<string>) => {},
 
-    updateCommentRequest: (
-      state,
-      action: PayloadAction<UpdateCommentPayload>
-    ) => {},
-    updateCommentRequestLoaded: (state) => {},
-    updateCommentRequestFailed: (state, action: PayloadAction<string>) => {},
+    updateCommentRequest: (state, action: APIAction<UpdateCommentPayload>) =>
+      setRequestInitiated(state, action),
   },
   extraReducers: (builder) => {},
 });

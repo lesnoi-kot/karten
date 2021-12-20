@@ -10,15 +10,15 @@ import { actions } from "./slice";
 export const addCommentEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.addCommentRequest.match),
-    mergeMap(({ payload: { taskId, text } }) =>
+    mergeMap(({ payload: { taskId, text, requestKey } }) =>
       from(api.addComment({ taskId, text })).pipe(
         mergeMap(({ error, data: comment }) =>
           isNil(error)
-            ? of(commentSet(comment!), actions.addCommentRequestLoaded())
-            : of(actions.addCommentRequestFailed(error))
+            ? of(commentSet(comment!), actions.requestLoaded({ requestKey }))
+            : of(actions.requestFailed({ error, requestKey }))
         ),
         catchError((error) =>
-          of(actions.addCommentRequestFailed(String(error)))
+          of(actions.requestFailed({ error: String(error), requestKey }))
         )
       )
     )
@@ -50,15 +50,18 @@ export const optimisticDeleteCommentEpic: Epic = (action$) =>
 export const updateCommentEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.updateCommentRequest.match),
-    mergeMap(({ payload: { commentId, text } }) =>
+    mergeMap(({ payload: { commentId, text, requestKey } }) =>
       from(api.editComment({ commentId, text })).pipe(
         mergeMap(({ error, data: comment }) =>
           isNil(error)
-            ? of(commentUpdated(comment!), actions.updateCommentRequestLoaded())
-            : of(actions.updateCommentRequestFailed(error))
+            ? of(
+                commentUpdated(comment!),
+                actions.requestLoaded({ requestKey })
+              )
+            : of(actions.requestFailed({ error, requestKey }))
         ),
         catchError((error) =>
-          of(actions.updateCommentRequestFailed(String(error)))
+          of(actions.requestFailed({ error: String(error), requestKey }))
         )
       )
     )

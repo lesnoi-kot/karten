@@ -36,12 +36,16 @@ function DescriptionEditor({ task }: Props) {
 
   return (
     <>
-      <Box display="flex" flexDirection="row">
+      <Box display="flex" flexDirection="row" gap={1}>
         <Typography variant="h6" component="h2">
           Description
         </Typography>
         {readonly && (
-          <Button onClick={() => setReadonly(false)} size="small">
+          <Button
+            onClick={() => setReadonly(false)}
+            size="small"
+            variant="text"
+          >
             Edit
           </Button>
         )}
@@ -63,14 +67,19 @@ function DescriptionEditor({ task }: Props) {
             variant="outlined"
             className={styles.textfield}
           />
-          <Box mt={1} />
-          <Button onClick={onDescriptionChange} variant="outlined" size="small">
-            Save
-          </Button>
-          &nbsp;
-          <Button onClick={onCloseEditor} variant="outlined" size="small">
-            Close
-          </Button>
+          <Box mt={1} display="flex" gap={0.5}>
+            <Button
+              onClick={onDescriptionChange}
+              variant="outlined"
+              size="small"
+            >
+              Save
+            </Button>
+            &nbsp;
+            <Button onClick={onCloseEditor} variant="outlined" size="small">
+              Close
+            </Button>
+          </Box>
         </>
       )}
     </>

@@ -1,4 +1,17 @@
+import { PayloadAction, AnyAction } from "@reduxjs/toolkit";
+
 import { ID } from "models/types";
+import { FetchState } from "utils/types";
+
+export type RequestInfo = {
+  state: FetchState;
+  action: AnyAction;
+  error: string | null;
+};
+
+export type RequestKey = { requestKey?: string };
+
+export type APIAction<T> = PayloadAction<T & RequestKey>;
 
 export type TaskListId = {
   taskListId: ID;

@@ -361,6 +361,8 @@ export default class MockAPI implements API {
   }
 
   async addComment(arg: AddCommentArgs) {
+    await emulateDelay(2);
+
     const task = this.findTask(arg.taskId);
 
     if (!task) {
@@ -369,6 +371,7 @@ export default class MockAPI implements API {
 
     const comment: Comment = {
       id: nanoid(),
+      taskId: task.id,
       author: "Yuko",
       text: arg.text ?? "",
       dateCreated: new Date().toISOString(),
@@ -381,6 +384,8 @@ export default class MockAPI implements API {
   }
 
   async deleteComment(arg: ById) {
+    await emulateDelay(1.5);
+
     const [comment, task] = this.findComment(arg.id);
 
     if (!task || !comment) {
@@ -396,6 +401,8 @@ export default class MockAPI implements API {
   }
 
   async editComment(arg: EditCommentArgs) {
+    await emulateDelay(1.5);
+
     const [comment, task] = this.findComment(arg.commentId);
 
     if (!task || !comment) {

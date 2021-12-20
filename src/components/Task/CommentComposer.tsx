@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, TextField, Typography, Button } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 import { ID } from "models/types";
 import { actions as apiActions } from "app/apiInteraction";
+import { useRequestInfo } from "app/apiInteraction/hooks";
 
 import styles from "./styles.module.css";
 
@@ -15,11 +17,23 @@ function CommentComposer({ taskId }: Props) {
   const dispatch = useDispatch();
   const [text, setText] = useState("");
   const [focused, setFocused] = useState(false);
+  const { isLoading } = useRequestInfo(`CommentComposer:${taskId}`);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setText("");
+      setFocused(false);
+    }
+  }, [isLoading]);
 
   const onSubmit = () => {
-    dispatch(apiActions.addCommentRequest({ taskId, text }));
-    setText("");
-    setFocused(false);
+    dispatch(
+      apiActions.addCommentRequest({
+        taskId,
+        text,
+        requestKey: `CommentComposer:${taskId}`,
+      })
+    );
   };
 
   return (
@@ -34,17 +48,20 @@ function CommentComposer({ taskId }: Props) {
         rows={focused ? 2 : 0}
         variant="outlined"
         onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        onBlur={() => !text && setFocused(false)}
       />
-      <Box mt={1} />
       {focused && (
-        <Button
-          onClick={onSubmit}
-          disabled={text.trim() === ""}
-          variant="outlined"
-        >
-          Save
-        </Button>
+        <>
+          <Box mt={1} />
+          <LoadingButton
+            loading={isLoading}
+            onClick={onSubmit}
+            disabled={text.trim() === ""}
+            variant="outlined"
+          >
+            Save
+          </LoadingButton>
+        </>
       )}
     </Box>
   );
