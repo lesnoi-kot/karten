@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Grid } from "@mui/material";
 
+import { RootState } from "app";
 import logger from "services/logger";
 import { ID } from "models/types";
 import { selectTaskListIds } from "app/boards/selectors";
@@ -17,7 +18,9 @@ export function TaskLists({
   onTaskClick: any;
 }) {
   logger.debug("Render: TaskLists", boardId);
-  const lists = useSelector((state) => selectTaskListIds(state, boardId));
+  const lists = useSelector((state: RootState) =>
+    selectTaskListIds(state, boardId)
+  );
 
   return (
     <Grid container spacing={1} wrap="nowrap">

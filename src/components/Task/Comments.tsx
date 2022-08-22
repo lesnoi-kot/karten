@@ -8,13 +8,16 @@ import { selectCommentsId } from "app/comments/selectors";
 import styles from "./styles.module.css";
 import Comment from "./Comment";
 import CommentComposer from "./CommentComposer";
+import { RootState } from "app";
 
 type Props = {
   taskId: ID;
 };
 
 function Comments({ taskId }: Props) {
-  const comments = useSelector((state) => selectCommentsId(state, taskId));
+  const comments = useSelector((state: RootState) =>
+    selectCommentsId(state, taskId)
+  );
 
   return (
     <Box>

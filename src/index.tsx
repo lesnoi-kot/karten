@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import {
   createTheme,
@@ -23,23 +23,24 @@ const theme = createTheme({
   },
 });
 
+const container = document.getElementById("root");
+const root = createRoot(container!);
 const store = createStore();
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <StylesProvider injectFirst>
-        <StyledEngineProvider injectFirst>
-          <ThemeProvider theme={theme}>
-            <BrowserRouter>
-              <DndProvider backend={HTML5Backend}>
-                <App />
-              </DndProvider>
-            </BrowserRouter>
-          </ThemeProvider>
-        </StyledEngineProvider>
-      </StylesProvider>
-    </Provider>
-  </React.StrictMode>,
-  document.getElementById("root")
+root.render(
+  // <React.StrictMode>
+  <Provider store={store}>
+    <StylesProvider injectFirst>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={theme}>
+          <BrowserRouter>
+            <DndProvider backend={HTML5Backend}>
+              <App />
+            </DndProvider>
+          </BrowserRouter>
+        </ThemeProvider>
+      </StyledEngineProvider>
+    </StylesProvider>
+  </Provider>
+  // </React.StrictMode>
 );

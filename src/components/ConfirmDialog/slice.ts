@@ -1,4 +1,9 @@
-import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  PayloadAction,
+  Action,
+  AnyAction,
+} from "@reduxjs/toolkit";
 
 import { RootState } from "app";
 
@@ -6,7 +11,7 @@ type WidgetState = {
   isOpen: boolean;
   title: string;
   text: string;
-  okAction: Action | null;
+  okAction: AnyAction | null;
   okButtonText?: string;
   cancelButtonText?: string;
 };
@@ -22,7 +27,11 @@ const initialState: WidgetState = {
   okAction: null,
 };
 
-export const { actions, reducer, name: sliceName } = createSlice({
+export const {
+  actions,
+  reducer,
+  name: sliceName,
+} = createSlice({
   name: "confirmDialog",
   initialState,
   reducers: {

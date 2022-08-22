@@ -13,19 +13,15 @@ import { actions, selectState } from "./slice";
 
 export function ConfirmDialog() {
   const dispatch = useDispatch();
-  const {
-    isOpen,
-    text,
-    title,
-    okAction,
-    okButtonText,
-    cancelButtonText,
-  } = useSelector(selectState);
+  const { isOpen, text, title, okAction, okButtonText, cancelButtonText } =
+    useSelector(selectState);
 
   const onClose = () => dispatch(actions.closeDialog());
 
   const onOK = () => {
-    dispatch(okAction);
+    if (okAction) {
+      dispatch(okAction);
+    }
     onClose();
   };
 

@@ -7,13 +7,14 @@ import { selectBoard } from "app/boards/selectors";
 import Stub from "components/Stub";
 
 import styles from "./styles.module.css";
+import { RootState } from "app";
 
 type Props = {
   id: ID;
 };
 
 function BoardPreview({ id }: Props) {
-  const board = useSelector((state) => selectBoard(state, id));
+  const board = useSelector((state: RootState) => selectBoard(state, id));
 
   if (!board) {
     return <Stub />;

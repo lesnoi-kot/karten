@@ -10,6 +10,7 @@ import { actions as apiActions } from "app/apiInteraction";
 
 import styles from "./styles.module.css";
 import Stub from "../Stub";
+import { RootState } from "app";
 
 export type Props = Omit<CardProps, "onClick"> & {
   id: ID;
@@ -17,13 +18,8 @@ export type Props = Omit<CardProps, "onClick"> & {
   onClick(id: ID): void;
 };
 
-export default function TaskPreview({
-  id,
-  blurred = false,
-  onClick,
-  className,
-}: Props) {
-  const task = useSelector((state) => selectTaskById(state, id));
+function TaskPreview({ id, blurred = false, onClick, className }: Props) {
+  const task = useSelector((state: RootState) => selectTaskById(state, id));
   const dispatch = useDispatch();
 
   const onDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -40,15 +36,16 @@ export default function TaskPreview({
     return <Stub source="TaskPreview" />;
   }
 
-  const { taskListId, name } = task;
+  const { taskListId, name, position } = task;
 
   return (
     <Card
       className={clsx(styles.taskPreview, className, blurred && styles.blurred)}
       onClick={() => onClick(id)}
+      variant="outlined"
     >
       <CardHeader
-        title={name}
+        title={name + ` - ${position}`}
         action={
           <IconButton
             aria-label="settings"
@@ -67,3 +64,5 @@ export default function TaskPreview({
     </Card>
   );
 }
+
+export default React.memo(TaskPreview);

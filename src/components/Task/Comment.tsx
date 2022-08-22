@@ -10,6 +10,7 @@ import { useRequestInfo } from "app/apiInteraction/hooks";
 
 import styles from "./styles.module.css";
 import CommentEditor from "./CommentEditor";
+import { RootState } from "app";
 
 type Props = {
   commentId: ID;
@@ -18,7 +19,9 @@ type Props = {
 export function Comment({ commentId }: Props) {
   const [editMode, setEditMode] = useState(false);
   const dispatch = useDispatch();
-  const comment = useSelector((state) => selectCommentById(state, commentId));
+  const comment = useSelector((state: RootState) =>
+    selectCommentById(state, commentId)
+  );
   const { isLoading } = useRequestInfo(`CommentEditor:${commentId}`);
 
   useEffect(() => {

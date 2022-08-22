@@ -23,7 +23,6 @@ import PageTitle from "./PageTitle";
 
 function BoardPage() {
   const { boardId = "", taskId: selectedTaskId = "" } = useParams();
-  logger.debug("Render: DashboardPage", boardId);
 
   const dispatch = useDispatch();
   const fetchState = useSelector(getBoardFetchState);
@@ -40,36 +39,45 @@ function BoardPage() {
     dispatch(apiActions.boardRequest(boardId));
   }, [dispatch, boardId]);
 
-  return <>
-    <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />
-    <Box mt={2} mb={3} textAlign="center">
-      <BoardName boardId={boardId} />
-    </Box>
+  logger.debug("Render: DashboardPage", { boardId, fetchState });
 
-    <NavbarContent>
-      <IconButton edge="start" color="secondary" onClick={openSidebar} size="large">
-        <MenuIcon />
-      </IconButton>
-    </NavbarContent>
+  return (
+    <>
+      <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />
+      <Box mt={2} mb={3} textAlign="center">
+        <BoardName boardId={boardId} />
+      </Box>
 
-    <Status />
+      <NavbarContent>
+        <IconButton
+          edge="start"
+          color="secondary"
+          onClick={openSidebar}
+          size="large"
+        >
+          <MenuIcon />
+        </IconButton>
+      </NavbarContent>
 
-    {fetchState === FetchState.FULFILLED && (
-      <ScrollableSpace>
-        <TaskLists boardId={boardId} onTaskClick={onTaskClick} />
-      </ScrollableSpace>
-    )}
+      <Status />
 
-    {selectedTaskId && (
-      <TaskModal onClose={onTaskModalClose} taskId={selectedTaskId} />
-    )}
+      {fetchState === FetchState.FULFILLED && (
+        <ScrollableSpace disabled>
+          <TaskLists boardId={boardId} onTaskClick={onTaskClick} />
+        </ScrollableSpace>
+      )}
 
-    <BoardMenu
-      boardId={boardId}
-      open={sidebarIsOpen}
-      onClose={closeSidebar}
-    />
-  </>;
+      {selectedTaskId && (
+        <TaskModal onClose={onTaskModalClose} taskId={selectedTaskId} />
+      )}
+
+      <BoardMenu
+        boardId={boardId}
+        open={sidebarIsOpen}
+        onClose={closeSidebar}
+      />
+    </>
+  );
 }
 
 export default makePage(BoardPage);

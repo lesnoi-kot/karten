@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 
+import { RootState } from "app";
 import EditableTextField from "components/EditableTextField";
 import { actions } from "app/apiInteraction";
 import { ID } from "models/types";
@@ -14,7 +15,7 @@ type Props = {
 
 export function BoardName({ boardId }: Props) {
   const dispatch = useDispatch();
-  const board = useSelector((state) => selectBoard(state, boardId));
+  const board = useSelector((state: RootState) => selectBoard(state, boardId));
 
   if (!board) {
     return null;
