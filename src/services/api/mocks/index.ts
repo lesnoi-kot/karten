@@ -28,8 +28,8 @@ const mocks: { [key: string]: ProjectDTO } = {
               {
                 id: "1",
                 taskListId: "A",
-                position: 20,
-                name: "2 - Rework scenario",
+                position: 10000,
+                name: "1 - Rework scenario",
                 text: "Think about my new bestseller",
                 dateCreated: new Date().toISOString(),
                 comments: [
@@ -53,8 +53,8 @@ const mocks: { [key: string]: ProjectDTO } = {
               {
                 id: "2",
                 taskListId: "A",
-                position: 30,
-                name: "3 - Clean house",
+                position: 20000,
+                name: "2 - Clean house",
                 text: "It's mess here!",
                 dateCreated: new Date().toISOString(),
                 comments: [],
@@ -63,8 +63,8 @@ const mocks: { [key: string]: ProjectDTO } = {
               {
                 id: "3",
                 taskListId: "A",
-                position: 10,
-                name: "1 - Mow the lawn",
+                position: 30000,
+                name: "3 - Mow the lawn",
                 text: "It's pretty bad looking...",
                 dateCreated: new Date().toISOString(),
                 comments: [],
@@ -73,8 +73,8 @@ const mocks: { [key: string]: ProjectDTO } = {
               {
                 id: "6",
                 taskListId: "A",
-                position: 40,
-                name: "4 - Nail with hammer",
+                position: 40000,
+                name: "6 - Nail with hammer",
                 text: "...",
                 dateCreated: new Date().toISOString(),
                 comments: [],
@@ -83,8 +83,8 @@ const mocks: { [key: string]: ProjectDTO } = {
               {
                 id: "7",
                 taskListId: "A",
-                position: 50,
-                name: "5 - Get a smoke",
+                position: 50000,
+                name: "7 - Get a smoke",
                 text: "Gotta get high",
                 dateCreated: new Date().toISOString(),
                 comments: [],

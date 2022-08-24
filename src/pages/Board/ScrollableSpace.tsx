@@ -6,15 +6,17 @@ import styles from "./styles.module.css";
 
 export default function ScrollableSpace({
   children,
+  disabled,
 }: {
   children: React.ReactNode;
+  disabled?: boolean;
 }) {
-  const [
-    scrollableRef,
-    onMouseDown,
-    onMouseUp,
-    onMouseMove,
-  ] = usePressAndMoveScroll<HTMLDivElement>();
+  const [scrollableRef, onMouseDown, onMouseUp, onMouseMove] =
+    usePressAndMoveScroll<HTMLDivElement>();
+
+  if (disabled) {
+    return <div className={styles.dashboard}>{children}</div>;
+  }
 
   return (
     <div

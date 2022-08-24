@@ -6,10 +6,19 @@
   border-radius: 2px;
 }
 
-.newList {
-  
+.placeholder {
+  background-color: #ebecf0;
+  position: absolute;
+  z-index: 10000;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
 }
 
+.isDragging {
+  display: none;
+}
 
 .taskComposerInput {
   background-color: white;

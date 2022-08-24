@@ -23,9 +23,9 @@ export function TaskLists({
   );
 
   return (
-    <Grid container spacing={1} wrap="nowrap">
+    <Grid container spacing={1} wrap="nowrap" height="100%">
       {lists.map((id: ID) => (
-        <Grid item key={id}>
+        <Grid item key={id} height="100%">
           <TaskList boardId={boardId} id={id} onTaskClick={onTaskClick} />
         </Grid>
       ))}

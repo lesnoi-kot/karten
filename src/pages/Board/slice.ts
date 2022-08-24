@@ -26,7 +26,11 @@ const initialState: BoardPageState = {
   becameDeleted: false,
 };
 
-export const { actions, reducer, name: sliceName } = createSlice({
+export const {
+  actions,
+  reducer,
+  name: sliceName,
+} = createSlice({
   name: "board",
   initialState,
   reducers: {
@@ -70,7 +74,9 @@ export const getBoardFetchError = (state: RootState) =>
   getState(state).boardFetchError;
 
 export const useDashboardMethods = (boardId: ID) => {
-  const becameDeleted = useSelector((state) => getState(state).becameDeleted);
+  const becameDeleted = useSelector(
+    (state: RootState) => getState(state).becameDeleted
+  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [sidebarIsOpen, setSidebarOpen] = useState(false);

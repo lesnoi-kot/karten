@@ -336,6 +336,10 @@ export default class MockAPI implements API {
       task.text = arg.text;
     }
 
+    if (arg.position) {
+      task.position = arg.position;
+    }
+
     return Promise.resolve({
       data: omit(["comments"], task),
       error: null,

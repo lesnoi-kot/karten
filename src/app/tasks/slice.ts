@@ -12,7 +12,11 @@ const initialState: TasksSlice = {
   items: {},
 };
 
-export const { actions, reducer, name: sliceName } = createSlice({
+export const {
+  actions,
+  reducer,
+  name: sliceName,
+} = createSlice({
   name: "tasks",
   initialState,
   reducers: {
@@ -22,8 +26,10 @@ export const { actions, reducer, name: sliceName } = createSlice({
     taskSet: (state, { payload: task }: PayloadAction<Task>) => {
       state.items[task.id] = task;
     },
-    taskUpdated: (state, { payload: task }: PayloadAction<Task>) => {
-      Object.assign(state.items[task.id], task);
+    taskUpdated: (state, { payload: task }: PayloadAction<Partial<Task>>) => {
+      if (task.id) {
+        Object.assign(state.items[task.id], task);
+      }
     },
     taskDeleted: (state, { payload: taskId }: PayloadAction<ID>) => {
       delete state.items[taskId];

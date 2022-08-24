@@ -15,6 +15,7 @@ import {
   TasksDeletedPayload,
   UpdateBoardPayload,
   UpdateTaskListPayload,
+  TaskMovedPayload,
   UpdateCommentPayload,
   UpdateTaskPayload,
   WithError,
@@ -117,6 +118,10 @@ export const {
     updateTaskRequest: (state, action: PayloadAction<UpdateTaskPayload>) => {},
     updateTaskRequestFailed: (state, action: PayloadAction<string>) => {},
     updateTaskRequestLoaded: (state) => {},
+
+    moveTaskRequest: (state, action: PayloadAction<TaskMovedPayload>) => {},
+    moveTaskRequestFailed: (state, action: PayloadAction<string>) => {},
+    moveTaskRequestLoaded: (state) => {},
 
     /*
       TaskLists

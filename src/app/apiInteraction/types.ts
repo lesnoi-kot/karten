@@ -86,3 +86,10 @@ export type TasksDeletedPayload = {
   taskIds: ID[];
   taskListId: ID;
 };
+
+export type TaskMovedPayload = {
+  taskId: ID;
+  dropTaskId?: ID;
+  dropTaskListId?: ID;
+  atop: boolean;
+};
