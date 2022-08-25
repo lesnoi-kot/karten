@@ -5,7 +5,7 @@ import { Grid } from "@mui/material";
 import { RootState } from "app";
 import logger from "services/logger";
 import { ID } from "models/types";
-import { selectTaskListIds } from "app/boards/selectors";
+import { selectSortedTaskListIds } from "app/boards/selectors";
 
 import TaskList from "components/TaskList";
 import NewListPlaceholder from "components/TaskList/NewListPlaceholder";
@@ -19,7 +19,7 @@ export function TaskLists({
 }) {
   logger.debug("Render: TaskLists", boardId);
   const lists = useSelector((state: RootState) =>
-    selectTaskListIds(state, boardId)
+    selectSortedTaskListIds(state, boardId)
   );
 
   return (

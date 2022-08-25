@@ -75,7 +75,7 @@ export const taskListUpdateEpic: Epic = (action$, store$, { api }) =>
             return of(actions.updateTaskListRequestFailed(String(error)));
           }
           return of(
-            taskListUpdated({ taskListId, name }),
+            taskListUpdated({ id: taskListId, name }),
             actions.updateTaskListRequestLoaded()
           );
         }),

@@ -1,4 +1,4 @@
-import { of, from, EMPTY } from "rxjs";
+import { of, from } from "rxjs";
 import { filter, mergeMap, catchError, map } from "rxjs/operators";
 import { AnyAction } from "@reduxjs/toolkit";
 
@@ -6,6 +6,7 @@ import { taskSet, taskDeleted, tasksDeleted, taskUpdated } from "app/tasks";
 import { selectTaskById } from "app/tasks/selectors";
 import { selectSortedTaskIds } from "app/taskLists/selectors";
 
+import { POSITION_GAP } from "../../constants";
 import { Epic } from "../types";
 import { actions } from "./slice";
 
@@ -93,8 +94,6 @@ export const updateTaskEpic: Epic = (action$, store$, { api }) =>
     )
   );
 
-const POSITION_GAP = 1000;
-
 export const moveTaskEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.moveTaskRequest.match),
@@ -104,12 +103,8 @@ export const moveTaskEpic: Epic = (action$, store$, { api }) =>
     ),
     mergeMap(({ payload: { taskId, dropTaskId, atop } }) => {
       const dropTask = selectTaskById(store$.value, dropTaskId!)!;
-      const dragTask = selectTaskById(store$.value, taskId)!;
       const taskIds = selectSortedTaskIds(store$.value, dropTask.taskListId);
-
       const dropTaskIndex = taskIds.indexOf(dropTaskId!);
-      const dragTaskIndex = taskIds.indexOf(taskId);
-      const after = dragTaskIndex < dropTaskIndex;
 
       if (dropTaskIndex === taskIds.length - 1 && !atop) {
         return of(
@@ -131,28 +126,7 @@ export const moveTaskEpic: Epic = (action$, store$, { api }) =>
         );
       }
 
-      // if (dropTaskIndex === taskIds.length - 1 && after) {
-      //   return of(
-      //     taskUpdated({
-      //       id: taskId,
-      //       position: dropTask.position + POSITION_GAP,
-      //       taskListId: dropTask.taskListId,
-      //     })
-      //   );
-      // }
-
-      // if (dropTaskIndex === 0 && !after) {
-      //   return of(
-      //     taskUpdated({
-      //       id: taskId,
-      //       position: dropTask.position - POSITION_GAP,
-      //       taskListId: dropTask.taskListId,
-      //     })
-      //   );
-      // }
-
       const nextOrPrevDropTaskId = taskIds[dropTaskIndex + (atop ? -1 : 1)];
-      // const nextOrPrevDropTaskId = taskIds[dropTaskIndex + (after ? 1 : -1)];
       const nextOrPrevDropTask = selectTaskById(
         store$.value,
         nextOrPrevDropTaskId

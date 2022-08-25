@@ -8,16 +8,21 @@ export type TaskListsSlice = {
   items: TaskListsMap;
 };
 
-type TaskListUpdatedPayload = {
+export type TaskListMovedPayload = {
   taskListId: ID;
-  name?: string;
+  dropTaskListId: ID;
+  before: boolean;
 };
 
 const initialState: TaskListsSlice = {
   items: {},
 };
 
-export const { actions, reducer, name: sliceName } = createSlice({
+export const {
+  actions,
+  reducer,
+  name: sliceName,
+} = createSlice({
   name: "taskLists",
   initialState,
   reducers: {
@@ -27,12 +32,9 @@ export const { actions, reducer, name: sliceName } = createSlice({
     taskListSet: (state, { payload }: PayloadAction<TaskList>) => {
       state.items[payload.id] = payload;
     },
-    taskListUpdated: (
-      state,
-      { payload }: PayloadAction<TaskListUpdatedPayload>
-    ) => {
-      if (payload.name) {
-        state.items[payload.taskListId].name = payload.name;
+    taskListUpdated: (state, { payload }: PayloadAction<Partial<TaskList>>) => {
+      if (payload.id) {
+        Object.assign(state.items[payload.id], payload);
       }
     },
     taskListDeleted: (state, { payload: taskListId }: PayloadAction<ID>) => {
@@ -46,5 +48,6 @@ export const { actions, reducer, name: sliceName } = createSlice({
         delete state.items[taskListId];
       }
     },
+    taskListMoved: (state, action: PayloadAction<TaskListMovedPayload>) => {},
   },
 });

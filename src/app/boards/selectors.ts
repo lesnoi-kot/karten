@@ -20,10 +20,22 @@ export const selectBoard = (state: RootState, id: ID) =>
 export const selectBoardName = (state: RootState, id: ID): string =>
   selectBoards(state)[id]?.name ?? "";
 
+export const selectTaskListsAsArray = createSelector(
+  selectTaskLists,
+  (taskListsMap) => Object.values(taskListsMap)
+);
+
 export const selectTaskListIds = createCachedSelector(
   [selectTaskLists, extraParam<ID>()],
   (taskLists, boardId) =>
     Object.keys(filter(propEq("boardId", boardId), taskLists))
 )((_, boardId) => boardId);
 
-// TODO: sorted by position
+export const selectSortedTaskListIds = createCachedSelector(
+  [selectTaskListsAsArray, extraParam<ID>()],
+  (taskLists, boardId) =>
+    taskLists
+      .filter((list) => list.boardId === boardId)
+      .sort((a, b) => a.position - b.position)
+      .map((list) => list.id)
+)((_, boardId) => boardId);

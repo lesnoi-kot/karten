@@ -12,7 +12,6 @@ import {
 import Stub from "components/Stub";
 import EditableTextField from "components/EditableTextField";
 import { actions as apiActions } from "app/apiInteraction";
-import { TaskMovedPayload } from "app/apiInteraction/types";
 import TaskPreview from "components/Task/TaskPreview";
 
 import TaskComposer from "./TaskComposer";
@@ -41,13 +40,6 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
     selectSortedTaskIds(state, id)
   );
 
-  const moveTask = useCallback(
-    (args: TaskMovedPayload, commit: boolean) => {
-      dispatch(apiActions.moveTaskRequest(args));
-    },
-    [dispatch]
-  );
-
   const onNameChange = useCallback(
     (newName: string) => {
       if (taskList.name !== newName) {
@@ -63,12 +55,13 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
     [id, boardId, dispatch, taskList]
   );
 
-  useTaskListDND({
+  const { dragPreviewRef } = useTaskListDND({
     taskListRef: ref,
     taskListId: id,
-    moveTask,
     taskIds,
   });
+
+  dragPreviewRef(ref);
 
   if (!taskList) {
     return <Stub />;
@@ -93,12 +86,7 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
         <Grid container direction="row">
           {taskIds.map((taskId, index) => (
             <Grid item xs={12} key={taskId}>
-              <ListSlot
-                index={index}
-                taskId={taskId}
-                taskListId={id}
-                moveTask={moveTask}
-              >
+              <ListSlot index={index} taskId={taskId} taskListId={id}>
                 <TaskPreview id={taskId} onClick={onTaskClick} />
               </ListSlot>
             </Grid>

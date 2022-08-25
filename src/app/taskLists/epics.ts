@@ -1,12 +1,16 @@
-import { map, filter } from "rxjs/operators";
+import { of } from "rxjs";
+import { map, filter, mergeMap } from "rxjs/operators";
+import { AnyAction } from "@reduxjs/toolkit";
 
 import { Epic } from "app/types";
 import { ID } from "models/types";
 import { actions as tasksActions } from "app/tasks";
 import { actionPayloadNotEmptyArray } from "utils/epics";
 
+import { POSITION_GAP } from "../../constants";
 import { actions } from "./slice";
-import { selectTaskIds } from "./selectors";
+import { selectTaskIds, selectTaskListById } from "./selectors";
+import { selectSortedTaskListIds } from "app/boards/selectors";
 
 export const onTaskListDeletedEpic: Epic = (action$, store$) =>
   action$.pipe(
@@ -31,4 +35,68 @@ export const onTaskListsDeletedEpic: Epic = (action$, store$) =>
       return tasksActions.tasksDeleted(tasks);
     }),
     filter(actionPayloadNotEmptyArray)
+  );
+
+export const taskListMovedEpic: Epic = (action$, store$) =>
+  action$.pipe(
+    filter(actions.taskListMoved.match),
+    mergeMap(({ payload: { taskListId, dropTaskListId, before } }) => {
+      const dropTaskList = selectTaskListById(store$.value, dropTaskListId)!;
+      const listIds = selectSortedTaskListIds(
+        store$.value,
+        dropTaskList.boardId
+      );
+      const dropTaskListIndex = listIds.indexOf(dropTaskListId);
+
+      if (dropTaskListIndex === 0 && before) {
+        return of(
+          actions.taskListUpdated({
+            id: taskListId,
+            position: dropTaskList.position - 1000,
+          })
+        );
+      }
+
+      if (dropTaskListIndex === listIds.length - 1 && !before) {
+        return of(
+          actions.taskListUpdated({
+            id: taskListId,
+            position: dropTaskList.position + 1000,
+          })
+        );
+      }
+
+      const nextOrPrevDropTaskListId =
+        listIds[dropTaskListIndex + (before ? -1 : 1)];
+      const nextOrPrevDropTask = selectTaskListById(
+        store$.value,
+        nextOrPrevDropTaskListId
+      )!;
+      const newPosition = Math.floor(
+        (dropTaskList.position + nextOrPrevDropTask.position) / 2
+      );
+
+      // Do we need to fix the gaps?
+      if (
+        newPosition === dropTaskList.position ||
+        newPosition === nextOrPrevDropTask.position
+      ) {
+        let position = 0;
+        const bulkUpdates: AnyAction[] = listIds.map((id) =>
+          actions.taskListUpdated({ id, position: (position += POSITION_GAP) })
+        );
+        bulkUpdates.push(
+          actions.taskListMoved({ taskListId, dropTaskListId, before })
+        );
+
+        return of(...bulkUpdates);
+      }
+
+      return of(
+        actions.taskListUpdated({
+          id: taskListId,
+          position: newPosition,
+        })
+      );
+    })
   );
