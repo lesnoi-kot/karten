@@ -1,11 +1,11 @@
 import { of, Subject } from "rxjs";
 import { TestScheduler } from "rxjs/testing";
-import { StateObservable, ActionsObservable } from "redux-observable";
+import { StateObservable } from "redux-observable";
 import { configureStore } from "@reduxjs/toolkit";
 import { createMemoryHistory } from "history";
 
 import { sleep } from "utils/async";
-import { getReturnedValues, observableToArray, kickOff } from "utils/rxjs";
+import { getReturnedValues, kickOff } from "utils/rxjs";
 import { RootState } from "app";
 import { MockAPI } from "services/api";
 import { rootReducer } from "app/reducers";
@@ -28,7 +28,7 @@ describe("app/apiInteraction/taskListsEpics", () => {
   });
   const store$ = new StateObservable<RootState>(
     new Subject(),
-    store.getState()
+    store.getState(),
   );
   const api = new MockAPI("sadPoe");
   const epicsDeps = { api, history };
@@ -43,11 +43,11 @@ describe("app/apiInteraction/taskListsEpics", () => {
       selectTaskIds as jest.MockedFunction<typeof selectTaskIds>
     ).mockReturnValueOnce(["a", "b", "c"]);
 
-    const inputActions = ActionsObservable.of(
-      actions.clearTaskListRequest({ taskListId: "test" })
+    const inputActions = of(
+      actions.clearTaskListRequest({ taskListId: "test" }),
     );
     const [outputActions$, returnedValues] = getReturnedValues(
-      taskListClearEpic(inputActions, store$, epicsDeps)
+      taskListClearEpic(inputActions, store$, epicsDeps),
     );
 
     const { completed } = kickOff(outputActions$);

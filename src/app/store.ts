@@ -1,4 +1,4 @@
-import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import { createEpicMiddleware } from "redux-observable";
 import { createLogger } from "redux-logger";
 import { createBrowserHistory } from "history";
@@ -23,7 +23,9 @@ export function createStore() {
 
   const store = configureStore({
     reducer: rootReducer,
-    middleware: [...getDefaultMiddleware(), reduxLogger, epicMiddleware],
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(reduxLogger, epicMiddleware),
+    devTools: true,
   });
 
   // @ts-ignore
