@@ -28,5 +28,5 @@ export const selectTaskListAddRequestState = (state: RootState): FetchState =>
 
 export const selectRequestInfo = (
   state: RootState,
-  requestKey: string
+  requestKey: string,
 ): RequestInfo | null => state.apiInteraction.requestsInfo[requestKey] ?? null;

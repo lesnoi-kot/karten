@@ -1,7 +1,8 @@
-import settings from "configs/settings";
+import { settings } from "configs/settings";
 
-import { Logger, NilLogger } from "./types";
+import { Logger } from "./types";
 import DevLogger from "./dev";
+import NilLogger from "./nil";
 
 let logger: Logger = NilLogger;
 
