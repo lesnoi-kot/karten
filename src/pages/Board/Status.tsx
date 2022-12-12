@@ -30,6 +30,10 @@ export default function Status() {
   const fetchState = useSelector(getBoardFetchState);
   const error = useSelector(getBoardFetchError);
 
+  if (fetchState === FetchState.FULFILLED) {
+    return null;
+  }
+
   return (
     <Box textAlign="center">
       {fetchState === FetchState.PENDING && <CircularProgress />}

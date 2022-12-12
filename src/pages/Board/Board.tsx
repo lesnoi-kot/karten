@@ -44,7 +44,7 @@ function BoardPage() {
   return (
     <>
       <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />
-      <Box mt={2} mb={3} textAlign="center">
+      <Box my={2} textAlign="center">
         <BoardName boardId={boardId} />
       </Box>
 

@@ -1,12 +1,9 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { Box } from "@mui/material";
 
 import { actions as apiActions } from "app/apiInteraction";
 import { Task } from "models/types";
 import EditableText from "components/EditableTextField";
-
-import styles from "./styles.module.css";
 
 export type Props = {
   task: Task;
@@ -22,17 +19,18 @@ function NameEditor({ task }: Props) {
         dispatch(apiActions.updateTaskRequest({ taskId, name: newName }));
       }
     },
-    [taskId, dispatch, name]
+    [taskId, dispatch, name],
   );
 
   return (
-    <>
-      <EditableText
-        value={name}
-        onChange={onNameChange}
-        className={styles.nameField}
-      />
-    </>
+    <EditableText
+      value={name}
+      onChange={onNameChange}
+      size="medium"
+      sx={{
+        fontSize: "1.5rem",
+      }}
+    />
   );
 }
 

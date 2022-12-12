@@ -6,13 +6,14 @@ import debounce from "lodash.debounce";
 import {
   Box,
   Button,
-  TextField,
+  Input,
   IconButton,
-  CircularProgress,
   Collapse,
   Fade,
   Grid,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
 import CheckIcon from "@mui/icons-material/Check";
@@ -20,15 +21,6 @@ import CheckIcon from "@mui/icons-material/Check";
 import * as models from "models/types";
 import { FetchState } from "utils/types";
 import { actions as apiActions, selectors } from "app/apiInteraction";
-
-import styles from "./styles.module.css";
-
-const textFieldInputProps = {
-  classes: {
-    root: styles.taskComposerInput,
-    focused: styles.taskComposerInput,
-  },
-};
 
 type Props = {
   taskListId: models.ID;
@@ -72,7 +64,7 @@ function TaskComposer({ taskListId, boardId }: Props) {
           title: normalizedTitle,
           taskListId,
           boardId,
-        })
+        }),
       );
     } else {
       textFieldRef?.current?.select();
@@ -101,7 +93,7 @@ function TaskComposer({ taskListId, boardId }: Props) {
         in={formIsVisible}
         onEntered={() => textFieldRef.current?.focus()}
       >
-        <TextField
+        <Input
           value={taskTitle}
           onChange={onChange}
           inputRef={textFieldRef}
@@ -110,27 +102,25 @@ function TaskComposer({ taskListId, boardId }: Props) {
           placeholder="Enter title for this card..."
           fullWidth
           rows={1}
-          variant="outlined"
-          InputProps={{ ...textFieldInputProps, onKeyDown }}
+          onKeyDown={onKeyDown}
         />
         <Box mt={1} />
         <Grid container spacing={1} direction="row">
           <Grid item>
-            <Button
+            <LoadingButton
               variant="contained"
               color="secondary"
               size="small"
+              loading={isTaskAdding}
               onClick={(event) => {
                 event.stopPropagation();
                 submit();
               }}
               disabled={!taskTitle}
-              startIcon={
-                isTaskAdding ? <CircularProgress size={15} /> : <CheckIcon />
-              }
+              startIcon={<CheckIcon />}
             >
               Add
-            </Button>
+            </LoadingButton>
           </Grid>
           <Grid item>
             <IconButton size="small" onClick={hideForm}>
@@ -146,7 +136,7 @@ function TaskComposer({ taskListId, boardId }: Props) {
             variant="contained"
             color="primary"
             size="small"
-            startIcon={<AddIcon />}
+            startIcon={<AddIcon fontSize="small" />}
             onClick={showForm}
             disableElevation
           >

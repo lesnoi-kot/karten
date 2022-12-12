@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { Grid } from "@mui/material";
 
 import { RootState } from "app";
-import logger from "services/logger";
 import { ID } from "models/types";
 import { selectSortedTaskListIds } from "app/boards/selectors";
 
@@ -17,13 +16,12 @@ export function TaskLists({
   boardId: ID;
   onTaskClick: any;
 }) {
-  logger.debug("Render: TaskLists", boardId);
   const lists = useSelector((state: RootState) =>
-    selectSortedTaskListIds(state, boardId)
+    selectSortedTaskListIds(state, boardId),
   );
 
   return (
-    <Grid container spacing={1} wrap="nowrap" height="100%">
+    <Grid container gap={1} wrap="nowrap" height="100%">
       {lists.map((id: ID) => (
         <Grid item key={id} height="100%">
           <TaskList boardId={boardId} id={id} onTaskClick={onTaskClick} />

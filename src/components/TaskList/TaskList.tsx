@@ -1,10 +1,9 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, InputBaseComponentProps } from "@mui/material";
 
 import * as models from "models/types";
 import { RootState } from "app";
-import logger from "services/logger";
 import {
   selectTaskListById,
   selectSortedTaskIds,
@@ -14,12 +13,14 @@ import EditableTextField from "components/EditableTextField";
 import { actions as apiActions } from "app/apiInteraction";
 import TaskPreview from "components/Task/TaskPreview";
 
+import { useTaskListDND } from "./hooks/taskListDragAndDrop";
+
 import TaskComposer from "./TaskComposer";
-import ListSection from "./ListSection";
 import ListSlot from "./ListSlot";
 import TaskListMenu from "./TaskListMenu";
+import { DragAndDropPlaceholder } from "./DragAndDropPlaceholder";
+
 import styles from "./styles.module.css";
-import { useTaskListDND } from "./hooks";
 
 type Props = {
   id: models.ID;
@@ -27,18 +28,20 @@ type Props = {
   onTaskClick(id: models.ID): void;
 };
 
-const nameStyle = { style: { fontWeight: "bold" } };
+const nameStyle: InputBaseComponentProps = { style: { fontWeight: "bold" } };
 
 export function TaskList({ id, boardId, onTaskClick }: Props) {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
+  const [wrapperRef, setWrapperRef] = useState<HTMLDivElement | null>(null);
   const dispatch = useDispatch();
   const taskList = useSelector((state: RootState) =>
-    selectTaskListById(state, id)
+    selectTaskListById(state, id),
   );
 
   const taskIds = useSelector((state: RootState) =>
-    selectSortedTaskIds(state, id)
+    selectSortedTaskIds(state, id),
   );
+  const isEmpty = taskIds.length === 0;
 
   const onNameChange = useCallback(
     (newName: string) => {
@@ -48,55 +51,59 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
             taskListId: id,
             boardId,
             name: newName,
-          })
+          }),
         );
       }
     },
-    [id, boardId, dispatch, taskList]
+    [id, boardId, dispatch, taskList],
   );
 
-  const { dragPreviewRef } = useTaskListDND({
+  const { dragPreviewRef, dragRef, dropRef, isDragging } = useTaskListDND({
     taskListRef: ref,
     taskListId: id,
     taskIds,
   });
 
-  dragPreviewRef(ref);
+  dragPreviewRef(dragRef(ref));
+  dropRef(wrapperRef);
 
   if (!taskList) {
     return <Stub />;
   }
 
   const { name } = taskList;
-  logger.debug("Render: TaskList", id, name, Date.now());
 
   return (
-    <Box py={1} px={2} className={styles.list} ref={setRef}>
-      <ListSection fontWeight="bold" mb={1} paddingLeft={1} display="flex">
-        <EditableTextField
-          value={name}
-          onChange={onNameChange}
-          fullWidth
-          inputProps={nameStyle}
-        />
-        <TaskListMenu id={id} boardId={boardId} />
-      </ListSection>
+    <Box className={styles.wrapper} ref={setWrapperRef}>
+      <Box ref={setRef} py={1} className={styles.list}>
+        <Box fontWeight="bold" paddingLeft={2} mb={1} display="flex">
+          <EditableTextField
+            value={name}
+            onChange={onNameChange}
+            fullWidth
+            inputProps={nameStyle}
+          />
+          <TaskListMenu id={id} boardId={boardId} />
+        </Box>
 
-      <ListSection>
-        <Grid container direction="row">
-          {taskIds.map((taskId, index) => (
+        <Grid container direction="row" gap={0.5}>
+          {taskIds.map((taskId) => (
             <Grid item xs={12} key={taskId}>
-              <ListSlot index={index} taskId={taskId} taskListId={id}>
+              <ListSlot taskId={taskId}>
                 <TaskPreview id={taskId} onClick={onTaskClick} />
               </ListSlot>
             </Grid>
           ))}
         </Grid>
-      </ListSection>
 
-      <ListSection mt={taskIds.length === 0 ? 0 : 2}>
-        <TaskComposer taskListId={id} boardId={boardId} />
-      </ListSection>
+        <Box px={1} mt={isEmpty ? 0 : 1.5}>
+          <TaskComposer taskListId={id} boardId={boardId} />
+        </Box>
+      </Box>
+
+      {isDragging && (
+        <DragAndDropPlaceholder rect={ref?.getBoundingClientRect()} />
+      )}
     </Box>
   );
 }

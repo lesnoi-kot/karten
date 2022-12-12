@@ -91,5 +91,5 @@ export type TaskMovedPayload = {
   taskId: ID;
   dropTaskId?: ID;
   dropTaskListId?: ID;
-  atop: boolean;
+  isBefore: boolean;
 };

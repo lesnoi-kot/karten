@@ -9,19 +9,6 @@
   display: none;
 }
 
-.taskPreviewHeader {
-  padding: 8px;
-}
-
-.taskPreviewButton {
-  margin-top: 0;
-  margin-right: 0px;
-}
-
-.blurred {
-  filter: blur(1px);
-}
-
 .modalWrapper {
   width: 768px;
   max-height: 960px;
@@ -34,7 +21,6 @@
 .taskCard {
   height: 100%;
   width: 100%;
-
   background-color: #f4f5f7;
 }
 
@@ -47,10 +33,6 @@
 .textfield {
   border-radius: 4px;
   background-color: white;
-}
-
-.nameField {
-  font-size: 1.5em;
 }
 
 .commentText {

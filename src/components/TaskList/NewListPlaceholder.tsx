@@ -17,6 +17,7 @@ import { actions, selectors } from "app/apiInteraction";
 
 import ListSection from "./ListSection";
 import styles from "./styles.module.css";
+import { LoadingButton } from "@mui/lab";
 
 type Props = {
   boardId: ID;
@@ -81,7 +82,7 @@ function NewListPlaceholder({ boardId }: Props) {
               id="name"
               inputRef={inputRef}
               fullWidth
-              label="Add list name"
+              label="Add new list"
               value={taskListName}
               onBlur={submit}
               onChange={(e) => setTaskListName(e.target.value)}
@@ -91,22 +92,18 @@ function NewListPlaceholder({ boardId }: Props) {
             <Box mt={2} />
           </>
         )}
-        <Button
+        <LoadingButton
           variant="outlined"
           color="primary"
-          startIcon={
-            requestState === FetchState.PENDING ? (
-              <CircularProgress size={15} />
-            ) : (
-              <AddIcon />
-            )
-          }
+          size="small"
+          loading={requestState === FetchState.PENDING}
+          startIcon={<AddIcon />}
           disabled={isFieldVisible && !taskListName}
           onClick={onClick}
           fullWidth
         >
-          Add another list
-        </Button>
+          {isFieldVisible ? "Add" : "Add another list"}
+        </LoadingButton>
       </ListSection>
     </Box>
   );

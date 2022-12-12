@@ -19,7 +19,7 @@ export const onTaskListDeletedEpic: Epic = (action$, store$) =>
       const tasks = selectTaskIds(store$.value, taskListId);
       return tasksActions.tasksDeleted(tasks);
     }),
-    filter(actionPayloadNotEmptyArray)
+    filter(actionPayloadNotEmptyArray),
   );
 
 export const onTaskListsDeletedEpic: Epic = (action$, store$) =>
@@ -34,7 +34,7 @@ export const onTaskListsDeletedEpic: Epic = (action$, store$) =>
 
       return tasksActions.tasksDeleted(tasks);
     }),
-    filter(actionPayloadNotEmptyArray)
+    filter(actionPayloadNotEmptyArray),
   );
 
 export const taskListMovedEpic: Epic = (action$, store$) =>
@@ -44,25 +44,27 @@ export const taskListMovedEpic: Epic = (action$, store$) =>
       const dropTaskList = selectTaskListById(store$.value, dropTaskListId)!;
       const listIds = selectSortedTaskListIds(
         store$.value,
-        dropTaskList.boardId
+        dropTaskList.boardId,
       );
       const dropTaskListIndex = listIds.indexOf(dropTaskListId);
+      const dragTaskListIndex = listIds.indexOf(taskListId);
+      // const before = dragTaskListIndex < dropTaskListIndex;
 
-      if (dropTaskListIndex === 0 && before) {
+      if (dropTaskListIndex === 0) {
         return of(
           actions.taskListUpdated({
             id: taskListId,
             position: dropTaskList.position - 1000,
-          })
+          }),
         );
       }
 
-      if (dropTaskListIndex === listIds.length - 1 && !before) {
+      if (dropTaskListIndex === listIds.length - 1) {
         return of(
           actions.taskListUpdated({
             id: taskListId,
             position: dropTaskList.position + 1000,
-          })
+          }),
         );
       }
 
@@ -70,10 +72,10 @@ export const taskListMovedEpic: Epic = (action$, store$) =>
         listIds[dropTaskListIndex + (before ? -1 : 1)];
       const nextOrPrevDropTask = selectTaskListById(
         store$.value,
-        nextOrPrevDropTaskListId
+        nextOrPrevDropTaskListId,
       )!;
       const newPosition = Math.floor(
-        (dropTaskList.position + nextOrPrevDropTask.position) / 2
+        (dropTaskList.position + nextOrPrevDropTask.position) / 2,
       );
 
       // Do we need to fix the gaps?
@@ -83,10 +85,10 @@ export const taskListMovedEpic: Epic = (action$, store$) =>
       ) {
         let position = 0;
         const bulkUpdates: AnyAction[] = listIds.map((id) =>
-          actions.taskListUpdated({ id, position: (position += POSITION_GAP) })
+          actions.taskListUpdated({ id, position: (position += POSITION_GAP) }),
         );
         bulkUpdates.push(
-          actions.taskListMoved({ taskListId, dropTaskListId, before })
+          actions.taskListMoved({ taskListId, dropTaskListId, before }),
         );
 
         return of(...bulkUpdates);
@@ -96,7 +98,7 @@ export const taskListMovedEpic: Epic = (action$, store$) =>
         actions.taskListUpdated({
           id: taskListId,
           position: newPosition,
-        })
+        }),
       );
-    })
+    }),
   );

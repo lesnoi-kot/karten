@@ -74,7 +74,7 @@ const mocks: { [key: string]: ProjectDTO } = {
                 id: "6",
                 taskListId: "A",
                 position: 40000,
-                name: "6 - Nail with hammer",
+                name: "6 - Nail with hammer.\nNail with hammer.\nNail with hammer.\nNail with hammer.\nNail with hammer.\nNail with hammer.\n",
                 text: "...",
                 dateCreated: new Date().toISOString(),
                 comments: [],

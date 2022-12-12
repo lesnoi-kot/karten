@@ -19,18 +19,18 @@ export const addTaskEpic: Epic = (action$, store$, { api }) =>
           boardId,
           taskListId,
           task: { name: title },
-        })
+        }),
       ).pipe(
         mergeMap(({ error, data: task }) =>
           error !== null
             ? of(actions.addTaskRequestFailed({ taskListId, error }))
-            : of(taskSet(task!), actions.addTaskRequestLoaded({ taskListId }))
+            : of(taskSet(task!), actions.addTaskRequestLoaded({ taskListId })),
         ),
         catchError((error) =>
-          of(actions.addTaskRequestFailed({ taskListId, error }))
-        )
-      )
-    )
+          of(actions.addTaskRequestFailed({ taskListId, error })),
+        ),
+      ),
+    ),
   );
 
 export const deleteTaskEpic: Epic = (action$, _, { api }) =>
@@ -41,17 +41,17 @@ export const deleteTaskEpic: Epic = (action$, _, { api }) =>
         mergeMap(({ error }) =>
           error !== null
             ? of(actions.deleteTaskRequestFailed(new Error(error)))
-            : of(actions.deleteTaskRequestLoaded())
+            : of(actions.deleteTaskRequestLoaded()),
         ),
-        catchError((error) => of(actions.deleteTaskRequestFailed(error)))
-      )
-    )
+        catchError((error) => of(actions.deleteTaskRequestFailed(error))),
+      ),
+    ),
   );
 
 export const optimisticDeleteTaskEpic: Epic = (action$) =>
   action$.pipe(
     filter(actions.deleteTaskRequest.match),
-    map(({ payload: { taskId } }) => taskDeleted(taskId))
+    map(({ payload: { taskId } }) => taskDeleted(taskId)),
   );
 
 export const deleteTasksEpic: Epic = (action$, _, { api }) =>
@@ -62,19 +62,19 @@ export const deleteTasksEpic: Epic = (action$, _, { api }) =>
         mergeMap(({ error }) =>
           error !== null
             ? of(actions.deleteTaskRequestFailed(error))
-            : of(actions.deleteTasksRequestLoaded())
+            : of(actions.deleteTasksRequestLoaded()),
         ),
         catchError((error) =>
-          of(actions.deleteTasksRequestFailed(String(error)))
-        )
-      )
-    )
+          of(actions.deleteTasksRequestFailed(String(error))),
+        ),
+      ),
+    ),
   );
 
 export const optimisticDeleteTasksEpic: Epic = (action$) =>
   action$.pipe(
     filter(actions.deleteTasksRequest.match),
-    map(({ payload: { taskIds } }) => tasksDeleted(taskIds))
+    map(({ payload: { taskIds } }) => tasksDeleted(taskIds)),
   );
 
 export const updateTaskEpic: Epic = (action$, store$, { api }) =>
@@ -85,13 +85,13 @@ export const updateTaskEpic: Epic = (action$, store$, { api }) =>
         mergeMap(({ error, data: task }) =>
           error !== null
             ? of(actions.updateTaskRequestFailed(error))
-            : of(taskUpdated(task!), actions.updateTaskRequestLoaded())
+            : of(taskUpdated(task!), actions.updateTaskRequestLoaded()),
         ),
         catchError((error) =>
-          of(actions.updateTaskRequestFailed(String(error)))
-        )
-      )
-    )
+          of(actions.updateTaskRequestFailed(String(error))),
+        ),
+      ),
+    ),
   );
 
 export const moveTaskEpic: Epic = (action$, store$, { api }) =>
@@ -99,40 +99,40 @@ export const moveTaskEpic: Epic = (action$, store$, { api }) =>
     filter(actions.moveTaskRequest.match),
     filter(
       ({ payload: { dropTaskId, dropTaskListId } }) =>
-        !Boolean(dropTaskListId) && Boolean(dropTaskId)
+        !Boolean(dropTaskListId) && Boolean(dropTaskId),
     ),
-    mergeMap(({ payload: { taskId, dropTaskId, atop } }) => {
+    mergeMap(({ payload: { taskId, dropTaskId, isBefore } }) => {
       const dropTask = selectTaskById(store$.value, dropTaskId!)!;
       const taskIds = selectSortedTaskIds(store$.value, dropTask.taskListId);
       const dropTaskIndex = taskIds.indexOf(dropTaskId!);
 
-      if (dropTaskIndex === taskIds.length - 1 && !atop) {
+      if (dropTaskIndex === taskIds.length - 1 && !isBefore) {
         return of(
           taskUpdated({
             id: taskId,
             position: dropTask.position + POSITION_GAP,
             taskListId: dropTask.taskListId,
-          })
+          }),
         );
       }
 
-      if (dropTaskIndex === 0 && atop) {
+      if (dropTaskIndex === 0 && isBefore) {
         return of(
           taskUpdated({
             id: taskId,
             position: dropTask.position - POSITION_GAP,
             taskListId: dropTask.taskListId,
-          })
+          }),
         );
       }
 
-      const nextOrPrevDropTaskId = taskIds[dropTaskIndex + (atop ? -1 : 1)];
+      const nextOrPrevDropTaskId = taskIds[dropTaskIndex + (isBefore ? -1 : 1)];
       const nextOrPrevDropTask = selectTaskById(
         store$.value,
-        nextOrPrevDropTaskId
+        nextOrPrevDropTaskId,
       )!;
       const newPosition = Math.floor(
-        (dropTask.position + nextOrPrevDropTask.position) / 2
+        (dropTask.position + nextOrPrevDropTask.position) / 2,
       );
 
       // Do we need to fix the gaps?
@@ -142,9 +142,11 @@ export const moveTaskEpic: Epic = (action$, store$, { api }) =>
       ) {
         let position = 0;
         const bulkUpdates: AnyAction[] = taskIds.map((taskId) =>
-          taskUpdated({ id: taskId, position: (position += POSITION_GAP) })
+          taskUpdated({ id: taskId, position: (position += POSITION_GAP) }),
         );
-        bulkUpdates.push(actions.moveTaskRequest({ taskId, dropTaskId, atop }));
+        bulkUpdates.push(
+          actions.moveTaskRequest({ taskId, dropTaskId, isBefore }),
+        );
 
         return of(...bulkUpdates);
       }
@@ -154,25 +156,25 @@ export const moveTaskEpic: Epic = (action$, store$, { api }) =>
           id: taskId,
           position: newPosition,
           taskListId: dropTask.taskListId,
-        })
+        }),
       );
-    })
+    }),
   );
 
 export const moveTaskToListEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.moveTaskRequest.match),
     filter(({ payload: { dropTaskListId } }) => Boolean(dropTaskListId)),
-    mergeMap(({ payload: { taskId, dropTaskListId, atop } }) => {
+    mergeMap(({ payload: { taskId, dropTaskListId, isBefore } }) => {
       const taskIds = selectSortedTaskIds(store$.value, dropTaskListId!);
       let position = POSITION_GAP;
 
       if (taskIds.length > 0) {
         const lastTask = selectTaskById(
           store$.value,
-          taskIds[atop ? 0 : taskIds.length - 1]
+          taskIds[isBefore ? 0 : taskIds.length - 1],
         )!;
-        position = lastTask.position + POSITION_GAP * (atop ? -1 : 1);
+        position = lastTask.position + POSITION_GAP * (isBefore ? -1 : 1);
       }
 
       return of(
@@ -180,7 +182,7 @@ export const moveTaskToListEpic: Epic = (action$, store$, { api }) =>
           id: taskId,
           position,
           taskListId: dropTaskListId,
-        })
+        }),
       );
-    })
+    }),
   );

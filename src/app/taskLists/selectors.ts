@@ -16,11 +16,11 @@ export const selectTaskListById = (state: RootState, taskListId: ID) =>
 export const selectTaskIds = createCachedSelector(
   [selectTasks, extraParam<ID>()],
   (tasks, taskListId) =>
-    Object.keys(filter(propEq("taskListId", taskListId), tasks))
+    Object.keys(filter(propEq("taskListId", taskListId), tasks)),
 )((_, taskListId) => taskListId);
 
 export const selectSortedTaskIds = createCachedSelector(
   [selectTaskIds, selectTasks],
   (taskIds, tasks) =>
-    sort((id1, id2) => tasks[id1].position - tasks[id2].position, taskIds)
+    sort((id1, id2) => tasks[id1].position - tasks[id2].position, taskIds),
 )((_, taskListId) => taskListId);
