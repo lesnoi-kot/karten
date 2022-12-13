@@ -12,10 +12,15 @@
   border-radius: 2px;
 }
 
+.newList {
+  min-width: 250px;
+  max-width: 250px;
+  width: 250px;
+}
+
 .placeholder {
   background-color: #ebecf0;
   position: absolute;
   z-index: 10000;
-  left: 0;
   top: 0;
 }

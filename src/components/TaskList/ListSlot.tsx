@@ -12,18 +12,20 @@ type Props = {
 };
 
 const ListSlot = ({ children, taskId }: Props) => {
-  const [ref, setRef] = useState<HTMLDivElement | null>(null);
+  const [taskRef, setTaskRef] = useState<HTMLDivElement | null>(null);
 
-  const { isDragging, dragPreviewRef } = useTaskDND({
+  const { isDragging, dragPreviewRef, dragRef, dropRef } = useTaskDND({
     taskId,
-    taskRef: ref,
+    taskRef,
   });
 
+  dragRef(dragPreviewRef(taskRef));
+
   return (
-    <Box ref={setRef} position="relative" px={1} width="content">
-      <Box ref={dragPreviewRef}>{children}</Box>
+    <Box ref={dropRef} position="relative" px={1}>
+      <Box ref={setTaskRef}>{children}</Box>
       {isDragging && (
-        <DragAndDropPlaceholder rect={ref?.getBoundingClientRect()} />
+        <DragAndDropPlaceholder rect={taskRef?.getBoundingClientRect()} />
       )}
     </Box>
   );

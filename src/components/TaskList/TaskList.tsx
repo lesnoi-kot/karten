@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, Grid, InputBaseComponentProps } from "@mui/material";
+import { Box, Stack, InputBaseComponentProps } from "@mui/material";
 
 import * as models from "models/types";
 import { RootState } from "app";
@@ -86,15 +86,13 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
           <TaskListMenu id={id} boardId={boardId} />
         </Box>
 
-        <Grid container direction="row" gap={0.5}>
+        <Stack direction="column" gap={0.5}>
           {taskIds.map((taskId) => (
-            <Grid item xs={12} key={taskId}>
-              <ListSlot taskId={taskId}>
-                <TaskPreview id={taskId} onClick={onTaskClick} />
-              </ListSlot>
-            </Grid>
+            <ListSlot key={taskId} taskId={taskId}>
+              <TaskPreview id={taskId} onClick={onTaskClick} />
+            </ListSlot>
           ))}
-        </Grid>
+        </Stack>
 
         <Box px={1} mt={isEmpty ? 0 : 1.5}>
           <TaskComposer taskListId={id} boardId={boardId} />

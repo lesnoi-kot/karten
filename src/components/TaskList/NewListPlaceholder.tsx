@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
 import cx from "classnames";
 
-import { Box, Button, TextField, CircularProgress } from "@mui/material";
+import { Box, TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 import { ID } from "models/types";
@@ -102,7 +102,7 @@ function NewListPlaceholder({ boardId }: Props) {
           onClick={onClick}
           fullWidth
         >
-          {isFieldVisible ? "Add" : "Add another list"}
+          {isFieldVisible ? "Add" : "Add new list"}
         </LoadingButton>
       </ListSection>
     </Box>

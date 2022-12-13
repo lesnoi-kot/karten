@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Grid } from "@mui/material";
+import { Stack } from "@mui/material";
 
 import { RootState } from "app";
 import { ID } from "models/types";
@@ -21,17 +21,18 @@ export function TaskLists({
   );
 
   return (
-    <Grid container gap={1} wrap="nowrap" height="100%">
+    <Stack gap={1} direction="row" alignItems="flex-start" height="100%">
       {lists.map((id: ID) => (
-        <Grid item key={id} height="100%">
-          <TaskList boardId={boardId} id={id} onTaskClick={onTaskClick} />
-        </Grid>
+        <TaskList
+          key={id}
+          boardId={boardId}
+          id={id}
+          onTaskClick={onTaskClick}
+        />
       ))}
 
-      <Grid item key="NewListPlaceholder">
-        <NewListPlaceholder boardId={boardId} />
-      </Grid>
-    </Grid>
+      <NewListPlaceholder boardId={boardId} />
+    </Stack>
   );
 }
 

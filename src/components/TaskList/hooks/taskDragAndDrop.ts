@@ -71,7 +71,5 @@ export const useTaskDND = ({ taskId, taskRef }: UseTaskDNDArgs) => {
     [taskRef, taskId, dispatch],
   );
 
-  dragRef(dropRef(taskRef));
-
-  return { dragPreviewRef, isDragging };
+  return { dragPreviewRef, dragRef, dropRef, isDragging };
 };
