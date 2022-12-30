@@ -3,6 +3,7 @@ import { useDrop, useDrag, XYCoord } from "react-dnd";
 import { useDispatch } from "react-redux";
 
 import { actions as apiActions } from "app/apiInteraction";
+import { actions as tasksActions } from "app/tasks";
 import { ID } from "models/types";
 
 import { DNDTaskItem, DND_TASK_TYPE } from "../constants";
@@ -30,6 +31,11 @@ export const useTaskDND = ({ taskId, taskRef }: UseTaskDNDArgs) => {
   const [, dropRef] = useDrop(
     () => ({
       accept: DND_TASK_TYPE,
+      drop: (item: DNDTaskItem, monitor) => {
+        if (!monitor.didDrop()) {
+          dispatch(apiActions.syncTaskRequest(item.taskId));
+        }
+      },
       hover(dragItem: DNDTaskItem, monitor) {
         const { taskId: draggedId } = dragItem;
         const offset = monitor.getClientOffset();
@@ -44,7 +50,7 @@ export const useTaskDND = ({ taskId, taskRef }: UseTaskDNDArgs) => {
 
         if (hoverBegin) {
           dispatch(
-            apiActions.moveTaskRequest({
+            tasksActions.taskMoved({
               taskId: draggedId,
               dropTaskId: taskId,
               isBefore,
@@ -55,7 +61,7 @@ export const useTaskDND = ({ taskId, taskRef }: UseTaskDNDArgs) => {
 
           if (yDiff !== 0) {
             dispatch(
-              apiActions.moveTaskRequest({
+              tasksActions.taskMoved({
                 taskId: draggedId,
                 dropTaskId: taskId,
                 isBefore: yDiff < 0,

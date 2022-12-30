@@ -12,6 +12,13 @@ const initialState: TasksSlice = {
   items: {},
 };
 
+export type TaskMovedPayload = {
+  taskId: ID;
+  dropTaskId?: ID;
+  dropTaskListId?: ID;
+  isBefore: boolean;
+};
+
 export const {
   actions,
   reducer,
@@ -39,5 +46,6 @@ export const {
         delete state.items[taskId];
       }
     },
+    taskMoved: (state, action: PayloadAction<TaskMovedPayload>) => {},
   },
 });

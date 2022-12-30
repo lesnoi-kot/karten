@@ -1,8 +1,9 @@
 import { useDrop, useDrag } from "react-dnd";
 import { useDispatch } from "react-redux";
 
-import { TaskMovedPayload } from "app/apiInteraction/types";
+import { TaskMovedPayload } from "app/tasks";
 import { actions as taskListsActions } from "app/taskLists";
+import { actions as tasksActions } from "app/tasks";
 import { actions as apiActions } from "app/apiInteraction";
 import { ID } from "models/types";
 
@@ -43,6 +44,21 @@ export const useTaskListDND = ({
   const [, dropRef] = useDrop(
     () => ({
       accept: [DND_TASK_TYPE, DND_LIST_TYPE],
+      drop: (item: DNDTaskItem | DNDTaskListItem, monitor) => {
+        if (monitor.didDrop()) {
+          return;
+        }
+
+        if (monitor.getItemType() === DND_TASK_TYPE) {
+          dispatch(apiActions.syncTaskRequest((item as DNDTaskItem).taskId));
+        } else {
+          dispatch(
+            apiActions.syncTaskListRequest(
+              (item as DNDTaskListItem).taskListId,
+            ),
+          );
+        }
+      },
       hover(item: DNDTaskItem | DNDTaskListItem, monitor) {
         const offset = monitor.getClientOffset();
 
@@ -60,7 +76,7 @@ export const useTaskListDND = ({
 
             if (rect.y + rect.height - offset.y <= 32) {
               dispatch(
-                apiActions.moveTaskRequest({
+                tasksActions.taskMoved({
                   taskId,
                   dropTaskId: taskIds[taskIds.length - 1],
                   dropTaskListId: taskListId,
@@ -71,7 +87,7 @@ export const useTaskListDND = ({
             }
 
             dispatch(
-              apiActions.moveTaskRequest({
+              tasksActions.taskMoved({
                 taskId,
                 dropTaskId: taskIds[0],
                 dropTaskListId: taskListId,

@@ -3,10 +3,11 @@ import { mergeAll, filter, mergeMap, catchError, map } from "rxjs/operators";
 
 import { taskListDeleted, taskListSet, taskListUpdated } from "app/taskLists";
 import { tasksDeleted } from "app/tasks";
-import { selectTaskIds } from "app/taskLists/selectors";
+import { selectTaskIds, selectTaskListById } from "app/taskLists/selectors";
 
 import { Epic } from "../types";
 import { actions } from "./slice";
+import { UpdateTaskListPayload } from "./types";
 
 export const taskListRequestEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
@@ -20,9 +21,9 @@ export const taskListRequestEpic: Epic = (action$, store$, { api }) =>
 
           return of(taskListSet(taskList), actions.taskListRequestLoaded());
         }),
-        catchError((error) => of(actions.taskListRequestFailed(String(error))))
-      )
-    )
+        catchError((error) => of(actions.taskListRequestFailed(String(error)))),
+      ),
+    ),
   );
 
 export const taskListAddEpic: Epic = (action$, store$, { api }) =>
@@ -38,10 +39,10 @@ export const taskListAddEpic: Epic = (action$, store$, { api }) =>
           return of(taskListSet(taskList), actions.addTaskListRequestLoaded());
         }),
         catchError((error) =>
-          of(actions.addTaskListRequestFailed(String(error)))
-        )
-      )
-    )
+          of(actions.addTaskListRequestFailed(String(error))),
+        ),
+      ),
+    ),
   );
 
 export const taskListDeleteEpic: Epic = (action$, store$, { api }) =>
@@ -55,14 +56,14 @@ export const taskListDeleteEpic: Epic = (action$, store$, { api }) =>
           }
           return of(
             taskListDeleted(taskListId),
-            actions.deleteTaskListRequestLoaded()
+            actions.deleteTaskListRequestLoaded(),
           );
         }),
         catchError((error) =>
-          of(actions.deleteTaskListRequestFailed(String(error)))
-        )
-      )
-    )
+          of(actions.deleteTaskListRequestFailed(String(error))),
+        ),
+      ),
+    ),
   );
 
 export const taskListUpdateEpic: Epic = (action$, store$, { api }) =>
@@ -76,14 +77,14 @@ export const taskListUpdateEpic: Epic = (action$, store$, { api }) =>
           }
           return of(
             taskListUpdated({ id: taskListId, name }),
-            actions.updateTaskListRequestLoaded()
+            actions.updateTaskListRequestLoaded(),
           );
         }),
         catchError((error) =>
-          of(actions.updateTaskListRequestFailed(String(error)))
-        )
-      )
-    )
+          of(actions.updateTaskListRequestFailed(String(error))),
+        ),
+      ),
+    ),
   );
 
 export const taskListClearEpic: Epic = (action$, store$, { api }) =>
@@ -97,13 +98,30 @@ export const taskListClearEpic: Epic = (action$, store$, { api }) =>
           map(({ error }) =>
             error !== null
               ? actions.deleteTaskRequestFailed(error)
-              : actions.deleteTasksRequestLoaded()
+              : actions.deleteTasksRequestLoaded(),
           ),
           catchError((error) =>
-            of(actions.deleteTasksRequestFailed(String(error)))
-          )
-        )
+            of(actions.deleteTasksRequestFailed(String(error))),
+          ),
+        ),
       );
     }),
-    mergeAll()
+    mergeAll(),
+  );
+
+export const syncTaskListEpic: Epic = (action$, store$, { api }) =>
+  action$.pipe(
+    filter(actions.syncTaskListRequest.match),
+    map(({ payload: taskListId }) => {
+      const taskList = selectTaskListById(store$.value, taskListId)!;
+
+      const payload: UpdateTaskListPayload = {
+        taskListId,
+        boardId: taskList.boardId,
+        name: taskList.name,
+        position: taskList.position,
+      };
+
+      return actions.updateTaskListRequest(payload);
+    }),
   );

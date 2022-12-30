@@ -57,6 +57,7 @@ export type UpdateTaskListPayload = {
   boardId: ID;
   taskListId: ID;
   name?: string;
+  position?: number;
 };
 
 export type ClearTaskListPayload = {
@@ -85,11 +86,4 @@ export type DeleteCommentPayload = {
 export type TasksDeletedPayload = {
   taskIds: ID[];
   taskListId: ID;
-};
-
-export type TaskMovedPayload = {
-  taskId: ID;
-  dropTaskId?: ID;
-  dropTaskListId?: ID;
-  isBefore: boolean;
 };

@@ -15,7 +15,6 @@ import {
   TasksDeletedPayload,
   UpdateBoardPayload,
   UpdateTaskListPayload,
-  TaskMovedPayload,
   UpdateCommentPayload,
   UpdateTaskPayload,
   WithError,
@@ -90,7 +89,7 @@ export const {
     },
     addTaskRequestFailed: (
       state,
-      { payload }: PayloadAction<TaskListId & WithError>
+      { payload }: PayloadAction<TaskListId & WithError>,
     ) => {
       state.taskLists[payload.taskListId] = {
         ...state.taskLists[payload.taskListId],
@@ -110,7 +109,7 @@ export const {
 
     deleteTasksRequest: (
       state,
-      action: PayloadAction<TasksDeletedPayload>
+      action: PayloadAction<TasksDeletedPayload>,
     ) => {},
     deleteTasksRequestFailed: (state, action: PayloadAction<string>) => {},
     deleteTasksRequestLoaded: (state) => {},
@@ -119,9 +118,8 @@ export const {
     updateTaskRequestFailed: (state, action: PayloadAction<string>) => {},
     updateTaskRequestLoaded: (state) => {},
 
-    moveTaskRequest: (state, action: PayloadAction<TaskMovedPayload>) => {},
-    moveTaskRequestFailed: (state, action: PayloadAction<string>) => {},
-    moveTaskRequestLoaded: (state) => {},
+    /* Sync server with a task in the local state */
+    syncTaskRequest: (state, action: PayloadAction<ID>) => {},
 
     /*
       TaskLists
@@ -142,22 +140,24 @@ export const {
 
     deleteTaskListRequest: (
       state,
-      action: PayloadAction<DeleteTaskListPayload>
+      action: PayloadAction<DeleteTaskListPayload>,
     ) => {},
     deleteTaskListRequestFailed: (state, action) => {},
     deleteTaskListRequestLoaded: (state) => {},
 
     updateTaskListRequest: (
       state,
-      action: PayloadAction<UpdateTaskListPayload>
+      action: PayloadAction<UpdateTaskListPayload>,
     ) => {},
     updateTaskListRequestFailed: (state, action) => {},
     updateTaskListRequestLoaded: (state) => {},
 
     clearTaskListRequest: (
       state,
-      action: PayloadAction<ClearTaskListPayload>
+      action: PayloadAction<ClearTaskListPayload>,
     ) => {},
+
+    syncTaskListRequest: (state, action: PayloadAction<ID>) => {},
 
     /*
       Boards
@@ -182,7 +182,7 @@ export const {
 
     updateBoardRequest: (
       state,
-      action: PayloadAction<UpdateBoardPayload>
+      action: PayloadAction<UpdateBoardPayload>,
     ) => {},
     updateBoardRequestLoaded: (state) => {},
     updateBoardRequestFailed: (state, action: PayloadAction<string>) => {},
@@ -203,7 +203,7 @@ export const {
 
     deleteCommentRequest: (
       state,
-      action: PayloadAction<DeleteCommentPayload>
+      action: PayloadAction<DeleteCommentPayload>,
     ) => {},
     deleteCommentRequestLoaded: (state) => {},
     deleteCommentRequestFailed: (state, action: PayloadAction<string>) => {},
