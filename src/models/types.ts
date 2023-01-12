@@ -1,60 +1,52 @@
-/* Database entities representation*/
-
-export type Color = "red" | "yellow" | "green";
-
 export type UUID = string;
-export type ID = string;
+export type Color = number;
+export type ID = UUID;
 export type DateString = string;
 
 export type Comment = {
-  id: ID;
-  taskId: ID;
+  id: UUID;
+  taskId: UUID;
   author: string;
   text: string;
   dateCreated: DateString;
 };
 
 export type Task = {
-  id: ID;
-  taskListId: ID;
+  id: UUID;
+  taskListId: UUID;
   name: string;
   text: string;
   position: number;
   dateCreated: DateString;
   dueDate: DateString;
-  comments?: ID[];
+  comments?: Comment[];
 };
 
 export type TaskList = {
-  id: ID;
-  boardId: ID;
+  id: UUID;
+  boardId: UUID;
   archived: boolean;
   position: number;
   name: string;
   dateCreated: DateString;
-  color: Color | null;
-  tasks?: ID[];
+  color: Color;
+  tasks?: Task[];
 };
 
 export type Board = {
-  id: ID;
-  projectId: ID;
+  id: UUID;
+  projectId: UUID;
   archived: boolean;
   name: string;
   dateCreated: DateString;
   dateLastViewed: DateString;
-  color: Color | null;
-  cover?: string;
-  taskLists?: ID[];
+  color: Color;
+  cover: string;
+  taskLists?: TaskList[];
 };
 
 export type Project = {
-  id: ID;
+  id: UUID;
   name: string;
-};
-
-export type APIError<T> = {
-  code: string;
-  message?: string;
-  details?: T;
+  boards?: Board[];
 };

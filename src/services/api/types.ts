@@ -1,60 +1,68 @@
-import { ID, Project, Board, TaskList, Task, Comment } from "models/types";
+import { ID, Board, Project, Task, TaskList, Comment } from "models/types";
 
-export type Response<T> =
-  | {
-      error: null;
-      data: T;
-    }
-  | {
-      error: string;
-      data?: null;
-    };
+export type ResponseOK<T> = {
+  error: null;
+  data: T;
+};
 
-export type ById = {
+export type ResponseError<E = string> = {
+  error: E;
+};
+
+export type CommentDTO = {
   id: ID;
+  task_id: ID;
+  author: string;
+  text: string;
+  date_created: string;
 };
 
-export type TaskDTO = Omit<Task, "comments"> & { comments: Comment[] };
-export type TaskListDTO = Omit<TaskList, "tasks"> & { tasks: TaskDTO[] };
-export type BoardDTO = Omit<Board, "taskLists"> & { taskLists?: TaskListDTO[] };
-export type ProjectDTO = Omit<Project, "boards"> & { boards: BoardDTO[] };
-
-export type BoardPreview = Pick<BoardDTO, "id" | "name" | "dateLastViewed">;
-export type GetOverviewResponse = {
-  boards: BoardPreview[];
+export type TaskDTO = {
+  id: ID;
+  task_list_id: ID;
+  name: string;
+  text: string;
+  position: number;
+  date_created: string;
+  due_date: string;
+  comments?: CommentDTO[];
 };
 
-export type AddTaskArgs = {
-  boardId: ID;
-  taskListId: ID;
-  task: { name: string };
+export type TaskListDTO = {
+  id: ID;
+  board_id: ID;
+  archived: boolean;
+  position: number;
+  name: string;
+  date_created: string;
+  color: number;
+  tasks?: TaskDTO[];
 };
 
-export type AddCommentArgs = {
-  taskId: ID;
-} & Partial<Pick<Comment, "text">>;
-
-export type DeleteTaskArgs = {
-  taskId: ID;
+export type BoardDTO = {
+  id: ID;
+  project_id: ID;
+  archived: boolean;
+  name: string;
+  date_created: string;
+  date_last_viewed: string;
+  color: number;
+  cover?: string | null;
+  task_lists?: TaskListDTO[];
 };
 
-export type DeleteTaskListArgs = {
-  boardId: ID;
-  taskListId: ID;
+export type ProjectDTO = {
+  id: ID;
+  name: string;
+  boards?: BoardDTO[];
 };
 
-export type EditTaskListArgs = {
-  boardId: ID;
-  taskListId: ID;
-  name?: string;
-};
-
-export type GetTaskListArgs = {
-  boardId: ID;
-  taskListId: ID;
+export type AddProjectArgs = {
+  name: string;
 };
 
 export type AddBoardArgs = {
+  projectId: ID;
   name: string;
 };
 
@@ -63,49 +71,66 @@ export type AddTaskListArgs = {
   name: string;
 };
 
-export type DeleteTasksArgs = {
+export type AddTaskArgs = {
   taskListId: ID;
-  taskIds: ID[];
+  name: string;
 };
 
-export type EditTaskArgs = {
+export type AddCommentArgs = {
   taskId: ID;
-} & Partial<Pick<Task, "name" | "position" | "text" | "dueDate">>;
-
-export type EditCommentArgs = {
-  commentId: ID;
-} & Partial<Pick<Comment, "text">>;
-
-export type DeleteBoardArgs = {
-  boardId: ID;
+  text: string;
 };
+
+export type EditProjectArgs = {
+  id: ID;
+  name: string;
+};
+
+export type EditBoardArgs = Pick<BoardDTO, "id"> &
+  Partial<Pick<BoardDTO, "name" | "color">>;
+
+export type EditTaskListArgs = Pick<TaskListDTO, "id"> &
+  Partial<Pick<TaskListDTO, "name" | "position">>;
+
+export type EditTaskArgs = Pick<TaskDTO, "id"> &
+  Partial<
+    Pick<TaskDTO, "name" | "position" | "text" | "due_date" | "task_list_id">
+  >;
+
+export type EditCommentArgs = Pick<CommentDTO, "id"> &
+  Partial<Pick<CommentDTO, "text">>;
 
 export interface API {
-  getProjects?(): Promise<Response<ProjectDTO[]>>;
-  addProject?(): Promise<Response<ProjectDTO>>;
+  getProjects(): Promise<Project[]>;
+  getProject(id: ID): Promise<Project>;
+  addProject(args: AddProjectArgs): Promise<Project>;
+  editProject(args: EditProjectArgs): Promise<Project>;
+  deleteProject(id: ID): Promise<void>;
 
-  getOverview(): Promise<Response<GetOverviewResponse>>;
+  getBoard(id: ID): Promise<Board>;
+  addBoard(args: AddBoardArgs): Promise<Board>;
+  editBoard(args: EditBoardArgs): Promise<Board>;
+  deleteBoard(id: ID): Promise<void>;
 
-  getBoards(): Promise<Response<Board[]>>;
-  getBoard({ id }: { id: ID }): Promise<Response<BoardDTO>>;
-  addBoard(arg: AddBoardArgs): Promise<Response<Board>>;
-  editBoard(board: Partial<Board>): Promise<Response<BoardDTO>>;
-  deleteBoard(arg: DeleteBoardArgs): Promise<Response<null>>;
+  getTaskList(id: ID): Promise<TaskList>;
+  addTaskList(args: AddTaskListArgs): Promise<TaskList>;
+  editTaskList(args: EditTaskListArgs): Promise<TaskList>;
+  deleteTaskList(id: ID): Promise<void>;
 
-  getTaskList(arg: GetTaskListArgs): Promise<Response<TaskListDTO>>;
-  addTaskList(arg: AddTaskListArgs): Promise<Response<TaskList>>;
-  deleteTaskList(arg: DeleteTaskListArgs): Promise<Response<null>>;
-  editTaskList(arg: EditTaskListArgs): Promise<Response<null>>;
+  getTask(id: ID): Promise<Task>;
+  addTask(args: AddTaskArgs): Promise<Task>;
+  editTask(args: EditTaskArgs): Promise<Task>;
+  deleteTask(id: ID): Promise<void>;
+  deleteTasks(args: ID[]): Promise<void>;
 
-  addTask(arg: AddTaskArgs): Promise<Response<Task>>;
-  editTask(arg: EditTaskArgs): Promise<Response<Task>>;
-  deleteTask(arg: DeleteTaskArgs): Promise<Response<null>>;
-  deleteTasks(arg: DeleteTasksArgs): Promise<Response<null>>;
-
-  addComment(arg: AddCommentArgs): Promise<Response<Comment>>;
-  editComment(arg: EditCommentArgs): Promise<Response<Comment>>;
-  deleteComment(arg: ById): Promise<Response<null>>;
+  addComment(args: AddCommentArgs): Promise<Comment>;
+  editComment(args: EditCommentArgs): Promise<Comment>;
+  deleteComment(id: ID): Promise<void>;
 }
+
+export const ERROR_CODES = {
+  ERROR: "error", // Generic error code
+};
 
 export class APIError extends Error {
   code: string;

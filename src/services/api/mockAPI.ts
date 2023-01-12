@@ -1,30 +1,22 @@
-import { is, clone, omit, map } from "ramda";
-import { ID, Task, Board, Comment } from "models/types";
-import { sleep } from "utils/async";
+import { is, clone } from "ramda";
 import { nanoid } from "@reduxjs/toolkit";
 
+import { ID, Task, Board, Comment, Project, TaskList } from "models/types";
+import { sleep } from "utils/async";
+
 import {
-  ById,
   AddBoardArgs,
   AddTaskArgs,
   AddCommentArgs,
   AddTaskListArgs,
+  AddProjectArgs,
   API,
   APIError,
-  BoardDTO,
-  DeleteBoardArgs,
-  DeleteTaskArgs,
-  DeleteTaskListArgs,
-  DeleteTasksArgs,
   EditTaskArgs,
   EditCommentArgs,
   EditTaskListArgs,
-  GetTaskListArgs,
-  ProjectDTO,
-  TaskDTO,
-  TaskListDTO,
+  EditProjectArgs,
 } from "./types";
-import mocks, { MockKey } from "./mocks";
 
 async function emulateDelay(rate: number = 1) {
   await sleep(200 + Math.random() * 500 * rate);
@@ -33,92 +25,97 @@ async function emulateDelay(rate: number = 1) {
 const badRequestError = new APIError("400", "bad request");
 const notFoundError = new APIError("404", "not found");
 
+export type MockStorage = {
+  projects: Record<ID, Project>;
+  boards: Record<ID, Board>;
+  taskLists: Record<ID, TaskList>;
+  tasks: Record<ID, Task>;
+  comments: Record<ID, Comment>;
+};
+
 export default class MockAPI implements API {
-  private mockStorage: ProjectDTO;
+  private mockStorage: MockStorage;
 
-  constructor(mockName: MockKey) {
-    this.mockStorage = clone(mocks[mockName]);
+  constructor(mock: MockStorage) {
+    this.mockStorage = clone(mock);
   }
 
-  private findBoard(id: ID) {
-    return this.mockStorage.boards.find((board) => board.id === id);
+  private findBoard(id: ID): Board | null {
+    return this.mockStorage.boards[id] ?? null;
   }
 
-  private findList(taskListId: ID): [TaskListDTO, BoardDTO] | [null, null] {
-    for (const board of this.mockStorage.boards) {
-      for (const taskList of board.taskLists || []) {
-        if (taskList.id === taskListId) {
-          return [taskList, board];
-        }
-      }
+  private findList(id: ID): TaskList | null {
+    return this.mockStorage.taskLists[id] ?? null;
+  }
+
+  private findTask(id: ID): Task | null {
+    return this.mockStorage.tasks[id] ?? null;
+  }
+
+  private findComment(id: ID): Comment | null {
+    return this.mockStorage.comments[id] ?? null;
+  }
+
+  async getProjects(): Promise<Project[]> {
+    return Object.values(this.mockStorage.projects);
+  }
+
+  async getProject(id: ID): Promise<Project> {
+    await emulateDelay(1);
+    const project = this.mockStorage.projects[id];
+
+    if (!project) {
+      throw notFoundError;
     }
 
-    return [null, null];
+    return project;
   }
 
-  private findTask(taskId: ID) {
-    for (const board of this.mockStorage.boards) {
-      for (const taskList of board.taskLists || []) {
-        for (const task of taskList.tasks) {
-          if (task.id === taskId) {
-            return task;
-          }
-        }
-      }
+  async addProject(args: AddProjectArgs): Promise<Project> {
+    await emulateDelay(1.5);
+
+    const project: Project = {
+      id: Date.now().toString(),
+      name: args.name,
+      boards: [],
+    };
+
+    this.mockStorage.projects[project.id] = project;
+    return clone(project);
+  }
+
+  async editProject(args: EditProjectArgs): Promise<Project> {
+    await emulateDelay(1);
+    const project = await this.getProject(args.id);
+    project.name = args.name;
+    return clone(project);
+  }
+
+  async deleteProject(id: ID): Promise<void> {
+    await emulateDelay(1);
+
+    if (await this.getProject(id)) {
+      delete this.mockStorage.projects[id];
     }
-
-    return null;
-  }
-
-  private findComment(commentId: ID): [Comment, TaskDTO] | [null, null] {
-    for (const board of this.mockStorage.boards) {
-      for (const taskList of board.taskLists || []) {
-        for (const task of taskList.tasks) {
-          for (const comment of task.comments) {
-            if (comment.id === commentId) {
-              return [comment, task];
-            }
-          }
-        }
-      }
-    }
-
-    return [null, null];
-  }
-
-  async getOverview() {
-    const boards = this.mockStorage.boards.map((board) => ({
-      id: board.id,
-      name: board.name,
-      dateLastViewed: board.dateLastViewed,
-    }));
-
-    await emulateDelay(5);
-
-    return Promise.resolve({ data: { boards }, error: null });
   }
 
   async getBoards() {
     await emulateDelay();
-
-    return Promise.resolve({
-      data: map(omit(["taskLists"]), this.mockStorage.boards),
-      error: null,
-    });
+    return Object.values(this.mockStorage.boards);
   }
 
-  async getBoard({ id }: { id: ID }) {
+  async getBoard(id: ID) {
     await emulateDelay();
 
-    const board = this.mockStorage.boards.find((board) => board.id === id);
+    const board = this.findBoard(id);
 
     if (!board) {
-      return Promise.resolve({ data: null, error: "NOT_FOUND" });
+      throw notFoundError;
     }
 
     board.dateLastViewed = new Date().toISOString();
 
-    return Promise.resolve({ data: board, error: null });
+    return board;
   }
 
   async editBoard(boardChanges: Partial<Board>) {
@@ -134,24 +131,21 @@ export default class MockAPI implements API {
 
     Object.assign(board, boardChanges);
 
-    return Promise.resolve({
-      data: clone(board),
-      error: null,
-    });
+    return clone(board);
   }
 
   async addTask(arg: AddTaskArgs) {
     await emulateDelay(1.5);
 
-    const [list] = this.findList(arg.taskListId);
+    const list = this.findList(arg.taskListId);
 
     if (!list) {
       throw notFoundError;
     }
 
-    const task: TaskDTO = {
-      ...arg.task,
+    const task: Task = {
       id: Date.now().toString(),
+      name: arg.name,
       taskListId: arg.taskListId,
       position: Date.now(),
       dateCreated: new Date().toISOString(),
@@ -160,62 +154,31 @@ export default class MockAPI implements API {
       comments: [],
     };
 
-    list.tasks.push(task);
-
-    return Promise.resolve({
-      data: omit(["comments"], clone(task)),
-      error: null,
-    });
+    return clone(task);
   }
 
-  async deleteTask(arg: DeleteTaskArgs) {
+  async deleteTask(taskId: ID) {
     await emulateDelay();
 
-    const task = this.findTask(arg.taskId);
+    const task = this.findTask(taskId);
 
     if (!task) {
       throw notFoundError;
     }
 
-    const [list] = this.findList(task.taskListId);
-
-    if (!list) {
-      throw notFoundError;
-    }
-
-    const idx = list.tasks.findIndex((task) => task.id === arg.taskId);
-
-    if (idx < 0) {
-      throw notFoundError;
-    }
-
-    list.tasks.splice(idx, 1);
-
-    return Promise.resolve({
-      data: null,
-      error: null,
-    });
+    delete this.mockStorage.tasks[taskId];
   }
 
-  async deleteTasks(arg: DeleteTasksArgs) {
+  async deleteTasks(taskIds: ID[]) {
     await emulateDelay();
 
-    const [list] = this.findList(arg.taskListId);
-
-    if (!list) {
-      throw notFoundError;
-    }
-
-    list.tasks = list.tasks.filter((task) => !arg.taskIds.includes(task.id));
-
-    return Promise.resolve({
-      data: null,
-      error: null,
+    taskIds.forEach((id) => {
+      delete this.mockStorage.tasks[id];
     });
   }
 
-  async getTaskList({ boardId, taskListId }: GetTaskListArgs) {
-    const [taskList] = this.findList(taskListId);
+  async getTaskList(taskListId: ID) {
+    const taskList = this.findList(taskListId);
 
     await emulateDelay();
 
@@ -223,32 +186,26 @@ export default class MockAPI implements API {
       throw notFoundError;
     }
 
-    return Promise.resolve({
-      data: clone(taskList),
-      error: null,
-    });
+    return clone(taskList);
   }
 
   async addBoard({ name }: AddBoardArgs) {
     await emulateDelay(5);
 
-    const newBoard = {
+    const newBoard: Board = {
       id: Date.now().toString(),
       projectId: "sadPoe",
       name,
       archived: false,
       dateCreated: new Date().toISOString(),
       dateLastViewed: new Date().toISOString(),
-      color: null,
+      color: 0,
+      cover: "",
       taskLists: [],
     };
 
-    this.mockStorage.boards.push(newBoard);
-
-    return Promise.resolve({
-      data: clone(newBoard),
-      error: null,
-    });
+    this.mockStorage.boards[newBoard.id] = newBoard;
+    return clone(newBoard);
   }
 
   async addTaskList({ boardId, name }: AddTaskListArgs) {
@@ -260,69 +217,67 @@ export default class MockAPI implements API {
       throw notFoundError;
     }
 
-    const newTaskList = {
+    const newTaskList: TaskList = {
       id: nanoid(),
       boardId,
       name,
       position: Date.now(),
       archived: false,
       dateCreated: new Date().toISOString(),
-      color: null,
+      color: 0,
       tasks: [],
     };
 
-    board.taskLists?.push(newTaskList);
-
-    return Promise.resolve({
-      data: clone(newTaskList),
-      error: null,
-    });
+    this.mockStorage.taskLists[newTaskList.id] = newTaskList;
+    return clone(newTaskList);
   }
 
-  async deleteTaskList(arg: DeleteTaskListArgs) {
+  async deleteTaskList(id: ID) {
     await emulateDelay();
 
-    const [taskList, board] = this.findList(arg.taskListId);
+    const taskList = this.findList(id);
 
-    if (!taskList || !board) {
+    if (!taskList) {
       throw notFoundError;
     }
 
-    const idx = board.taskLists?.findIndex((t) => t.id === taskList.id) ?? -1;
-
-    if (idx >= 0) {
-      board.taskLists?.splice(idx, 1);
-    }
-
-    return Promise.resolve({
-      data: null,
-      error: null,
-    });
+    delete this.mockStorage.taskLists[id];
   }
 
   async editTaskList(arg: EditTaskListArgs) {
     await emulateDelay();
 
-    const [taskList, board] = this.findList(arg.taskListId);
+    const taskList = this.findList(arg.id);
 
-    if (!taskList || !board) {
+    if (!taskList) {
       throw notFoundError;
     }
 
     if (arg.name) {
       taskList.name = arg.name;
     }
+    if (arg.position) {
+      taskList.position = arg.position;
+    }
 
-    return Promise.resolve({
-      data: null,
-      error: null,
-    });
+    return taskList;
+  }
+
+  async getTask(id: ID): Promise<Task> {
+    await emulateDelay(1);
+    const task = this.mockStorage.tasks[id];
+
+    if (!task) {
+      throw notFoundError;
+    }
+
+    return task;
   }
 
   async editTask(arg: EditTaskArgs) {
     await emulateDelay();
 
-    const task = this.findTask(arg.taskId);
+    const task = this.findTask(arg.id);
 
     if (!task) {
       throw notFoundError;
@@ -331,37 +286,28 @@ export default class MockAPI implements API {
     if (arg.name) {
       task.name = arg.name;
     }
-
     if (arg.text) {
       task.text = arg.text;
     }
-
     if (arg.position) {
       task.position = arg.position;
     }
+    if (arg.task_list_id) {
+      task.taskListId = arg.task_list_id;
+    }
 
-    return Promise.resolve({
-      data: omit(["comments"], task),
-      error: null,
-    });
+    return task;
   }
 
-  async deleteBoard(arg: DeleteBoardArgs) {
+  async deleteBoard(id: ID) {
     await emulateDelay();
-    const idx = this.mockStorage.boards.findIndex(
-      (board) => board.id === arg.boardId
-    );
+    const board = this.findBoard(id);
 
-    if (idx < 0) {
+    if (!board) {
       throw notFoundError;
     }
 
-    this.mockStorage.boards.splice(idx, 1);
-
-    return Promise.resolve({
-      data: null,
-      error: null,
-    });
+    delete this.mockStorage.boards[id];
   }
 
   async addComment(arg: AddCommentArgs) {
@@ -381,35 +327,27 @@ export default class MockAPI implements API {
       dateCreated: new Date().toISOString(),
     };
 
-    return {
-      data: comment,
-      error: null,
-    };
+    return comment;
   }
 
-  async deleteComment(arg: ById) {
+  async deleteComment(id: ID) {
     await emulateDelay(1.5);
 
-    const [comment, task] = this.findComment(arg.id);
+    const comment = this.findComment(id);
 
-    if (!task || !comment) {
+    if (!comment) {
       throw notFoundError;
     }
 
-    task.comments.splice(task.comments.indexOf(comment), 1);
-
-    return {
-      data: null,
-      error: null,
-    };
+    delete this.mockStorage.comments[id];
   }
 
   async editComment(arg: EditCommentArgs) {
     await emulateDelay(1.5);
 
-    const [comment, task] = this.findComment(arg.commentId);
+    const comment = this.findComment(arg.id);
 
-    if (!task || !comment) {
+    if (!comment) {
       throw notFoundError;
     }
 
@@ -417,9 +355,6 @@ export default class MockAPI implements API {
       comment.text = arg.text;
     }
 
-    return {
-      data: comment,
-      error: null,
-    };
+    return comment;
   }
 }

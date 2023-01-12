@@ -1,10 +1,11 @@
+import { settings } from "configs/settings";
+
 import { API } from "./types";
-import MockAPI from "./mockAPI";
+import { APIService } from "./backend";
 
 export { default as MockAPI } from "./mockAPI";
-
 export * from "./types";
 
 export function getAPI(): API {
-  return new MockAPI("sadPoe");
+  return new APIService(settings.apiURL);
 }
