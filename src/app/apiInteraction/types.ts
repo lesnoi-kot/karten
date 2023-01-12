@@ -6,12 +6,10 @@ import { FetchState } from "utils/types";
 export type RequestInfo = {
   state: FetchState;
   action: AnyAction;
-  error: string | null;
+  error: any;
 };
-
-export type RequestKey = { requestKey?: string };
-
-export type APIAction<T> = PayloadAction<T & RequestKey>;
+export type WithRequestKey = { requestKey: string };
+export type APIAction<T> = PayloadAction<T, string, WithRequestKey>;
 
 export type TaskListId = {
   taskListId: ID;
@@ -21,15 +19,13 @@ export type WithError = {
   error: string;
 };
 
-export type DeleteTaskListPayload = {
-  taskListId: ID;
-  boardId: ID;
+export type AddProjectPayload = {
+  name: string;
 };
 
 export type AddTaskPayload = {
-  boardId: ID;
   taskListId: ID;
-  title: string;
+  name: string;
 };
 
 export type AddCommentPayload = {
@@ -38,14 +34,8 @@ export type AddCommentPayload = {
 };
 
 export type AddBoardPayload = {
+  projectId: ID;
   name: string;
-};
-
-export type UpdateTaskPayload = {
-  taskId: ID;
-  name?: string;
-  text?: string;
-  position?: number;
 };
 
 export type AddTaskListPayload = {
@@ -53,37 +43,30 @@ export type AddTaskListPayload = {
   name: string;
 };
 
+export type UpdateProjectPayload = {
+  id: ID;
+  name: string;
+};
+
 export type UpdateTaskListPayload = {
-  boardId: ID;
-  taskListId: ID;
+  id: ID;
   name?: string;
   position?: number;
 };
 
-export type ClearTaskListPayload = {
-  taskListId: ID;
-};
-
 export type UpdateBoardPayload = {
-  boardId: ID;
+  id: ID;
   name?: string;
 };
 
-export type UpdateCommentPayload = {
-  commentId: ID;
+export type UpdateTaskPayload = {
+  id: ID;
+  name?: string;
   text?: string;
+  position?: number;
 };
 
-export type TaskDeletedPayload = {
-  taskId: ID;
-  taskListId: ID;
-};
-
-export type DeleteCommentPayload = {
-  commentId: ID;
-};
-
-export type TasksDeletedPayload = {
-  taskIds: ID[];
-  taskListId: ID;
+export type UpdateCommentPayload = {
+  id: ID;
+  text?: string;
 };

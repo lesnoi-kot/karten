@@ -6,21 +6,18 @@ import { FetchState } from "utils/types";
 import {
   AddBoardPayload,
   AddCommentPayload,
+  AddProjectPayload,
   AddTaskPayload,
-  ClearTaskListPayload,
-  DeleteTaskListPayload,
-  DeleteCommentPayload,
-  TaskDeletedPayload,
-  TaskListId,
-  TasksDeletedPayload,
   UpdateBoardPayload,
   UpdateTaskListPayload,
   UpdateCommentPayload,
+  UpdateProjectPayload,
   UpdateTaskPayload,
   WithError,
   APIAction,
-  RequestKey,
+  WithRequestKey,
   RequestInfo,
+  TaskListId,
 } from "./types";
 
 export type TaskListMetaInfo = {
@@ -41,22 +38,18 @@ const initialState: APISlice = {
   requestsInfo: {},
 };
 
-// const injectRequestId = <T>(payload: T) => ({
-//   payload,
-//   meta: {
-//     requestId: nanoid(),
-//   },
-// });
-
-const setRequestInitiated = <T>(state: APISlice, action: APIAction<T>) => {
-  if (action.payload.requestKey) {
-    state.requestsInfo[action.payload.requestKey] = {
-      state: FetchState.PENDING,
-      error: null,
-      action,
-    };
-  }
+const setRequestInitiated = <S extends APISlice, T>(
+  state: S,
+  action: APIAction<T>,
+) => {
+  state.requestsInfo[action.meta.requestKey] = {
+    state: FetchState.PENDING,
+    error: null,
+    action,
+  };
 };
+
+// TODO: fix payload types for all actions
 
 export const {
   actions,
@@ -66,18 +59,42 @@ export const {
   name: "apiInteraction",
   initialState,
   reducers: {
-    requestLoaded: (state, { payload }: PayloadAction<RequestKey>) => {
-      if (payload.requestKey) {
-        delete state.requestsInfo[payload.requestKey];
-      }
+    /*
+      Meta actions
+    */
+    requestLoaded: {
+      reducer: (state, { meta }: APIAction<null>) => {
+        const { requestKey } = meta;
+        state.requestsInfo[requestKey].state = FetchState.FULFILLED;
+        delete state.requestsInfo[requestKey].error;
+      },
+      prepare: (requestKey: string) => ({
+        payload: null,
+        meta: { requestKey },
+      }),
     },
-    requestFailed: (state, action: PayloadAction<RequestKey & WithError>) => {
-      const { requestKey, error } = action.payload;
-      if (requestKey) {
-        state.requestsInfo[requestKey].error = error;
+
+    requestFailed: {
+      reducer: (state, action: APIAction<any>) => {
+        const { requestKey } = action.meta;
+        state.requestsInfo[requestKey].error = action.payload;
         state.requestsInfo[requestKey].state = FetchState.FAILED;
-      }
+      },
+      prepare: (error: any, requestKey: string) => ({
+        payload: error,
+        meta: { requestKey },
+      }),
     },
+
+    /*
+      Projects
+    */
+    getProjects: requestWithPayload<void>(),
+    getProject: requestWithPayload<ID>(),
+    addProject: requestWithPayload<AddProjectPayload>(),
+    updateProject: requestWithPayload<UpdateProjectPayload>(),
+    deleteProject: requestWithPayload<ID>(),
+
     /*
       Tasks
     */
@@ -103,14 +120,11 @@ export const {
       };
     },
 
-    deleteTaskRequest: (state, action: PayloadAction<TaskDeletedPayload>) => {},
+    deleteTaskRequest: (state, action: PayloadAction<ID>) => {},
     deleteTaskRequestFailed: (state, action) => {},
     deleteTaskRequestLoaded: (state) => {},
 
-    deleteTasksRequest: (
-      state,
-      action: PayloadAction<TasksDeletedPayload>,
-    ) => {},
+    deleteTasksRequest: (state, action: PayloadAction<ID[]>) => {},
     deleteTasksRequestFailed: (state, action: PayloadAction<string>) => {},
     deleteTasksRequestLoaded: (state) => {},
 
@@ -124,7 +138,7 @@ export const {
     /*
       TaskLists
     */
-    taskListRequest: (state, action) => {},
+    taskListRequest: (state, action: PayloadAction<ID>) => {},
     taskListRequestFailed: (state, action) => {},
     taskListRequestLoaded: (state) => {},
 
@@ -138,10 +152,7 @@ export const {
       state.taskListAddRequestState = FetchState.FULFILLED;
     },
 
-    deleteTaskListRequest: (
-      state,
-      action: PayloadAction<DeleteTaskListPayload>,
-    ) => {},
+    deleteTaskListRequest: (state, action: PayloadAction<ID>) => {},
     deleteTaskListRequestFailed: (state, action) => {},
     deleteTaskListRequestLoaded: (state) => {},
 
@@ -152,20 +163,12 @@ export const {
     updateTaskListRequestFailed: (state, action) => {},
     updateTaskListRequestLoaded: (state) => {},
 
-    clearTaskListRequest: (
-      state,
-      action: PayloadAction<ClearTaskListPayload>,
-    ) => {},
-
+    clearTaskListRequest: (state, action: PayloadAction<ID>) => {},
     syncTaskListRequest: (state, action: PayloadAction<ID>) => {},
 
     /*
       Boards
     */
-    boardsRequest: (state) => {},
-    boardsRequestFailed: (state, action: PayloadAction<Error | null>) => {},
-    boardsRequestLoaded: (state) => {},
-
     boardRequest: (state, action: PayloadAction<ID>) => {},
     boardRequestFailed: (state, action) => {},
     boardRequestLoaded: (state) => {},
@@ -198,18 +201,39 @@ export const {
     /*
       Comments
     */
-    addCommentRequest: (state, action: APIAction<AddCommentPayload>) =>
-      setRequestInitiated(state, action),
-
-    deleteCommentRequest: (
+    addCommentRequest: (
       state,
-      action: PayloadAction<DeleteCommentPayload>,
-    ) => {},
+      action: PayloadAction<AddCommentPayload & WithRequestKey>,
+    ) => {
+      // setRequestInitiated(state, action);
+    },
+
+    deleteCommentRequest: (state, action: PayloadAction<ID>) => {},
     deleteCommentRequestLoaded: (state) => {},
     deleteCommentRequestFailed: (state, action: PayloadAction<string>) => {},
 
-    updateCommentRequest: (state, action: APIAction<UpdateCommentPayload>) =>
-      setRequestInitiated(state, action),
+    updateCommentRequest: (
+      state,
+      action: PayloadAction<UpdateCommentPayload & WithRequestKey>,
+    ) => {
+      // setRequestInitiated(state, action),
+    },
   },
   extraReducers: (builder) => {},
 });
+
+function requestWithPayload<P>() {
+  return {
+    reducer: (state: APISlice, action: APIAction<P>) => {
+      state.requestsInfo[action.meta.requestKey] = {
+        state: FetchState.PENDING,
+        error: null,
+        action,
+      };
+    },
+    prepare: (payload: P, requestKey?: string) => ({
+      payload,
+      meta: { requestKey: requestKey ?? nanoid() },
+    }),
+  };
+}

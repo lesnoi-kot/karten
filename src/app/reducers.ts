@@ -1,7 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
 
 import {
-  reducer as projectsReducer,
+  reducer as projectsPageReducer,
   sliceName as projectsPageSliceName,
 } from "pages/Projects/slice";
 
@@ -14,6 +14,11 @@ import {
   reducer as confirmDialogReducer,
   sliceName as confirmDialogSliceName,
 } from "components/ConfirmDialog/slice";
+
+import {
+  reducer as projectsReducer,
+  sliceName as projectsSliceName,
+} from "./projects";
 
 import {
   reducer as taskListsReducer,
@@ -41,6 +46,7 @@ export const rootReducer = combineReducers({
   [apiInteractionSliceName]: apiInteractionReducer,
 
   entities: combineReducers({
+    [projectsSliceName]: projectsReducer,
     [boardsSliceName]: boardsReducer,
     [taskListsSliceName]: taskListsReducer,
     [tasksSliceName]: tasksReducer,
@@ -48,7 +54,7 @@ export const rootReducer = combineReducers({
   }),
 
   pages: combineReducers({
-    [projectsPageSliceName]: projectsReducer,
+    [projectsPageSliceName]: projectsPageReducer,
     [boardPageSliceName]: boardPageReducer,
   }),
 
