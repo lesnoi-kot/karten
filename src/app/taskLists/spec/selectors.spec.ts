@@ -1,7 +1,11 @@
 import { RootState } from "app";
 import { FetchState } from "utils/types";
 
-import { selectBoardsIds } from "../selectors";
+import {
+  selectTaskListIds,
+  selectTaskListsAsArray,
+  selectSortedTaskListIds,
+} from "../selectors";
 
 let store: RootState = {
   apiInteraction: {
@@ -180,8 +184,47 @@ let store: RootState = {
   },
 };
 
-describe("app/boards/selectors.ts", () => {
-  it("selectBoardsIds", () => {
-    expect(selectBoardsIds(store)).toEqual(["1"]);
+describe("app/taskLists/selectors.ts", () => {
+  it("selectTaskListsAsArray", () => {
+    expect(selectTaskListsAsArray(store)).toEqual([
+      {
+        id: "A",
+        boardId: "1",
+        name: "To do",
+        position: 1000,
+        archived: false,
+        dateCreated: "2022-08-25T15:26:59.673Z",
+        color: 0,
+        tasks: ["1", "2", "3", "6", "7"],
+      },
+      {
+        id: "B",
+        boardId: "1",
+        name: "In progress",
+        position: 2000,
+        archived: false,
+        dateCreated: "2022-08-25T15:26:59.673Z",
+        color: 0,
+        tasks: ["4"],
+      },
+      {
+        id: "C",
+        boardId: "1",
+        name: "Done",
+        position: 0,
+        archived: false,
+        dateCreated: "2022-08-25T15:26:59.673Z",
+        color: 0,
+        tasks: ["5"],
+      },
+    ]);
+  });
+
+  it("selectTaskListIds", () => {
+    expect(selectTaskListIds(store, "1")).toEqual(["A", "B", "C"]);
+  });
+
+  it("selectSortedTaskListIds", () => {
+    expect(selectSortedTaskListIds(store, "1")).toEqual(["C", "A", "B"]);
   });
 });

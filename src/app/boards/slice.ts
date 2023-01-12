@@ -4,15 +4,19 @@ import { ID, Board } from "models/types";
 
 export type BoardsMap = Record<ID, Board>;
 
-export type BoardsSlice = {
+export type BoardsState = {
   items: BoardsMap;
 };
 
-const initialState: BoardsSlice = {
+const initialState: BoardsState = {
   items: {},
 };
 
-export const { actions, reducer, name: sliceName } = createSlice({
+export const {
+  actions,
+  reducer,
+  name: sliceName,
+} = createSlice({
   name: "boards",
   initialState,
   reducers: {

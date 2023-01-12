@@ -21,7 +21,6 @@ function App() {
     <Routes>
       <Route element={<Page />}>
         {generateRoutes(routes)}
-        <Route index element={<defaultRoute.component />} />
         <Route path="*" element={<Navigate to={defaultRoute.path} />} />
       </Route>
     </Routes>

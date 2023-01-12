@@ -1,4 +1,3 @@
-import React from "react";
 import { useSelector } from "react-redux";
 
 import { FetchState } from "utils/types";
@@ -9,24 +8,30 @@ import { RequestInfo } from "./types";
 
 type UseRequestInfoReturnType = Partial<RequestInfo> & {
   isLoading: boolean;
+  isError: boolean;
+  isLoaded: boolean;
 };
 
 export const useRequestInfo = (
-  requestKey: string
+  requestKey: string,
 ): UseRequestInfoReturnType => {
   const requestInfo = useSelector((state: RootState) =>
-    selectRequestInfo(state, requestKey)
+    selectRequestInfo(state, requestKey),
   );
 
   if (!requestInfo) {
     return {
+      state: FetchState.INITIAL,
       isLoading: false,
-      error: null,
+      isError: false,
+      isLoaded: false,
     };
   }
 
   return {
     isLoading: requestInfo.state === FetchState.PENDING,
+    isError: requestInfo.state === FetchState.FAILED,
+    isLoaded: requestInfo.state === FetchState.FULFILLED,
     ...requestInfo,
   };
 };

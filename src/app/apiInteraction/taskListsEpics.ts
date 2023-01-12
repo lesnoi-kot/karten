@@ -12,16 +12,12 @@ import { UpdateTaskListPayload } from "./types";
 export const taskListRequestEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.taskListRequest.match),
-    mergeMap(({ payload: { boardId, taskListId } }) =>
-      from(api.getTaskList({ boardId, taskListId })).pipe(
-        mergeMap(({ data: taskList, error }: any) => {
-          if (error) {
-            return of(actions.taskListRequestFailed(String(error)));
-          }
-
-          return of(taskListSet(taskList), actions.taskListRequestLoaded());
-        }),
-        catchError((error) => of(actions.taskListRequestFailed(String(error)))),
+    mergeMap(({ payload: taskListId }) =>
+      from(api.getTaskList(taskListId)).pipe(
+        mergeMap((taskList) =>
+          of(taskListSet(taskList), actions.taskListRequestLoaded()),
+        ),
+        catchError((error) => of(actions.taskListRequestFailed(error))),
       ),
     ),
   );
@@ -29,7 +25,7 @@ export const taskListRequestEpic: Epic = (action$, store$, { api }) =>
 export const taskListAddEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.addTaskListRequest.match),
-    mergeMap(({ payload: { boardId, name }, type }) =>
+    mergeMap(({ payload: { boardId, name } }) =>
       from(api.addTaskList({ boardId, name })).pipe(
         mergeMap(({ data: taskList, error }: any) => {
           if (error) {
@@ -48,12 +44,9 @@ export const taskListAddEpic: Epic = (action$, store$, { api }) =>
 export const taskListDeleteEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.deleteTaskListRequest.match),
-    mergeMap(({ payload: { taskListId, boardId } }) =>
-      from(api.deleteTaskList({ taskListId, boardId })).pipe(
-        mergeMap(({ error }: any) => {
-          if (error) {
-            return of(actions.deleteTaskListRequestFailed(String(error)));
-          }
+    mergeMap(({ payload: taskListId }) =>
+      from(api.deleteTaskList(taskListId)).pipe(
+        mergeMap(() => {
           return of(
             taskListDeleted(taskListId),
             actions.deleteTaskListRequestLoaded(),
@@ -69,17 +62,11 @@ export const taskListDeleteEpic: Epic = (action$, store$, { api }) =>
 export const taskListUpdateEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.updateTaskListRequest.match),
-    mergeMap(({ payload: { taskListId, boardId, name } }) =>
-      from(api.editTaskList({ taskListId, boardId, name })).pipe(
-        mergeMap(({ error }: any) => {
-          if (error) {
-            return of(actions.updateTaskListRequestFailed(String(error)));
-          }
-          return of(
-            taskListUpdated({ id: taskListId, name }),
-            actions.updateTaskListRequestLoaded(),
-          );
-        }),
+    mergeMap(({ payload }) =>
+      from(api.editTaskList(payload)).pipe(
+        mergeMap((taskList) =>
+          of(taskListUpdated(taskList), actions.updateTaskListRequestLoaded()),
+        ),
         catchError((error) =>
           of(actions.updateTaskListRequestFailed(String(error))),
         ),
@@ -90,16 +77,13 @@ export const taskListUpdateEpic: Epic = (action$, store$, { api }) =>
 export const taskListClearEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.clearTaskListRequest.match),
-    mergeMap(({ payload: { taskListId } }) => {
+    mergeMap(({ payload: taskListId }) => {
       const taskIds = selectTaskIds(store$.value, taskListId);
+
       return of(
         of(tasksDeleted(taskIds)),
-        from(api.deleteTasks({ taskIds, taskListId })).pipe(
-          map(({ error }) =>
-            error !== null
-              ? actions.deleteTaskRequestFailed(error)
-              : actions.deleteTasksRequestLoaded(),
-          ),
+        from(api.deleteTasks(taskIds)).pipe(
+          map(() => actions.deleteTasksRequestLoaded()),
           catchError((error) =>
             of(actions.deleteTasksRequestFailed(String(error))),
           ),
@@ -116,8 +100,7 @@ export const syncTaskListEpic: Epic = (action$, store$, { api }) =>
       const taskList = selectTaskListById(store$.value, taskListId)!;
 
       const payload: UpdateTaskListPayload = {
-        taskListId,
-        boardId: taskList.boardId,
+        id: taskListId,
         name: taskList.name,
         position: taskList.position,
       };

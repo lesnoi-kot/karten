@@ -1,4 +1,4 @@
-import { Board, ID, Project, TaskList, Task, Comment } from "models/types";
+import { Board, Project, TaskList, Task, Comment } from "models/types";
 import {
   ProjectDTO,
   BoardDTO,
@@ -6,8 +6,6 @@ import {
   TaskDTO,
   CommentDTO,
 } from "./types";
-
-const getId = (obj: { id: ID }): ID => obj.id;
 
 export function convertProjectDTO(dto: ProjectDTO): Project {
   return {

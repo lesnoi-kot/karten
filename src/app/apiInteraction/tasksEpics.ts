@@ -11,21 +11,21 @@ import { UpdateTaskPayload } from "./types";
 export const addTaskEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.addTaskRequest.match),
-    mergeMap(({ payload: { boardId, taskListId, title } }) =>
-      from(
-        api.addTask({
-          boardId,
-          taskListId,
-          task: { name: title },
-        }),
-      ).pipe(
-        mergeMap(({ error, data: task }) =>
-          error !== null
-            ? of(actions.addTaskRequestFailed({ taskListId, error }))
-            : of(taskSet(task!), actions.addTaskRequestLoaded({ taskListId })),
+    mergeMap(({ payload }) =>
+      from(api.addTask(payload)).pipe(
+        mergeMap((task) =>
+          of(
+            taskSet(task),
+            actions.addTaskRequestLoaded({ taskListId: payload.taskListId }),
+          ),
         ),
         catchError((error) =>
-          of(actions.addTaskRequestFailed({ taskListId, error })),
+          of(
+            actions.addTaskRequestFailed({
+              taskListId: payload.taskListId,
+              error,
+            }),
+          ),
         ),
       ),
     ),
@@ -34,13 +34,9 @@ export const addTaskEpic: Epic = (action$, store$, { api }) =>
 export const deleteTaskEpic: Epic = (action$, _, { api }) =>
   action$.pipe(
     filter(actions.deleteTaskRequest.match),
-    mergeMap(({ payload: { taskId, taskListId } }) =>
-      from(api.deleteTask({ taskId })).pipe(
-        mergeMap(({ error }) =>
-          error !== null
-            ? of(actions.deleteTaskRequestFailed(new Error(error)))
-            : of(actions.deleteTaskRequestLoaded()),
-        ),
+    mergeMap(({ payload: taskId }) =>
+      from(api.deleteTask(taskId)).pipe(
+        mergeMap(() => of(actions.deleteTaskRequestLoaded())),
         catchError((error) => of(actions.deleteTaskRequestFailed(error))),
       ),
     ),
@@ -49,19 +45,15 @@ export const deleteTaskEpic: Epic = (action$, _, { api }) =>
 export const optimisticDeleteTaskEpic: Epic = (action$) =>
   action$.pipe(
     filter(actions.deleteTaskRequest.match),
-    map(({ payload: { taskId } }) => taskDeleted(taskId)),
+    map(({ payload: taskId }) => taskDeleted(taskId)),
   );
 
 export const deleteTasksEpic: Epic = (action$, _, { api }) =>
   action$.pipe(
     filter(actions.deleteTasksRequest.match),
-    mergeMap(({ payload: { taskIds, taskListId } }) =>
-      from(api.deleteTasks({ taskIds, taskListId })).pipe(
-        mergeMap(({ error }) =>
-          error !== null
-            ? of(actions.deleteTaskRequestFailed(error))
-            : of(actions.deleteTasksRequestLoaded()),
-        ),
+    mergeMap(({ payload: taskIds }) =>
+      from(api.deleteTasks(taskIds)).pipe(
+        mergeMap(() => of(actions.deleteTasksRequestLoaded())),
         catchError((error) =>
           of(actions.deleteTasksRequestFailed(String(error))),
         ),
@@ -72,18 +64,16 @@ export const deleteTasksEpic: Epic = (action$, _, { api }) =>
 export const optimisticDeleteTasksEpic: Epic = (action$) =>
   action$.pipe(
     filter(actions.deleteTasksRequest.match),
-    map(({ payload: { taskIds } }) => tasksDeleted(taskIds)),
+    map(({ payload: taskIds }) => tasksDeleted(taskIds)),
   );
 
 export const updateTaskEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.updateTaskRequest.match),
-    mergeMap(({ payload: { taskId, name, text } }) =>
-      from(api.editTask({ taskId, name, text })).pipe(
-        mergeMap(({ error, data: task }) =>
-          error !== null
-            ? of(actions.updateTaskRequestFailed(error))
-            : of(taskUpdated(task!), actions.updateTaskRequestLoaded()),
+    mergeMap(({ payload }) =>
+      from(api.editTask(payload)).pipe(
+        mergeMap((task) =>
+          of(taskUpdated(task), actions.updateTaskRequestLoaded()),
         ),
         catchError((error) =>
           of(actions.updateTaskRequestFailed(String(error))),
@@ -99,7 +89,7 @@ export const syncTaskEpic: Epic = (action$, store$, { api }) =>
       const task = selectTaskById(store$.value, taskId)!;
 
       const payload: UpdateTaskPayload = {
-        taskId,
+        id: taskId,
         name: task.name,
         text: task.text,
         position: task.position,

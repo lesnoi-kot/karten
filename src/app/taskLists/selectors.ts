@@ -1,5 +1,6 @@
 import { sort, filter, propEq } from "ramda";
 import { createCachedSelector } from "re-reselect";
+import { createSelector } from "reselect";
 
 import { ID } from "models/types";
 import { RootState } from "app";
@@ -24,3 +25,23 @@ export const selectSortedTaskIds = createCachedSelector(
   (taskIds, tasks) =>
     sort((id1, id2) => tasks[id1].position - tasks[id2].position, taskIds),
 )((_, taskListId) => taskListId);
+
+export const selectTaskListIds = createCachedSelector(
+  [selectTaskLists, extraParam<ID>()],
+  (taskLists, boardId) =>
+    Object.keys(filter(propEq("boardId", boardId), taskLists)),
+)((_, boardId) => boardId);
+
+export const selectTaskListsAsArray = createSelector(
+  selectTaskLists,
+  (taskListsMap) => Object.values(taskListsMap),
+);
+
+export const selectSortedTaskListIds = createCachedSelector(
+  [selectTaskListsAsArray, extraParam<ID>()],
+  (taskLists, boardId) =>
+    taskLists
+      .filter((list) => list.boardId === boardId)
+      .sort((a, b) => a.position - b.position)
+      .map((list) => list.id),
+)((_, boardId) => boardId);

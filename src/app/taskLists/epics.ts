@@ -9,8 +9,11 @@ import { actionPayloadNotEmptyArray } from "utils/epics";
 
 import { POSITION_GAP } from "../../constants";
 import { actions } from "./slice";
-import { selectTaskIds, selectTaskListById } from "./selectors";
-import { selectSortedTaskListIds } from "app/boards/selectors";
+import {
+  selectTaskIds,
+  selectTaskListById,
+  selectSortedTaskListIds,
+} from "./selectors";
 
 export const onTaskListDeletedEpic: Epic = (action$, store$) =>
   action$.pipe(

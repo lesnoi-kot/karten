@@ -1,10 +1,8 @@
-import { filter, propEq } from "ramda";
+import { values, prop, propEq } from "ramda";
 import { createSelector } from "reselect";
-import { createCachedSelector } from "re-reselect";
 
 import { ID } from "models/types";
 import { RootState } from "app";
-import { selectTaskLists } from "app/taskLists/selectors";
 import { extraParam } from "utils/selectors";
 
 import { BoardsMap, sliceName } from "./slice";
@@ -20,22 +18,8 @@ export const selectBoard = (state: RootState, id: ID) =>
 export const selectBoardName = (state: RootState, id: ID): string =>
   selectBoards(state)[id]?.name ?? "";
 
-export const selectTaskListsAsArray = createSelector(
-  selectTaskLists,
-  (taskListsMap) => Object.values(taskListsMap)
+export const selectBoardsIdsByProjectId = createSelector(
+  [selectBoards, extraParam<ID>()],
+  (boards, projectId) =>
+    values(boards).filter(propEq("projectId", projectId)).map(prop("id")),
 );
-
-export const selectTaskListIds = createCachedSelector(
-  [selectTaskLists, extraParam<ID>()],
-  (taskLists, boardId) =>
-    Object.keys(filter(propEq("boardId", boardId), taskLists))
-)((_, boardId) => boardId);
-
-export const selectSortedTaskListIds = createCachedSelector(
-  [selectTaskListsAsArray, extraParam<ID>()],
-  (taskLists, boardId) =>
-    taskLists
-      .filter((list) => list.boardId === boardId)
-      .sort((a, b) => a.position - b.position)
-      .map((list) => list.id)
-)((_, boardId) => boardId);
