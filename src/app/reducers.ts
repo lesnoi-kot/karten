@@ -1,11 +1,6 @@
 import { combineReducers } from "@reduxjs/toolkit";
 
 import {
-  reducer as projectsPageReducer,
-  sliceName as projectsPageSliceName,
-} from "pages/Projects/slice";
-
-import {
   reducer as boardPageReducer,
   sliceName as boardPageSliceName,
 } from "pages/Board/slice";
@@ -54,7 +49,6 @@ export const rootReducer = combineReducers({
   }),
 
   pages: combineReducers({
-    [projectsPageSliceName]: projectsPageReducer,
     [boardPageSliceName]: boardPageReducer,
   }),
 

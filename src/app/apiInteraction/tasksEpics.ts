@@ -3,10 +3,10 @@ import { filter, mergeMap, catchError, map } from "rxjs/operators";
 
 import { taskSet, taskDeleted, tasksDeleted, taskUpdated } from "app/tasks";
 import { selectTaskById } from "app/tasks/selectors";
+import { showSnackbar } from "components/Snackbars/slice";
 
 import { Epic } from "../types";
 import { actions } from "./slice";
-import { UpdateTaskPayload } from "./types";
 
 export const addTaskEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
@@ -14,10 +14,7 @@ export const addTaskEpic: Epic = (action$, store$, { api }) =>
     mergeMap(({ payload }) =>
       from(api.addTask(payload)).pipe(
         mergeMap((task) =>
-          of(
-            taskSet(task),
-            actions.addTaskRequestLoaded({ taskListId: payload.taskListId }),
-          ),
+          of(taskSet(task), actions.addTaskRequestLoaded(payload.taskListId)),
         ),
         catchError((error) =>
           of(
@@ -25,6 +22,7 @@ export const addTaskEpic: Epic = (action$, store$, { api }) =>
               taskListId: payload.taskListId,
               error,
             }),
+            showSnackbar({ message: String(error), type: "error" }),
           ),
         ),
       ),
@@ -34,10 +32,10 @@ export const addTaskEpic: Epic = (action$, store$, { api }) =>
 export const deleteTaskEpic: Epic = (action$, _, { api }) =>
   action$.pipe(
     filter(actions.deleteTaskRequest.match),
-    mergeMap(({ payload: taskId }) =>
+    mergeMap(({ payload: taskId, meta: { requestKey } }) =>
       from(api.deleteTask(taskId)).pipe(
-        mergeMap(() => of(actions.deleteTaskRequestLoaded())),
-        catchError((error) => of(actions.deleteTaskRequestFailed(error))),
+        mergeMap(() => of(actions.requestLoaded(requestKey))),
+        catchError((error) => of(actions.requestFailed(error, requestKey))),
       ),
     ),
   );
@@ -51,11 +49,11 @@ export const optimisticDeleteTaskEpic: Epic = (action$) =>
 export const deleteTasksEpic: Epic = (action$, _, { api }) =>
   action$.pipe(
     filter(actions.deleteTasksRequest.match),
-    mergeMap(({ payload: taskIds }) =>
+    mergeMap(({ payload: taskIds, meta: { requestKey } }) =>
       from(api.deleteTasks(taskIds)).pipe(
-        mergeMap(() => of(actions.deleteTasksRequestLoaded())),
+        mergeMap(() => of(actions.requestLoaded(requestKey))),
         catchError((error) =>
-          of(actions.deleteTasksRequestFailed(String(error))),
+          of(actions.requestFailed(String(error), requestKey)),
         ),
       ),
     ),
@@ -70,13 +68,13 @@ export const optimisticDeleteTasksEpic: Epic = (action$) =>
 export const updateTaskEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.updateTaskRequest.match),
-    mergeMap(({ payload }) =>
+    mergeMap(({ payload, meta: { requestKey } }) =>
       from(api.editTask(payload)).pipe(
         mergeMap((task) =>
-          of(taskUpdated(task), actions.updateTaskRequestLoaded()),
+          of(taskUpdated(task), actions.requestLoaded(requestKey)),
         ),
         catchError((error) =>
-          of(actions.updateTaskRequestFailed(String(error))),
+          of(actions.requestFailed(String(error), requestKey)),
         ),
       ),
     ),
@@ -88,11 +86,13 @@ export const syncTaskEpic: Epic = (action$, store$, { api }) =>
     map(({ payload: taskId }) => {
       const task = selectTaskById(store$.value, taskId)!;
 
-      const payload: UpdateTaskPayload = {
+      const payload = {
         id: taskId,
+        taskListId: task.taskListId,
         name: task.name,
         text: task.text,
         position: task.position,
+        dueDate: task.dueDate,
       };
 
       return actions.updateTaskRequest(payload);

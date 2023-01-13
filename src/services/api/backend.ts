@@ -29,6 +29,10 @@ import {
   TaskListDTO,
 } from "./types";
 
+const headers = {
+  "Content-Type": "application/json; charset=UTF-8",
+};
+
 export class APIService implements API {
   apiRootURL: string;
 
@@ -47,8 +51,8 @@ export class APIService implements API {
 
   private async checkResponseError(response: globalThis.Response) {
     if (response.status < 200 || response.status >= 300) {
-      const body = (await response.json()) as ResponseError<any>;
-      throw new APIError(body.error);
+      const body = (await response.json()) as ResponseError;
+      throw new APIError(body.message);
     }
   }
 
@@ -65,6 +69,7 @@ export class APIService implements API {
 
   async editProject(args: EditProjectArgs): Promise<Project> {
     const res = await fetch(`${this.apiRootURL}/projects/${args.id}`, {
+      headers,
       method: "PATCH",
       body: JSON.stringify({ name: args.name }),
     });
@@ -73,6 +78,7 @@ export class APIService implements API {
 
   async addProject(args: AddProjectArgs): Promise<Project> {
     const res = await fetch(`${this.apiRootURL}/projects`, {
+      headers,
       method: "POST",
       body: JSON.stringify(args),
     });
@@ -95,6 +101,7 @@ export class APIService implements API {
 
   async editBoard(args: EditBoardArgs): Promise<Board> {
     const res = await fetch(`${this.apiRootURL}/projects/${args.id}`, {
+      headers,
       method: "PATCH",
       body: JSON.stringify({ name: args.name }),
     });
@@ -112,6 +119,7 @@ export class APIService implements API {
     const { projectId, name } = args;
 
     const res = await fetch(`${this.apiRootURL}/projects/${projectId}/boards`, {
+      headers,
       method: "POST",
       body: JSON.stringify({ name }),
     });
@@ -127,6 +135,7 @@ export class APIService implements API {
 
   async editTaskList(args: EditTaskListArgs): Promise<TaskList> {
     const res = await fetch(`${this.apiRootURL}/task-lists/${args.id}`, {
+      headers,
       method: "PATCH",
       body: JSON.stringify({ name: args.name, position: args.position }),
     });
@@ -145,6 +154,7 @@ export class APIService implements API {
     const res = await fetch(
       `${this.apiRootURL}/boards/${args.boardId}/task-lists`,
       {
+        headers,
         method: "POST",
         body: JSON.stringify({ name: args.name }),
       },
@@ -161,12 +171,12 @@ export class APIService implements API {
 
   async editTask(args: EditTaskArgs): Promise<Task> {
     const res = await fetch(`${this.apiRootURL}/tasks/${args.id}`, {
+      headers,
       method: "PATCH",
       body: JSON.stringify({
         name: args.name,
         position: args.position,
         text: args.text,
-        due_date: args.due_date,
       }),
     });
 
@@ -188,8 +198,13 @@ export class APIService implements API {
     const res = await fetch(
       `${this.apiRootURL}/task-lists/${args.taskListId}/tasks`,
       {
+        headers,
         method: "POST",
-        body: JSON.stringify({ name: args.name }),
+        body: JSON.stringify({
+          name: args.name,
+          text: args.text ?? "",
+          position: args.position,
+        }),
       },
     );
     return convertTaskDTO(await this.unwrapResponse<TaskDTO>(res));
@@ -201,6 +216,7 @@ export class APIService implements API {
     const res = await fetch(
       `${this.apiRootURL}/tasks/${args.taskId}/comments`,
       {
+        headers,
         method: "POST",
         body: JSON.stringify({ text: args.text }),
       },
@@ -210,6 +226,7 @@ export class APIService implements API {
 
   async editComment(args: EditCommentArgs): Promise<Comment> {
     const res = await fetch(`${this.apiRootURL}/comments/${args.id}`, {
+      headers,
       method: "PATCH",
       body: JSON.stringify({ text: args.text }),
     });

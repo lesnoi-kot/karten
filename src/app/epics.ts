@@ -1,6 +1,5 @@
 import { combineEpics } from "redux-observable";
 
-import { epics as projectsPageEpics } from "pages/Projects";
 import { epics as boardPageEpics } from "pages/Board";
 
 import { epics as apiInteractionEpics } from "./apiInteraction";
@@ -20,9 +19,8 @@ export const rootEpic = combineEpics(
     apiInteractionEpics,
 
     // Pages
-    projectsPageEpics,
     boardPageEpics,
 
     // Components
-  ].flatMap(Object.values)
+  ].flatMap(Object.values),
 );

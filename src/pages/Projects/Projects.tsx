@@ -1,57 +1,63 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 import { Box, Grid, CircularProgress } from "@mui/material";
 
-import { FetchState } from "utils/types";
 import { buildURL } from "utils/routes";
-
-import { BoardPreview, NewBoardStub } from "components/Board";
-import Heading from "components/ui/Heading";
-import Link from "components/Link";
-
 import { actions as apiActions } from "app/apiInteraction";
-import { selectBoardsIds } from "app/boards/selectors";
+import { useRequest } from "app/apiInteraction/hooks";
+import { selectProjectsIds } from "app/projects/selectors";
+import { useAppSelector } from "app/hooks";
 import makePage from "pages/makePageHOC";
 
-import { selectFetchState } from "./slice";
-import styles from "./styles.module.css";
+import Heading from "components/ui/Heading";
+import ProjectPreview from "components/Project/ProjectPreview";
+import ErrorSplash from "components/ui/ErrorSplash";
+import Link from "components/Link";
+
+import NewProjectStub from "./NewProjectStub";
 
 function Projects() {
-  const dispatch = useDispatch();
-  const boards = useSelector(selectBoardsIds);
-  const fetchState = useSelector(selectFetchState);
+  const { load, isLoading, isLoaded, isError, error } = useRequest(
+    apiActions.getProjects,
+  );
+  const projects = useAppSelector(selectProjectsIds);
 
-  useEffect(() => {
-    dispatch(apiActions.boardsRequest());
-  }, [dispatch]);
+  useEffect(() => load(undefined), [load]);
 
   return (
     <>
       <Box mt={2} mb={5} textAlign="center">
-        <Heading>Personal boards</Heading>
+        <Heading>Projects</Heading>
       </Box>
 
-      {fetchState === FetchState.PENDING && (
+      {isLoading && (
         <Box textAlign="center">
           <CircularProgress />
         </Box>
       )}
 
-      {fetchState === FetchState.FULFILLED && (
-        <Grid container spacing={2} className={styles.boardsPreviewContainer}>
-          {boards.map((id) => (
+      {isError && <ErrorSplash message={error && String(error)} />}
+
+      {isLoaded && (
+        <Grid
+          container
+          gap={2}
+          width="60%"
+          marginX="auto"
+          justifyContent="center"
+        >
+          {projects.map((projectId) => (
             <Grid
-              key={id}
+              key={projectId}
               item
               component={Link}
-              to={buildURL("pages:board", { boardId: id })}
+              to={buildURL("pages:project", { projectId })}
               underline="none"
             >
-              <BoardPreview id={id} />
+              <ProjectPreview id={projectId} />
             </Grid>
           ))}
-          <Grid key="NewBoardStub" item>
-            <NewBoardStub />
+          <Grid key="NewProjectStub" item>
+            <NewProjectStub />
           </Grid>
         </Grid>
       )}

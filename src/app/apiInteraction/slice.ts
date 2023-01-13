@@ -4,49 +4,32 @@ import { ID } from "models/types";
 import { FetchState } from "utils/types";
 
 import {
-  AddBoardPayload,
-  AddCommentPayload,
-  AddProjectPayload,
-  AddTaskPayload,
-  UpdateBoardPayload,
-  UpdateTaskListPayload,
-  UpdateCommentPayload,
-  UpdateProjectPayload,
-  UpdateTaskPayload,
-  WithError,
-  APIAction,
-  WithRequestKey,
-  RequestInfo,
-  TaskListId,
-} from "./types";
+  AddProjectArgs,
+  AddBoardArgs,
+  AddTaskArgs,
+  EditProjectArgs,
+  EditCommentArgs,
+  AddCommentArgs,
+  EditBoardArgs,
+  EditTaskArgs,
+  EditTaskListArgs,
+  AddTaskListArgs,
+} from "services/api";
+
+import { WithError, APIAction, RequestInfo } from "./types";
 
 export type TaskListMetaInfo = {
   taskAddState: FetchState;
 };
 
 export type APISlice = {
-  boardAddRequestState: FetchState;
-  taskListAddRequestState: FetchState;
   taskLists: Record<ID, TaskListMetaInfo>;
   requestsInfo: Record<string, RequestInfo>;
 };
 
 const initialState: APISlice = {
-  taskListAddRequestState: FetchState.INITIAL,
-  boardAddRequestState: FetchState.INITIAL,
   taskLists: {},
   requestsInfo: {},
-};
-
-const setRequestInitiated = <S extends APISlice, T>(
-  state: S,
-  action: APIAction<T>,
-) => {
-  state.requestsInfo[action.meta.requestKey] = {
-    state: FetchState.PENDING,
-    error: null,
-    action,
-  };
 };
 
 // TODO: fix payload types for all actions
@@ -91,8 +74,8 @@ export const {
     */
     getProjects: requestWithPayload<void>(),
     getProject: requestWithPayload<ID>(),
-    addProject: requestWithPayload<AddProjectPayload>(),
-    updateProject: requestWithPayload<UpdateProjectPayload>(),
+    addProject: requestWithPayload<AddProjectArgs>(),
+    updateProject: requestWithPayload<EditProjectArgs>(),
     deleteProject: requestWithPayload<ID>(),
 
     /*
@@ -120,27 +103,18 @@ export const {
       };
     },
 
-    deleteTaskRequest: (state, action: PayloadAction<ID>) => {},
-    deleteTaskRequestFailed: (state, action) => {},
-    deleteTaskRequestLoaded: (state) => {},
-
-    deleteTasksRequest: (state, action: PayloadAction<ID[]>) => {},
-    deleteTasksRequestFailed: (state, action: PayloadAction<string>) => {},
-    deleteTasksRequestLoaded: (state) => {},
-
-    updateTaskRequest: (state, action: PayloadAction<UpdateTaskPayload>) => {},
-    updateTaskRequestFailed: (state, action: PayloadAction<string>) => {},
-    updateTaskRequestLoaded: (state) => {},
+    deleteTaskRequest: requestWithPayload<ID>(),
+    deleteTasksRequest: requestWithPayload<ID[]>(),
+    updateTaskRequest: requestWithPayload<EditTaskArgs>(),
 
     /* Sync server with a task in the local state */
-    syncTaskRequest: (state, action: PayloadAction<ID>) => {},
+    syncTaskRequest: requestWithPayload<ID>(),
 
     /*
       TaskLists
     */
-    taskListRequest: (state, action: PayloadAction<ID>) => {},
-    taskListRequestFailed: (state, action) => {},
-    taskListRequestLoaded: (state) => {},
+    taskListRequest: requestWithPayload<ID>(),
+    addTaskListRequest: requestWithPayload<AddTaskListArgs>(),
 
     addTaskListRequest: (state, action) => {
       state.taskListAddRequestState = FetchState.PENDING;
@@ -152,19 +126,10 @@ export const {
       state.taskListAddRequestState = FetchState.FULFILLED;
     },
 
-    deleteTaskListRequest: (state, action: PayloadAction<ID>) => {},
-    deleteTaskListRequestFailed: (state, action) => {},
-    deleteTaskListRequestLoaded: (state) => {},
-
-    updateTaskListRequest: (
-      state,
-      action: PayloadAction<UpdateTaskListPayload>,
-    ) => {},
-    updateTaskListRequestFailed: (state, action) => {},
-    updateTaskListRequestLoaded: (state) => {},
-
-    clearTaskListRequest: (state, action: PayloadAction<ID>) => {},
-    syncTaskListRequest: (state, action: PayloadAction<ID>) => {},
+    deleteTaskListRequest: requestWithPayload<ID>(),
+    updateTaskListRequest: requestWithPayload<EditTaskListArgs>(),
+    clearTaskListRequest: requestWithPayload<ID>(),
+    syncTaskListRequest: requestWithPayload<ID>(),
 
     /*
       Boards
@@ -173,51 +138,20 @@ export const {
     boardRequestFailed: (state, action) => {},
     boardRequestLoaded: (state) => {},
 
-    addBoardRequest: (state, action: PayloadAction<AddBoardPayload>) => {
-      state.boardAddRequestState = FetchState.PENDING;
-    },
-    addBoardRequestLoaded: (state) => {
-      state.boardAddRequestState = FetchState.FULFILLED;
-    },
-    addBoardRequestFailed: (state, action: PayloadAction<string>) => {
-      state.boardAddRequestState = FetchState.FAILED;
-    },
+    updateBoardRequest: requestWithPayload<EditBoardArgs>(),
+    clearBoardRequest: requestWithPayload<ID>(),
 
-    updateBoardRequest: (
-      state,
-      action: PayloadAction<UpdateBoardPayload>,
-    ) => {},
-    updateBoardRequestLoaded: (state) => {},
-    updateBoardRequestFailed: (state, action: PayloadAction<string>) => {},
-
-    deleteBoardRequest: (state, action: PayloadAction<ID>) => {},
+    deleteBoardRequest: requestWithPayload<ID>(),
     deleteBoardRequestLoaded: (state) => {},
     deleteBoardRequestFailed: (state, action: PayloadAction<string>) => {},
 
-    clearBoardRequest: (state, action: PayloadAction<ID>) => {},
-    clearBoardRequestLoaded: (state) => {},
-    clearBoardRequestFailed: (state, action: PayloadAction<string>) => {},
 
     /*
       Comments
     */
-    addCommentRequest: (
-      state,
-      action: PayloadAction<AddCommentPayload & WithRequestKey>,
-    ) => {
-      // setRequestInitiated(state, action);
-    },
-
-    deleteCommentRequest: (state, action: PayloadAction<ID>) => {},
-    deleteCommentRequestLoaded: (state) => {},
-    deleteCommentRequestFailed: (state, action: PayloadAction<string>) => {},
-
-    updateCommentRequest: (
-      state,
-      action: PayloadAction<UpdateCommentPayload & WithRequestKey>,
-    ) => {
-      // setRequestInitiated(state, action),
-    },
+    addCommentRequest: requestWithPayload<AddCommentArgs>(),
+    updateCommentRequest: requestWithPayload<EditCommentArgs>(),
+    deleteCommentRequest: requestWithPayload<ID>(),
   },
   extraReducers: (builder) => {},
 });

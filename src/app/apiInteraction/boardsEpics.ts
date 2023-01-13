@@ -35,12 +35,14 @@ export const boardRequestEpic: Epic = (action$, store$, { api }) =>
 export const addBoardEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.addBoardRequest.match),
-    switchMap(({ payload }) =>
+    switchMap(({ payload, meta: { requestKey } }) =>
       from(api.addBoard(payload)).pipe(
         mergeMap((board) => {
-          return of(boardSet(board), actions.addBoardRequestLoaded());
+          return of(boardSet(board), actions.requestLoaded(requestKey));
         }),
-        catchError((error) => of(actions.addBoardRequestFailed(String(error)))),
+        catchError((error) =>
+          of(actions.requestFailed(String(error), requestKey)),
+        ),
       ),
     ),
   );
@@ -48,7 +50,7 @@ export const addBoardEpic: Epic = (action$, store$, { api }) =>
 export const updateBoardEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.updateBoardRequest.match),
-    switchMap(({ payload: { id, name } }) =>
+    switchMap(({ payload: { id, name }, meta }) =>
       from(api.editBoard({ id, name })).pipe(
         mergeMap((board) => {
           const { boards, taskLists, tasks, comments } = normalizeBoard(board);
@@ -58,11 +60,11 @@ export const updateBoardEpic: Epic = (action$, store$, { api }) =>
             taskListsSet(taskLists),
             boardsSet(boards),
             commentsSet(comments),
-            actions.updateBoardRequestLoaded(),
+            actions.requestLoaded(meta.requestKey),
           );
         }),
         catchError((error) =>
-          of(actions.updateBoardRequestFailed(String(error))),
+          of(actions.requestFailed(String(error), meta.requestKey)),
         ),
       ),
     ),

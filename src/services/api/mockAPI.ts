@@ -292,8 +292,8 @@ export default class MockAPI implements API {
     if (arg.position) {
       task.position = arg.position;
     }
-    if (arg.task_list_id) {
-      task.taskListId = arg.task_list_id;
+    if (arg.taskListId) {
+      task.taskListId = arg.taskListId;
     }
 
     return task;

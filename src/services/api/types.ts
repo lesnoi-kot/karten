@@ -1,12 +1,11 @@
 import { ID, Board, Project, Task, TaskList, Comment } from "models/types";
 
 export type ResponseOK<T> = {
-  error: null;
   data: T;
 };
 
-export type ResponseError<E = string> = {
-  error: E;
+export type ResponseError = {
+  message: string;
 };
 
 export type CommentDTO = {
@@ -74,6 +73,8 @@ export type AddTaskListArgs = {
 export type AddTaskArgs = {
   taskListId: ID;
   name: string;
+  text?: string;
+  position: number;
 };
 
 export type AddCommentArgs = {
@@ -86,19 +87,31 @@ export type EditProjectArgs = {
   name: string;
 };
 
-export type EditBoardArgs = Pick<BoardDTO, "id"> &
-  Partial<Pick<BoardDTO, "name" | "color">>;
+export type EditBoardArgs = {
+  id: ID;
+  name?: string;
+  color?: number;
+};
 
-export type EditTaskListArgs = Pick<TaskListDTO, "id"> &
-  Partial<Pick<TaskListDTO, "name" | "position">>;
+export type EditTaskListArgs = {
+  id: ID;
+  name?: string;
+  position?: number;
+};
 
-export type EditTaskArgs = Pick<TaskDTO, "id"> &
-  Partial<
-    Pick<TaskDTO, "name" | "position" | "text" | "due_date" | "task_list_id">
-  >;
+export type EditTaskArgs = {
+  id: ID;
+  taskListId?: ID;
+  name?: string;
+  position?: number;
+  text?: string;
+  dueDate?: string;
+};
 
-export type EditCommentArgs = Pick<CommentDTO, "id"> &
-  Partial<Pick<CommentDTO, "text">>;
+export type EditCommentArgs = {
+  id: ID;
+  text: string;
+};
 
 export interface API {
   getProjects(): Promise<Project[]>;

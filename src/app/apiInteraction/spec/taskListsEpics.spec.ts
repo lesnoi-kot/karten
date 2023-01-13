@@ -55,7 +55,7 @@ describe("app/apiInteraction/taskListsEpics", () => {
 
     expect(returnedValues).toEqual([
       tasksDeleted(["a", "b", "c"]),
-      actions.deleteTasksRequestLoaded(),
+      actions.requestLoaded(expect.any(String)),
     ]);
   });
 });
