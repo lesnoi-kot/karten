@@ -1,10 +1,11 @@
-import { useSelector } from "react-redux";
+import { useCallback, useRef, useMemo, useEffect } from "react";
+import { ActionCreator, nanoid } from "@reduxjs/toolkit";
 
 import { FetchState } from "utils/types";
-import { RootState } from "app";
+import { useAppDispatch, useAppSelector } from "app/hooks";
 
 import { selectRequestInfo } from "./selectors";
-import { RequestInfo } from "./types";
+import { APIAction, RequestInfo } from "./types";
 
 type UseRequestInfoReturnType = Partial<RequestInfo> & {
   isLoading: boolean;
@@ -15,7 +16,7 @@ type UseRequestInfoReturnType = Partial<RequestInfo> & {
 export const useRequestInfo = (
   requestKey: string,
 ): UseRequestInfoReturnType => {
-  const requestInfo = useSelector((state: RootState) =>
+  const requestInfo = useAppSelector((state) =>
     selectRequestInfo(state, requestKey),
   );
 
@@ -29,9 +30,68 @@ export const useRequestInfo = (
   }
 
   return {
+    ...requestInfo,
     isLoading: requestInfo.state === FetchState.PENDING,
     isError: requestInfo.state === FetchState.FAILED,
     isLoaded: requestInfo.state === FetchState.FULFILLED,
-    ...requestInfo,
   };
 };
+
+const noPayload = Symbol("no payload");
+
+type Callback = () => void;
+
+type UseRequestReturnType<P> = Partial<RequestInfo> & {
+  isLoading: boolean;
+  isError: boolean;
+  isLoaded: boolean;
+
+  reload(): void;
+  load(payload: P): void;
+  onSuccess(callback: Callback): void;
+};
+
+export function useRequest<P>(
+  actionCreator: ActionCreator<APIAction<P>>,
+): UseRequestReturnType<P> {
+  const dispatch = useAppDispatch();
+  const prevPayload = useRef<P | Symbol>(noPayload);
+  const successHandler = useRef<Callback>(() => {});
+  const requestKey = useMemo(() => nanoid(), []);
+
+  const load = useCallback(
+    (payload: P) => {
+      prevPayload.current = payload;
+      dispatch(actionCreator(payload, requestKey));
+    },
+    [dispatch, actionCreator, requestKey],
+  );
+
+  const reload = useCallback(() => {
+    if (prevPayload.current !== noPayload) {
+      dispatch(actionCreator(prevPayload.current, requestKey));
+    }
+  }, [dispatch, prevPayload, actionCreator, requestKey]);
+
+  const onSuccess = useCallback((callback: Callback) => {
+    successHandler.current = callback;
+  }, []);
+
+  const requestInfo = useRequestInfo(requestKey);
+
+  useEffect(() => {
+    if (requestInfo.isLoaded) {
+      successHandler.current();
+    }
+  }, [dispatch, requestInfo.isLoaded]);
+
+  return {
+    ...requestInfo,
+    isLoading: requestInfo?.state === FetchState.PENDING,
+    isError: requestInfo?.state === FetchState.FAILED,
+    isLoaded: requestInfo?.state === FetchState.FULFILLED,
+    load,
+    reload,
+    onSuccess,
+  };
+}

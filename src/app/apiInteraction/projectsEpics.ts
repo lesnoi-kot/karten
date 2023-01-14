@@ -14,9 +14,13 @@ export const getProjectsEpic: Epic = (action$, store$, { api }) =>
     switchMap(({ meta: { requestKey } }) =>
       from(api.getProjects()).pipe(
         mergeMap((projectsArr) => {
-          const { projects } = normalizeProjects(projectsArr);
+          const { projects, boards } = normalizeProjects(projectsArr);
 
-          return of(projectsSet(projects), actions.requestLoaded(requestKey));
+          return of(
+            projectsSet(projects),
+            boardsSet(boards),
+            actions.requestLoaded(requestKey),
+          );
         }),
         catchError((error) => of(actions.requestFailed(error, requestKey))),
       ),
@@ -30,12 +34,6 @@ export const getProjectEpic: Epic = (action$, store$, { api }) =>
       from(api.getProject(projectId)).pipe(
         mergeMap((project) => {
           const { boards, projects } = normalizeProject(project);
-          console.log({
-            project,
-            boards,
-            projects,
-          });
-
           return of(
             projectsSet(projects),
             boardsSet(boards),
