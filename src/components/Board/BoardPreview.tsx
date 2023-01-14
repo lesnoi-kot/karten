@@ -1,19 +1,13 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Box } from "@mui/material";
 
+import { RootState } from "app";
 import { ID } from "models/types";
 import { selectBoard } from "app/boards/selectors";
 import Stub from "components/Stub";
+import { PreviewCard } from "components/ui/PreviewCard";
 
-import styles from "./styles.module.css";
-import { RootState } from "app";
-
-type Props = {
-  id: ID;
-};
-
-function BoardPreview({ id }: Props) {
+function BoardPreview({ id }: { id: ID }) {
   const board = useSelector((state: RootState) => selectBoard(state, id));
 
   if (!board) {
@@ -22,11 +16,7 @@ function BoardPreview({ id }: Props) {
 
   const { name } = board;
 
-  return (
-    <Box className={styles.boardPreview}>
-      <Box className={styles.boardPreviewName}>{name}</Box>
-    </Box>
-  );
+  return <PreviewCard>{name}</PreviewCard>;
 }
 
 export default BoardPreview;

@@ -5,28 +5,23 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-import * as models from "models/types";
+import { ID } from "models/types";
 import useToggle from "components/hooks/useToggle";
 
 import { actions } from "app/apiInteraction";
 
-type Props = {
-  id: models.ID;
-  boardId: models.ID;
-};
-
-export default function TaskListMenu({ id, boardId }: Props) {
+export default function TaskListMenu({ id }: { id: ID }) {
   const dispatch = useDispatch();
   const [visible, show, hide] = useToggle(false);
   const anchorEl = useRef(null);
 
   const onClear = () => {
-    dispatch(actions.clearTaskListRequest({ taskListId: id }));
+    dispatch(actions.clearTaskListRequest(id));
     hide();
   };
 
   const onDelete = () => {
-    dispatch(actions.deleteTaskListRequest({ boardId, taskListId: id }));
+    dispatch(actions.deleteTaskListRequest(id));
     hide();
   };
 

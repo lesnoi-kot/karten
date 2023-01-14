@@ -1,40 +1,22 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  KeyboardEventHandler,
-} from "react";
-import { useDispatch, useSelector } from "react-redux";
-import debounce from "lodash.debounce";
+import { useState, useRef, KeyboardEventHandler } from "react";
 import cx from "classnames";
 
 import { Box, TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { LoadingButton } from "@mui/lab";
 
 import { ID } from "models/types";
-import { FetchState } from "utils/types";
-import { actions, selectors } from "app/apiInteraction";
+import { useRequest } from "app/apiInteraction/hooks";
+import { actions } from "app/apiInteraction";
 
 import ListSection from "./ListSection";
 import styles from "./styles.module.css";
-import { LoadingButton } from "@mui/lab";
 
-type Props = {
-  boardId: ID;
-};
-
-function NewListPlaceholder({ boardId }: Props) {
-  const dispatch = useDispatch();
-  const requestState = useSelector(selectors.selectTaskListAddRequestState);
+function NewListPlaceholder({ boardId }: { boardId: ID }) {
+  const { load, onSuccess, isLoading } = useRequest(actions.addTaskListRequest);
   const [isFieldVisible, setFieldVisible] = useState(false);
   const [taskListName, setTaskListName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (requestState === FetchState.FULFILLED) {
-      openField();
-    }
-  }, [requestState]);
 
   const openField = () => {
     setTaskListName("");
@@ -47,13 +29,15 @@ function NewListPlaceholder({ boardId }: Props) {
     setTaskListName("");
   };
 
-  const submit = debounce(() => {
+  onSuccess(closeField);
+
+  const submit = () => {
     if (taskListName) {
-      dispatch(actions.addTaskListRequest({ boardId, name: taskListName }));
+      load({ boardId, name: taskListName });
     } else {
       closeField();
     }
-  }, 100);
+  };
 
   const onClick = () => {
     if (isFieldVisible) {
@@ -71,6 +55,12 @@ function NewListPlaceholder({ boardId }: Props) {
     }
   };
 
+  const onBlur = () => {
+    if (!taskListName.trim()) {
+      closeField();
+    }
+  };
+
   return (
     <Box py={1} px={2} className={cx(styles.list, styles.newList)}>
       <ListSection paddingLeft={1} justifyItems="center">
@@ -84,7 +74,7 @@ function NewListPlaceholder({ boardId }: Props) {
               fullWidth
               label="Add new list"
               value={taskListName}
-              onBlur={submit}
+              onBlur={onBlur}
               onChange={(e) => setTaskListName(e.target.value)}
               onKeyDown={onKeyDown}
               autoComplete="off"
@@ -96,7 +86,7 @@ function NewListPlaceholder({ boardId }: Props) {
           variant="outlined"
           color="primary"
           size="small"
-          loading={requestState === FetchState.PENDING}
+          loading={isLoading}
           startIcon={<AddIcon />}
           disabled={isFieldVisible && !taskListName}
           onClick={onClick}

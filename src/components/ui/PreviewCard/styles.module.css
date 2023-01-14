@@ -1,0 +1,35 @@
+.card {
+  max-width: 200px;
+  min-width: 100px;
+  width: 200px;
+  height: 70px;
+  border-radius: 3px;
+  background-color: rgb(0 121 191);
+}
+
+.card:hover {
+  filter: brightness(110%);
+}
+
+.cardText {
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  word-wrap: break-word;
+}
+
+.cardButton {
+  width: 200px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  background-color: rgb(220 220 220);
+  cursor: pointer;
+  transition: background-color;
+}
+
+.cardButton:hover {
+  filter: brightness(110%);
+}

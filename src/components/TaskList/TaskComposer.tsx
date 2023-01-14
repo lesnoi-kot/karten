@@ -1,7 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import type { KeyboardEventHandler } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import debounce from "lodash.debounce";
 
 import {
   Box,
@@ -18,30 +16,20 @@ import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
 import CheckIcon from "@mui/icons-material/Check";
 
-import * as models from "models/types";
-import { FetchState } from "utils/types";
-import { actions as apiActions, selectors } from "app/apiInteraction";
+import { ID } from "models/types";
+import { actions as apiActions } from "app/apiInteraction";
+import { useRequest } from "app/apiInteraction/hooks";
 
-type Props = {
-  taskListId: models.ID;
-  boardId: models.ID;
-};
-
-function TaskComposer({ taskListId, boardId }: Props) {
-  const dispatch = useDispatch();
-  const taskListMeta = useSelector(selectors.selectTaskListMeta(taskListId));
-  const isTaskAdding = useSelector(selectors.selectIsTaskAdding(taskListId));
-
+function TaskComposer({ taskListId }: { taskListId: ID }) {
   const textFieldRef = useRef<HTMLTextAreaElement>(null);
   const [formIsVisible, toggleForm] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
+  const { isLoading, load, onSuccess } = useRequest(apiActions.addTaskRequest);
 
-  useEffect(() => {
-    if (taskListMeta?.taskAddState === FetchState.FULFILLED) {
-      setTaskTitle("");
-      textFieldRef?.current?.select();
-    }
-  }, [taskListMeta]);
+  onSuccess(() => {
+    setTaskTitle("");
+    textFieldRef?.current?.select();
+  });
 
   const showForm = () => {
     toggleForm(true);
@@ -55,27 +43,23 @@ function TaskComposer({ taskListId, boardId }: Props) {
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
     setTaskTitle(e.target.value);
 
-  const submit = debounce(() => {
+  const submit = () => {
     const normalizedTitle = taskTitle.trim();
 
     if (normalizedTitle) {
-      dispatch(
-        apiActions.addTaskRequest({
-          title: normalizedTitle,
-          taskListId,
-          boardId,
-        }),
-      );
+      load({
+        name: normalizedTitle,
+        position: Date.now(),
+        taskListId,
+      });
     } else {
       textFieldRef?.current?.select();
     }
-  }, 100);
+  };
 
   const onBlur = () => {
     if (!taskTitle) {
       hideForm();
-    } else {
-      submit();
     }
   };
 
@@ -97,7 +81,7 @@ function TaskComposer({ taskListId, boardId }: Props) {
           value={taskTitle}
           onChange={onChange}
           inputRef={textFieldRef}
-          disabled={isTaskAdding}
+          disabled={isLoading}
           onBlur={onBlur}
           placeholder="Enter title for this card..."
           fullWidth
@@ -111,7 +95,7 @@ function TaskComposer({ taskListId, boardId }: Props) {
               variant="contained"
               color="secondary"
               size="small"
-              loading={isTaskAdding}
+              loading={isLoading}
               onClick={(event) => {
                 event.stopPropagation();
                 submit();

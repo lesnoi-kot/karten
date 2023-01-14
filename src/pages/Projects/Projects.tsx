@@ -16,7 +16,7 @@ import Link from "components/Link";
 import NewProjectStub from "./NewProjectStub";
 
 function Projects() {
-  const { load, isLoading, isLoaded, isError, error } = useRequest(
+  const { load, reload, isLoading, isLoaded, isError, error } = useRequest(
     apiActions.getProjects,
   );
   const projects = useAppSelector(selectProjectsIds);
@@ -35,7 +35,9 @@ function Projects() {
         </Box>
       )}
 
-      {isError && <ErrorSplash message={error && String(error)} />}
+      {isError && (
+        <ErrorSplash message={error && String(error)} retry={reload} />
+      )}
 
       {isLoaded && (
         <Grid

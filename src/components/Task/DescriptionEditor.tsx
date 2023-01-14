@@ -14,7 +14,7 @@ export type Props = {
 
 function DescriptionEditor({ task }: Props) {
   const dispatch = useDispatch();
-  const { id: taskId, text: initialDescription } = task;
+  const { id, text: initialDescription } = task;
   const [readonly, setReadonly] = useState(true);
   const [description, setDescription] = useState(initialDescription);
 
@@ -24,7 +24,7 @@ function DescriptionEditor({ task }: Props) {
 
   const onDescriptionChange = () => {
     if (initialDescription !== description) {
-      dispatch(apiActions.updateTaskRequest({ taskId, text: description }));
+      dispatch(apiActions.updateTaskRequest({ id, text: description }));
     }
     setReadonly(true);
   };

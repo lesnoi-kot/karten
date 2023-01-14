@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Stack, InputBaseComponentProps } from "@mui/material";
 
-import * as models from "models/types";
+import { ID } from "models/types";
 import { RootState } from "app";
 import {
   selectTaskListById,
@@ -14,7 +14,6 @@ import { actions as apiActions } from "app/apiInteraction";
 import TaskPreview from "components/Task/TaskPreview";
 
 import { useTaskListDND } from "./hooks/taskListDragAndDrop";
-
 import TaskComposer from "./TaskComposer";
 import ListSlot from "./ListSlot";
 import TaskListMenu from "./TaskListMenu";
@@ -23,9 +22,9 @@ import { DragAndDropPlaceholder } from "./DragAndDropPlaceholder";
 import styles from "./styles.module.css";
 
 type Props = {
-  id: models.ID;
-  boardId: models.ID;
-  onTaskClick(id: models.ID): void;
+  id: ID;
+  boardId: ID;
+  onTaskClick(id: ID): void;
 };
 
 const nameStyle: InputBaseComponentProps = { style: { fontWeight: "bold" } };
@@ -48,14 +47,13 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
       if (taskList.name !== newName) {
         dispatch(
           apiActions.updateTaskListRequest({
-            taskListId: id,
-            boardId,
+            id,
             name: newName,
           }),
         );
       }
     },
-    [id, boardId, dispatch, taskList],
+    [id, dispatch, taskList],
   );
 
   const { dragPreviewRef, dragRef, dropRef, isDragging } = useTaskListDND({
@@ -83,7 +81,7 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
             fullWidth
             inputProps={nameStyle}
           />
-          <TaskListMenu id={id} boardId={boardId} />
+          <TaskListMenu id={id} />
         </Box>
 
         <Stack direction="column" gap={0.5}>
@@ -95,7 +93,7 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
         </Stack>
 
         <Box px={1} mt={isEmpty ? 0 : 1.5}>
-          <TaskComposer taskListId={id} boardId={boardId} />
+          <TaskComposer taskListId={id} />
         </Box>
       </Box>
 

@@ -1,38 +1,30 @@
-import React from "react";
-import { useDispatch } from "react-redux";
-import { Box } from "@mui/material";
+import React, { useCallback } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
+import { ID } from "models/types";
 import { NewBoardDialog } from "components/Board";
-import { actions } from "app/apiInteraction";
+import { PreviewCardIconButton } from "components/ui/PreviewCard";
 
-import styles from "./styles.module.css";
-
-export default function NewBoardStub() {
-  const dispatch = useDispatch();
+export default function NewBoardStub({ projectId }: { projectId: ID }) {
   const [isOpen, setOpen] = React.useState(false);
 
   const openDialog = () => {
     setOpen(true);
   };
 
-  const closeDialog = () => {
+  const closeDialog = useCallback(() => {
     setOpen(false);
-  };
-
-  const addBoard = (name: string) => {
-    dispatch(actions.addBoardRequest({ name }));
-  };
+  }, [setOpen]);
 
   return (
     <>
-      <Box className={styles.newBoardStub} onClick={openDialog}>
+      <PreviewCardIconButton onClick={openDialog}>
         <AddCircleOutlineIcon htmlColor="black" fontSize="large" />
-      </Box>
+      </PreviewCardIconButton>
       <NewBoardDialog
+        projectId={projectId}
         isOpen={isOpen}
         onClose={closeDialog}
-        onAction={addBoard}
       />
     </>
   );
