@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Box, TextField, Typography, Button } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { Box, TextField } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
 import { ID } from "models/types";
@@ -28,11 +28,13 @@ function CommentComposer({ taskId }: Props) {
 
   const onSubmit = () => {
     dispatch(
-      apiActions.addCommentRequest({
-        taskId,
-        text,
-        requestKey: `CommentComposer:${taskId}`,
-      })
+      apiActions.addCommentRequest(
+        {
+          taskId,
+          text,
+        },
+        `CommentComposer:${taskId}`,
+      ),
     );
   };
 

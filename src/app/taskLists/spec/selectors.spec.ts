@@ -173,6 +173,11 @@ let store: RootState = {
       cancelButtonText: "",
       okAction: null,
     },
+    snackbars: {
+      isOpen: false,
+      message: "",
+      type: "info",
+    },
   },
 };
 

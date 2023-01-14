@@ -26,15 +26,10 @@ function TaskPreview({ id, onClick }: Props) {
 
   const onDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    dispatch(
-      apiActions.deleteTaskRequest({
-        taskListId,
-        taskId: id,
-      }),
-    );
+    dispatch(apiActions.deleteTaskRequest(id));
   };
 
-  const { taskListId, name, position } = task;
+  const { name, position } = task;
 
   return (
     <Card

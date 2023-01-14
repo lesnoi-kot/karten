@@ -11,6 +11,11 @@ import {
 } from "components/ConfirmDialog/slice";
 
 import {
+  reducer as snackbarsReducer,
+  sliceName as snackbarsSliceName,
+} from "components/Snackbars/slice";
+
+import {
   reducer as projectsReducer,
   sliceName as projectsSliceName,
 } from "./projects";
@@ -54,5 +59,6 @@ export const rootReducer = combineReducers({
 
   widgets: combineReducers({
     [confirmDialogSliceName]: confirmDialogReducer,
+    [snackbarsSliceName]: snackbarsReducer,
   }),
 });

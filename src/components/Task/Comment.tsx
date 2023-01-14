@@ -20,7 +20,7 @@ export function Comment({ commentId }: Props) {
   const [editMode, setEditMode] = useState(false);
   const dispatch = useDispatch();
   const comment = useSelector((state: RootState) =>
-    selectCommentById(state, commentId)
+    selectCommentById(state, commentId),
   );
   const { isLoading } = useRequestInfo(`CommentEditor:${commentId}`);
 
@@ -35,16 +35,18 @@ export function Comment({ commentId }: Props) {
   }
 
   const onDelete = () => {
-    dispatch(apiActions.deleteCommentRequest({ commentId }));
+    dispatch(apiActions.deleteCommentRequest(commentId));
   };
 
   const onEdit = (text: string) => {
     dispatch(
-      apiActions.updateCommentRequest({
-        commentId,
-        text,
-        requestKey: `CommentEditor:${commentId}`,
-      })
+      apiActions.updateCommentRequest(
+        {
+          id: commentId,
+          text,
+        },
+        `CommentEditor:${commentId}`,
+      ),
     );
   };
 

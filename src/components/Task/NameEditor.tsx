@@ -16,7 +16,7 @@ function NameEditor({ task }: Props) {
   const onNameChange = useCallback(
     (newName: string) => {
       if (name !== newName) {
-        dispatch(apiActions.updateTaskRequest({ taskId, name: newName }));
+        dispatch(apiActions.updateTaskRequest({ id: taskId, name: newName }));
       }
     },
     [taskId, dispatch, name],
