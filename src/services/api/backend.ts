@@ -52,7 +52,7 @@ export class APIService implements API {
   private async checkResponseError(response: globalThis.Response) {
     if (response.status < 200 || response.status >= 300) {
       const body = (await response.json()) as ResponseError;
-      throw new APIError(body.message);
+      throw new APIError(body.message, body.error);
     }
   }
 

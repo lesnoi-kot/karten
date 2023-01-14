@@ -16,9 +16,11 @@ function stripBoards(project: Project) {
 
 export function normalizeProjects(data: any) {
   const normalized = normalize(data, projectsScheme);
+  forEachObjIndexed(stripBoards, normalized.entities.projects);
 
   return {
     projects: normalized.entities.projects ?? {},
+    boards: normalized.entities.boards ?? {},
   };
 }
 

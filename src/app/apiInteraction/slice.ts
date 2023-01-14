@@ -1,4 +1,4 @@
-import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, nanoid } from "@reduxjs/toolkit";
 
 import { ID } from "models/types";
 import { FetchState } from "utils/types";
@@ -16,23 +16,15 @@ import {
   AddTaskListArgs,
 } from "services/api";
 
-import { WithError, APIAction, RequestInfo } from "./types";
-
-export type TaskListMetaInfo = {
-  taskAddState: FetchState;
-};
+import { APIAction, RequestInfo } from "./types";
 
 export type APISlice = {
-  taskLists: Record<ID, TaskListMetaInfo>;
   requestsInfo: Record<string, RequestInfo>;
 };
 
 const initialState: APISlice = {
-  taskLists: {},
   requestsInfo: {},
 };
-
-// TODO: fix payload types for all actions
 
 export const {
   actions,
@@ -81,28 +73,7 @@ export const {
     /*
       Tasks
     */
-    addTaskRequest: (state, { payload }: PayloadAction<AddTaskPayload>) => {
-      state.taskLists[payload.taskListId] = {
-        ...state.taskLists[payload.taskListId],
-        taskAddState: FetchState.PENDING,
-      };
-    },
-    addTaskRequestFailed: (
-      state,
-      { payload }: PayloadAction<TaskListId & WithError>,
-    ) => {
-      state.taskLists[payload.taskListId] = {
-        ...state.taskLists[payload.taskListId],
-        taskAddState: FetchState.FAILED,
-      };
-    },
-    addTaskRequestLoaded: (state, { payload }: PayloadAction<TaskListId>) => {
-      state.taskLists[payload.taskListId] = {
-        ...state.taskLists[payload.taskListId],
-        taskAddState: FetchState.FULFILLED,
-      };
-    },
-
+    addTaskRequest: requestWithPayload<AddTaskArgs>(),
     deleteTaskRequest: requestWithPayload<ID>(),
     deleteTasksRequest: requestWithPayload<ID[]>(),
     updateTaskRequest: requestWithPayload<EditTaskArgs>(),
@@ -115,17 +86,6 @@ export const {
     */
     taskListRequest: requestWithPayload<ID>(),
     addTaskListRequest: requestWithPayload<AddTaskListArgs>(),
-
-    addTaskListRequest: (state, action) => {
-      state.taskListAddRequestState = FetchState.PENDING;
-    },
-    addTaskListRequestFailed: (state, action) => {
-      state.taskListAddRequestState = FetchState.FAILED;
-    },
-    addTaskListRequestLoaded: (state) => {
-      state.taskListAddRequestState = FetchState.FULFILLED;
-    },
-
     deleteTaskListRequest: requestWithPayload<ID>(),
     updateTaskListRequest: requestWithPayload<EditTaskListArgs>(),
     clearTaskListRequest: requestWithPayload<ID>(),
@@ -134,17 +94,11 @@ export const {
     /*
       Boards
     */
-    boardRequest: (state, action: PayloadAction<ID>) => {},
-    boardRequestFailed: (state, action) => {},
-    boardRequestLoaded: (state) => {},
-
+    boardRequest: requestWithPayload<ID>(),
     updateBoardRequest: requestWithPayload<EditBoardArgs>(),
     clearBoardRequest: requestWithPayload<ID>(),
-
+    addBoardRequest: requestWithPayload<AddBoardArgs>(),
     deleteBoardRequest: requestWithPayload<ID>(),
-    deleteBoardRequestLoaded: (state) => {},
-    deleteBoardRequestFailed: (state, action: PayloadAction<string>) => {},
-
 
     /*
       Comments
@@ -153,7 +107,6 @@ export const {
     updateCommentRequest: requestWithPayload<EditCommentArgs>(),
     deleteCommentRequest: requestWithPayload<ID>(),
   },
-  extraReducers: (builder) => {},
 });
 
 function requestWithPayload<P>() {

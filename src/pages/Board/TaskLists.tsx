@@ -4,7 +4,7 @@ import { Stack } from "@mui/material";
 
 import { RootState } from "app";
 import { ID } from "models/types";
-import { selectSortedTaskListIds } from "app/boards/selectors";
+import { selectSortedTaskListIds } from "app/taskLists/selectors";
 
 import TaskList from "components/TaskList";
 import NewListPlaceholder from "components/TaskList/NewListPlaceholder";
@@ -14,7 +14,7 @@ export function TaskLists({
   onTaskClick,
 }: {
   boardId: ID;
-  onTaskClick: any;
+  onTaskClick: (id: ID) => void;
 }) {
   const lists = useSelector((state: RootState) =>
     selectSortedTaskListIds(state, boardId),

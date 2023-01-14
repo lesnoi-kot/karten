@@ -5,7 +5,6 @@ import { selectBoardsIds } from "../selectors";
 
 let store: RootState = {
   apiInteraction: {
-    taskLists: {},
     requestsInfo: {},
   },
   entities: {
@@ -158,9 +157,7 @@ let store: RootState = {
     board: {
       boardId: "1",
       selectedTaskId: null,
-      boardFetchState: "fulfilled" as FetchState,
-      boardFetchError: null,
-      becameDeleted: false,
+      shouldRedirectToProject: false,
     },
   },
   widgets: {

@@ -4,6 +4,7 @@ import { mergeAll, filter, mergeMap, catchError, map } from "rxjs/operators";
 import { taskListDeleted, taskListSet, taskListUpdated } from "app/taskLists";
 import { tasksDeleted } from "app/tasks";
 import { selectTaskIds, selectTaskListById } from "app/taskLists/selectors";
+import { showSnackbar } from "components/Snackbars/slice";
 
 import { Epic } from "../types";
 import { actions } from "./slice";
@@ -24,17 +25,16 @@ export const taskListRequestEpic: Epic = (action$, store$, { api }) =>
 export const taskListAddEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.addTaskListRequest.match),
-    mergeMap(({ payload: { boardId, name } }) =>
+    mergeMap(({ payload: { boardId, name }, meta: { requestKey } }) =>
       from(api.addTaskList({ boardId, name })).pipe(
-        mergeMap(({ data: taskList, error }: any) => {
-          if (error) {
-            return of(actions.addTaskListRequestFailed(String(error)));
-          }
-
-          return of(taskListSet(taskList), actions.addTaskListRequestLoaded());
-        }),
+        mergeMap((taskList) =>
+          of(taskListSet(taskList), actions.requestLoaded(requestKey)),
+        ),
         catchError((error) =>
-          of(actions.addTaskListRequestFailed(String(error))),
+          of(
+            actions.requestFailed(String(error), requestKey),
+            showSnackbar({ message: String(error), type: "error" }),
+          ),
         ),
       ),
     ),

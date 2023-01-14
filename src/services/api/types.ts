@@ -6,6 +6,7 @@ export type ResponseOK<T> = {
 
 export type ResponseError = {
   message: string;
+  error?: string;
 };
 
 export type CommentDTO = {
@@ -149,11 +150,11 @@ export class APIError extends Error {
   code: string;
 
   constructor(code: string, message?: string) {
-    super(message);
+    super(message ?? "");
     this.code = code;
   }
 
   toString() {
-    return this.code;
+    return `${this.code}; ${this.message}`;
   }
 }

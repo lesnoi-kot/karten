@@ -11,17 +11,14 @@ import { actions } from "./slice";
 export const addTaskEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.addTaskRequest.match),
-    mergeMap(({ payload }) =>
+    mergeMap(({ payload, meta: { requestKey } }) =>
       from(api.addTask(payload)).pipe(
         mergeMap((task) =>
-          of(taskSet(task), actions.addTaskRequestLoaded(payload.taskListId)),
+          of(taskSet(task), actions.requestLoaded(requestKey)),
         ),
         catchError((error) =>
           of(
-            actions.addTaskRequestFailed({
-              taskListId: payload.taskListId,
-              error,
-            }),
+            actions.requestFailed(error, requestKey),
             showSnackbar({ message: String(error), type: "error" }),
           ),
         ),

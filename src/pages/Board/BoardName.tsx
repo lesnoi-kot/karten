@@ -23,7 +23,7 @@ export function BoardName({ boardId }: Props) {
 
   const onNameChange = (name: string) => {
     if (name && name !== board.name) {
-      dispatch(actions.updateBoardRequest({ boardId, name }));
+      dispatch(actions.updateBoardRequest({ id: boardId, name }));
     }
   };
 

@@ -14,7 +14,7 @@ import { actions } from "./slice";
 export const boardRequestEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.boardRequest.match),
-    switchMap(({ payload: boardId }) =>
+    switchMap(({ payload: boardId, meta: { requestKey } }) =>
       from(api.getBoard(boardId)).pipe(
         mergeMap((board) => {
           const { boards, taskLists, tasks, comments } = normalizeBoard(board);
@@ -24,10 +24,10 @@ export const boardRequestEpic: Epic = (action$, store$, { api }) =>
             taskListsSet(taskLists),
             boardsSet(boards),
             commentsSet(comments),
-            actions.boardRequestLoaded(),
+            actions.requestLoaded(requestKey),
           );
         }),
-        catchError((error) => of(actions.boardRequestFailed(error))),
+        catchError((error) => of(actions.requestFailed(error, requestKey))),
       ),
     ),
   );
@@ -73,13 +73,13 @@ export const updateBoardEpic: Epic = (action$, store$, { api }) =>
 export const deleteBoardEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.deleteBoardRequest.match),
-    switchMap(({ payload: boardId }) =>
+    switchMap(({ payload: boardId, meta: { requestKey } }) =>
       from(api.deleteBoard(boardId)).pipe(
         mergeMap(() =>
-          of(boardDeleted(boardId), actions.deleteBoardRequestLoaded()),
+          of(boardDeleted(boardId), actions.requestLoaded(requestKey)),
         ),
         catchError((error) =>
-          of(actions.deleteBoardRequestFailed(String(error))),
+          of(actions.requestFailed(String(error), requestKey)),
         ),
       ),
     ),

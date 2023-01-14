@@ -1,4 +1,4 @@
-import { values, prop, propEq } from "ramda";
+import { values, prop, propEq, count } from "ramda";
 import { createSelector } from "reselect";
 
 import { ID } from "models/types";
@@ -11,6 +11,7 @@ export const selectBoards = (state: RootState): BoardsMap =>
   state.entities[sliceName].items;
 
 export const selectBoardsIds = createSelector(selectBoards, Object.keys);
+export const selectBoardsArray = createSelector(selectBoards, Object.values);
 
 export const selectBoard = (state: RootState, id: ID) =>
   selectBoards(state)[id] ?? null;
@@ -22,4 +23,9 @@ export const selectBoardsIdsByProjectId = createSelector(
   [selectBoards, extraParam<ID>()],
   (boards, projectId) =>
     values(boards).filter(propEq("projectId", projectId)).map(prop("id")),
+);
+
+export const selectBoardsCountOfProject = createSelector(
+  [selectBoardsArray, extraParam<ID>()],
+  (boards, projectId) => count(propEq("projectId", projectId), boards),
 );
