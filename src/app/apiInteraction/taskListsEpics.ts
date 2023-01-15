@@ -3,8 +3,8 @@ import { mergeAll, filter, mergeMap, catchError, map } from "rxjs/operators";
 
 import { taskListDeleted, taskListSet, taskListUpdated } from "app/taskLists";
 import { tasksDeleted } from "app/tasks";
+import { showSnackbar } from "app/snackbars";
 import { selectTaskIds, selectTaskListById } from "app/taskLists/selectors";
-import { showSnackbar } from "components/Snackbars/slice";
 
 import { Epic } from "../types";
 import { actions } from "./slice";

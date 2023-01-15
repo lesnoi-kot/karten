@@ -4,6 +4,7 @@ import { filter, switchMap, mergeMap, catchError } from "rxjs/operators";
 import { boardsSet } from "app/boards";
 import { projectsSet, projectSet, projectDeleted } from "app/projects";
 import { normalizeProjects, normalizeProject } from "app/projects/utils";
+import { showSnackbar } from "app/snackbars";
 
 import { Epic } from "../types";
 import { actions } from "./slice";
@@ -53,7 +54,12 @@ export const addProjectEpic: Epic = (action$, store$, { api }) =>
         mergeMap((project) => {
           return of(projectSet(project), actions.requestLoaded(requestKey));
         }),
-        catchError((error) => of(actions.requestFailed(error, requestKey))),
+        catchError((error) =>
+          of(
+            actions.requestFailed(String(error), requestKey),
+            showSnackbar({ message: String(error), type: "error" }),
+          ),
+        ),
       ),
     ),
   );

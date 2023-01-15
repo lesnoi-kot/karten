@@ -1,7 +1,10 @@
 import { AlertColor } from "@mui/lab";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { RootState } from "app";
+type Snackbar = {
+  message: string;
+  type: AlertColor;
+};
 
 type WidgetState = {
   isOpen: boolean;
@@ -25,17 +28,13 @@ export const {
   name: "snackbars",
   initialState,
   reducers: {
-    show: (state, action: PayloadAction<ShowArgs>) => {
+    showSnackbar: (state, action: PayloadAction<ShowArgs>) => {
       state.isOpen = true;
       state.type = action.payload.type;
       state.message = action.payload.message;
     },
-    close: (state) => {
+    closeSnackbar: (state) => {
       state.isOpen = false;
     },
   },
 });
-
-export const { show: showSnackbar, close: closeSnackbar } = actions;
-
-export const selectState = (state: RootState) => state.widgets.snackbars;

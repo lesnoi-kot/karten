@@ -13,7 +13,7 @@ import {
 import {
   reducer as snackbarsReducer,
   sliceName as snackbarsSliceName,
-} from "components/Snackbars/slice";
+} from "app/snackbars/slice";
 
 import {
   reducer as projectsReducer,

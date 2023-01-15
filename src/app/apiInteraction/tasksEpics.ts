@@ -3,7 +3,7 @@ import { filter, mergeMap, catchError, map } from "rxjs/operators";
 
 import { taskSet, taskDeleted, tasksDeleted, taskUpdated } from "app/tasks";
 import { selectTaskById } from "app/tasks/selectors";
-import { showSnackbar } from "components/Snackbars/slice";
+import { showSnackbar } from "app/snackbars";
 
 import { Epic } from "../types";
 import { actions } from "./slice";

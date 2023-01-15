@@ -3,14 +3,14 @@ import Snackbar from "@mui/material/Snackbar";
 
 import { useAppDispatch, useAppSelector } from "app/hooks";
 
-import { selectState, actions } from "./slice";
+import { selectors, actions } from "app/snackbars";
 
 function Snackbars() {
   const dispatch = useAppDispatch();
-  const { isOpen, message, type } = useAppSelector(selectState);
+  const { isOpen, message, type } = useAppSelector(selectors.selectState);
 
   const onClose = () => {
-    dispatch(actions.close());
+    dispatch(actions.closeSnackbar());
   };
 
   return (
