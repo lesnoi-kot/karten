@@ -7,12 +7,12 @@
     "node": ">=14.16"
   },
   "dependencies": {
-    "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.6.0",
-    "@mui/icons-material": "^5.10.16",
-    "@mui/lab": "^5.0.0-alpha.111",
-    "@mui/material": "^5.10.17",
-    "@mui/styles": "^5.10.16",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/icons-material": "^5.11.0",
+    "@mui/lab": "^5.0.0-alpha.115",
+    "@mui/material": "^5.11.4",
+    "@mui/styles": "^5.11.2",
     "@reduxjs/toolkit": "^1.8.5",
     "@types/lodash.debounce": "^4.0.6",
     "@types/ramda": "^0.28.20",
