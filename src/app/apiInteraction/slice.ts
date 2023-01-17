@@ -50,13 +50,13 @@ export const {
     },
 
     requestFailed: {
-      reducer: (state, action: APIAction<any>) => {
+      reducer: (state, action: APIAction<string>) => {
         const { requestKey } = action.meta;
         state.requestsInfo[requestKey].error = action.payload;
         state.requestsInfo[requestKey].state = FetchState.FAILED;
       },
-      prepare: (error: any, requestKey: string) => ({
-        payload: error,
+      prepare: (error: unknown, requestKey: string) => ({
+        payload: String(error),
         meta: { requestKey },
       }),
     },
@@ -114,7 +114,6 @@ function requestWithPayload<P>() {
     reducer: (state: APISlice, action: APIAction<P>) => {
       state.requestsInfo[action.meta.requestKey] = {
         state: FetchState.PENDING,
-        error: null,
         action,
       };
     },

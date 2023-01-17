@@ -56,8 +56,8 @@ export const addProjectEpic: Epic = (action$, store$, { api }) =>
         }),
         catchError((error) =>
           of(
-            actions.requestFailed(String(error), requestKey),
-            showSnackbar({ message: String(error), type: "error" }),
+            actions.requestFailed(error, requestKey),
+            showSnackbar({ message: error, type: "error" }),
           ),
         ),
       ),
@@ -79,7 +79,12 @@ export const updateProjectEpic: Epic = (action$, store$, { api }) =>
             actions.requestLoaded(requestKey),
           );
         }),
-        catchError((error) => of(actions.requestFailed(error, requestKey))),
+        catchError((error) =>
+          of(
+            actions.requestFailed(error, requestKey),
+            showSnackbar({ message: error, type: "error" }),
+          ),
+        ),
       ),
     ),
   );
@@ -92,7 +97,12 @@ export const deleteProjectEpic: Epic = (action$, store$, { api }) =>
         mergeMap(() =>
           of(projectDeleted(projectId), actions.requestLoaded(requestKey)),
         ),
-        catchError((error) => of(actions.requestFailed(error, requestKey))),
+        catchError((error) =>
+          of(
+            actions.requestFailed(error, requestKey),
+            showSnackbar({ message: error, type: "error" }),
+          ),
+        ),
       ),
     ),
   );

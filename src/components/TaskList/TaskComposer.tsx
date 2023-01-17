@@ -1,5 +1,4 @@
-import React, { useState, useRef } from "react";
-import type { KeyboardEventHandler } from "react";
+import React, { useState, useRef, KeyboardEventHandler } from "react";
 
 import {
   Box,

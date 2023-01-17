@@ -9,8 +9,9 @@ import { APIAction, RequestInfo } from "./types";
 
 type UseRequestInfoReturnType = Partial<RequestInfo> & {
   isLoading: boolean;
-  isError: boolean;
+  isFailed: boolean;
   isLoaded: boolean;
+  isRetrying: boolean;
 };
 
 export const useRequestInfo = (
@@ -24,28 +25,26 @@ export const useRequestInfo = (
     return {
       state: FetchState.INITIAL,
       isLoading: false,
-      isError: false,
+      isFailed: false,
       isLoaded: false,
+      isRetrying: false,
     };
   }
 
   return {
     ...requestInfo,
     isLoading: requestInfo.state === FetchState.PENDING,
-    isError: requestInfo.state === FetchState.FAILED,
+    isFailed: requestInfo.state === FetchState.FAILED,
     isLoaded: requestInfo.state === FetchState.FULFILLED,
+    isRetrying:
+      Boolean(requestInfo.error) && requestInfo.state === FetchState.PENDING,
   };
 };
 
 const noPayload = Symbol("no payload");
-
 type Callback = () => void;
 
-type UseRequestReturnType<P> = Partial<RequestInfo> & {
-  isLoading: boolean;
-  isError: boolean;
-  isLoaded: boolean;
-
+type UseRequestReturnType<P> = UseRequestInfoReturnType & {
   reload(): void;
   load(payload: P): void;
   onSuccess(callback: Callback): void;
@@ -87,9 +86,6 @@ export function useRequest<P>(
 
   return {
     ...requestInfo,
-    isLoading: requestInfo?.state === FetchState.PENDING,
-    isError: requestInfo?.state === FetchState.FAILED,
-    isLoaded: requestInfo?.state === FetchState.FULFILLED,
     load,
     reload,
     onSuccess,

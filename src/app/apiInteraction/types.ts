@@ -5,11 +5,7 @@ import { FetchState } from "utils/types";
 export type RequestInfo = {
   state: FetchState;
   action: AnyAction;
-  error: any;
+  error?: string;
 };
 export type WithRequestKey = { requestKey: string };
 export type APIAction<T> = PayloadAction<T, string, WithRequestKey>;
-
-export type WithError = {
-  error: string;
-};

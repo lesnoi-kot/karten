@@ -31,7 +31,7 @@ export const {
     showSnackbar: (state, action: PayloadAction<ShowArgs>) => {
       state.isOpen = true;
       state.type = action.payload.type;
-      state.message = action.payload.message;
+      state.message = String(action.payload.message);
     },
     closeSnackbar: (state) => {
       state.isOpen = false;
