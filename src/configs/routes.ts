@@ -1,4 +1,5 @@
 import ProjectsPage from "pages/Projects";
+import ProjectPage from "pages/Project";
 import BoardPage from "pages/Board";
 
 export type Route = {
@@ -11,8 +12,13 @@ export type Route = {
 export const routes: Route[] = [
   {
     name: "pages:projects",
-    path: "/boards",
+    path: "/projects",
     component: ProjectsPage,
+  },
+  {
+    name: "pages:project",
+    path: "/project/:projectId",
+    component: ProjectPage,
   },
   {
     name: "pages:board",
