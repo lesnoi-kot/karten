@@ -1,12 +1,12 @@
-import React, { useCallback } from "react";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { useCallback, useState } from "react";
+import AddIcon from "@mui/icons-material/Add";
 
 import { ID } from "models/types";
 import { NewBoardDialog } from "components/Board";
 import { PreviewCardIconButton } from "components/ui/PreviewCard";
 
 export default function NewBoardStub({ projectId }: { projectId: ID }) {
-  const [isOpen, setOpen] = React.useState(false);
+  const [isOpen, setOpen] = useState(false);
 
   const openDialog = () => {
     setOpen(true);
@@ -18,8 +18,8 @@ export default function NewBoardStub({ projectId }: { projectId: ID }) {
 
   return (
     <>
-      <PreviewCardIconButton onClick={openDialog}>
-        <AddCircleOutlineIcon htmlColor="black" fontSize="large" />
+      <PreviewCardIconButton onClick={openDialog} title="Create new board">
+        <AddIcon fontSize="medium" />
       </PreviewCardIconButton>
       <NewBoardDialog
         projectId={projectId}

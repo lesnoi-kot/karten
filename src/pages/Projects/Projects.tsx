@@ -1,69 +1,43 @@
 import { useEffect } from "react";
-import { Box, Grid, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Container } from "@mui/material";
 
-import { buildURL } from "utils/routes";
 import { actions as apiActions } from "app/apiInteraction";
 import { useRequest } from "app/apiInteraction/hooks";
-import { selectProjectsIds } from "app/projects/selectors";
-import { useAppSelector } from "app/hooks";
 import makePage from "pages/makePageHOC";
 
-import Heading from "components/ui/Heading";
-import ProjectPreview from "components/Project/ProjectPreview";
 import ErrorSplash from "components/ui/ErrorSplash";
-import Link from "components/Link";
 
-import NewProjectStub from "./NewProjectStub";
+import RecentlyViewed from "./RecentlyViewed";
+import ProjectsList from "./ProjectsList";
 
 function Projects() {
-  const { load, reload, isLoading, isLoaded, isError, error } = useRequest(
+  const { load, reload, isLoading, isLoaded, isFailed, error } = useRequest(
     apiActions.getProjects,
   );
-  const projects = useAppSelector(selectProjectsIds);
 
   useEffect(() => load(undefined), [load]);
 
-  return (
-    <>
-      <Box mt={2} mb={5} textAlign="center">
-        <Heading>Projects</Heading>
+  if (isLoading) {
+    return (
+      <Box textAlign="center" mt={3}>
+        <CircularProgress />
       </Box>
+    );
+  }
 
-      {isLoading && (
-        <Box textAlign="center">
-          <CircularProgress />
-        </Box>
-      )}
+  if (isFailed) {
+    return <ErrorSplash message={error} retry={reload} />;
+  }
 
-      {isError && (
-        <ErrorSplash message={error && String(error)} retry={reload} />
-      )}
+  if (!isLoaded) {
+    return null;
+  }
 
-      {isLoaded && (
-        <Grid
-          container
-          gap={2}
-          width="60%"
-          marginX="auto"
-          justifyContent="center"
-        >
-          {projects.map((projectId) => (
-            <Grid
-              key={projectId}
-              item
-              component={Link}
-              to={buildURL("pages:project", { projectId })}
-              underline="none"
-            >
-              <ProjectPreview id={projectId} />
-            </Grid>
-          ))}
-          <Grid key="NewProjectStub" item>
-            <NewProjectStub />
-          </Grid>
-        </Grid>
-      )}
-    </>
+  return (
+    <Container maxWidth="lg">
+      <RecentlyViewed />
+      <ProjectsList />
+    </Container>
   );
 }
 
