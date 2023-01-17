@@ -178,6 +178,9 @@ let store: RootState = {
       message: "",
       type: "info",
     },
+    drawerMenu: {
+      isOpen: false,
+    },
   },
 };
 

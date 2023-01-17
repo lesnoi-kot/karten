@@ -16,6 +16,11 @@ import {
 } from "app/snackbars/slice";
 
 import {
+  reducer as drawerMenuReducer,
+  sliceName as drawerMenuSliceName,
+} from "app/widgets/drawerMenu";
+
+import {
   reducer as projectsReducer,
   sliceName as projectsSliceName,
 } from "./projects";
@@ -60,5 +65,6 @@ export const rootReducer = combineReducers({
   widgets: combineReducers({
     [confirmDialogSliceName]: confirmDialogReducer,
     [snackbarsSliceName]: snackbarsReducer,
+    [drawerMenuSliceName]: drawerMenuReducer,
   }),
 });
