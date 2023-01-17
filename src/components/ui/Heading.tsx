@@ -1,8 +1,7 @@
-import React from "react";
-import { Typography } from "@mui/material";
+import { Typography, TypographyProps } from "@mui/material";
 
-function Heading(props: any) {
-  return <Typography variant="h3" {...props} />;
+function Heading(props: TypographyProps<"h1">) {
+  return <Typography variant="h3" {...props} component="h1" />;
 }
 
 export default Heading;

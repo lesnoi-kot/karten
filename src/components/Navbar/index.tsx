@@ -1,42 +1,56 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import {
-  AppBar,
-  Toolbar,
-  Box,
-  Typography,
-  IconButton,
-  Badge,
-} from "@mui/material";
-import AccountCircle from "@mui/icons-material/AccountCircle";
+import { AppBar, Toolbar, Box, IconButton, Badge } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import MenuIcon from "@mui/icons-material/Menu";
 
-import styles from "./styles.module.css";
+import { useAppDispatch } from "app/hooks";
+import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
+
+import Heading from "components/ui/Heading";
+import Link from "components/Link";
+import ColorThemeSwitch from "components/ColorThemeSwitch";
+
+import DrawerMenu from "./DrawerMenu";
 
 export function NavbarTitle() {
   return (
-    <Typography variant="h5">
-      <a href="/">Karten</a>
-    </Typography>
+    <Heading variant="h4">
+      <Link to="/" color="inherit" underline="none">
+        Karten
+      </Link>
+    </Heading>
   );
 }
 
-function Navbar() {
+export default function Navbar() {
+  const dispatch = useAppDispatch();
+
   return (
     <AppBar position="static">
       <Toolbar>
         <Box id="navbar-page-content" />
+        <IconButton
+          edge="start"
+          onClick={() => {
+            dispatch(drawerMenuActions.toggle());
+          }}
+        >
+          <MenuIcon />
+        </IconButton>
         <NavbarTitle />
-        <Box className={styles.grow} />
-        <IconButton color="inherit" size="large">
+        <Box sx={{ flexGrow: 1 }} />
+
+        <ColorThemeSwitch />
+
+        <IconButton color="inherit" edge="end" size="large">
           <Badge badgeContent={17} color="secondary">
             <NotificationsIcon />
           </Badge>
         </IconButton>
-        <IconButton edge="end" color="inherit" size="large">
-          <AccountCircle />
-        </IconButton>
       </Toolbar>
+
+      <DrawerMenu />
     </AppBar>
   );
 }
@@ -50,5 +64,3 @@ export function NavbarContent({ children }: { children: React.ReactNode }) {
 
   return ReactDOM.createPortal(children, target);
 }
-
-export default Navbar;
