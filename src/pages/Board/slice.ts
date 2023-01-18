@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
@@ -55,15 +55,14 @@ export const {
 
 export const { taskSelected, taskClosed } = actions;
 
-export const getPageState = (state: RootState) => state.pages[sliceName];
+const selectPageState = (state: RootState) => state.pages[sliceName];
+
+export const selectShouldRedirectToProject = (state: RootState) =>
+  selectPageState(state).shouldRedirectToProject;
 
 export const useDashboardMethods = (boardId: ID) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [sidebarIsOpen, setSidebarOpen] = useState(false);
-
-  const openSidebar = useCallback(() => setSidebarOpen(true), []);
-  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
 
   const onTaskClick = useCallback(
     (taskId: ID) => {
@@ -82,8 +81,5 @@ export const useDashboardMethods = (boardId: ID) => {
   return {
     onTaskClick,
     onTaskModalClose,
-    sidebarIsOpen,
-    openSidebar,
-    closeSidebar,
   };
 };

@@ -1,67 +1,64 @@
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
-import { IconButton, Box } from "@mui/material";
-
-import MenuIcon from "@mui/icons-material/Menu";
+import { useEffect } from "react";
+import { useParams, Navigate } from "react-router-dom";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { Box, CircularProgress } from "@mui/material";
 
 import logger from "services/logger";
-import { FetchState } from "utils/types";
 import { actions as apiActions } from "app/apiInteraction";
+import { useRequest } from "app/apiInteraction/hooks";
+import { useAppSelector } from "app/hooks";
+import { buildURL } from "utils/routes";
 
 import { TaskModal } from "components/Task";
 import { NavbarContent } from "components/Navbar";
+import ErrorSplash from "components/ui/ErrorSplash";
 import makePage from "pages/makePageHOC";
 
-import { useDashboardMethods, getBoardFetchState } from "./slice";
+import { useDashboardMethods, selectShouldRedirectToProject } from "./slice";
 import BoardName from "./BoardName";
 import BoardMenu from "./BoardMenu";
-import Status from "./Status";
 import ScrollableSpace from "./ScrollableSpace";
 import TaskLists from "./TaskLists";
 import PageTitle from "./PageTitle";
 
 function BoardPage() {
   const { boardId = "", taskId: selectedTaskId = "" } = useParams();
+  const { load, reload, isLoading, isLoaded, isFailed, state, error } =
+    useRequest(apiActions.boardRequest);
+  const { onTaskClick, onTaskModalClose } = useDashboardMethods(boardId);
+  const shouldRedirectToProject = useAppSelector(selectShouldRedirectToProject);
 
-  const dispatch = useDispatch();
-  const fetchState = useSelector(getBoardFetchState);
+  useEffect(() => load(boardId), [load, boardId]);
 
-  const {
-    onTaskClick,
-    onTaskModalClose,
-    sidebarIsOpen,
-    openSidebar,
-    closeSidebar,
-  } = useDashboardMethods(boardId);
+  if (shouldRedirectToProject) {
+    return <Navigate to={buildURL("pages:projects")} />;
+  }
 
-  useEffect(() => {
-    dispatch(apiActions.boardRequest(boardId));
-  }, [dispatch, boardId]);
-
-  logger.debug("Render: DashboardPage", { boardId, fetchState });
+  logger.debug("Render: DashboardPage", { boardId, fetchState: state });
 
   return (
-    <>
+    <DndProvider backend={HTML5Backend}>
       <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />
-      <Box my={2} textAlign="center">
-        <BoardName boardId={boardId} />
-      </Box>
+      {isLoaded && (
+        <Box my={2} textAlign="center">
+          <BoardName boardId={boardId} />
+        </Box>
+      )}
 
       <NavbarContent>
-        <IconButton
-          edge="start"
-          color="secondary"
-          onClick={openSidebar}
-          size="large"
-        >
-          <MenuIcon />
-        </IconButton>
+        <BoardMenu boardId={boardId} />
       </NavbarContent>
 
-      <Status />
+      {isLoading && (
+        <Box textAlign="center">
+          <CircularProgress />
+        </Box>
+      )}
 
-      {fetchState === FetchState.FULFILLED && (
+      {isFailed && <ErrorSplash message={error} retry={reload} />}
+
+      {isLoaded && (
         <ScrollableSpace disabled>
           <TaskLists boardId={boardId} onTaskClick={onTaskClick} />
         </ScrollableSpace>
@@ -70,13 +67,7 @@ function BoardPage() {
       {selectedTaskId && (
         <TaskModal onClose={onTaskModalClose} taskId={selectedTaskId} />
       )}
-
-      <BoardMenu
-        boardId={boardId}
-        open={sidebarIsOpen}
-        onClose={closeSidebar}
-      />
-    </>
+    </DndProvider>
   );
 }
 
