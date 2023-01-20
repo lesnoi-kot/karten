@@ -1,7 +1,10 @@
+import { ENTITY_COLOR } from "./constants";
+
 export type UUID = string;
-export type Color = number;
+export type Color = string;
 export type ID = UUID;
 export type DateString = string;
+export type ColorName = keyof typeof ENTITY_COLOR;
 
 export type Comment = {
   id: UUID;

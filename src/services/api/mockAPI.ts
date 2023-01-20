@@ -6,16 +6,17 @@ import { sleep } from "utils/async";
 
 import {
   AddBoardArgs,
-  AddTaskArgs,
   AddCommentArgs,
-  AddTaskListArgs,
   AddProjectArgs,
+  AddTaskArgs,
+  AddTaskListArgs,
   API,
   APIError,
-  EditTaskArgs,
+  EditBoardArgs,
   EditCommentArgs,
-  EditTaskListArgs,
   EditProjectArgs,
+  EditTaskArgs,
+  EditTaskListArgs,
 } from "./types";
 
 async function emulateDelay(rate: number = 1) {
@@ -118,7 +119,7 @@ export default class MockAPI implements API {
     return board;
   }
 
-  async editBoard(boardChanges: Partial<Board>) {
+  async editBoard(boardChanges: EditBoardArgs) {
     if (!is(String, boardChanges.id)) {
       throw badRequestError;
     }
@@ -199,7 +200,7 @@ export default class MockAPI implements API {
       archived: false,
       dateCreated: new Date().toISOString(),
       dateLastViewed: new Date().toISOString(),
-      color: 0,
+      color: "",
       cover: "",
       taskLists: [],
     };
@@ -224,7 +225,7 @@ export default class MockAPI implements API {
       position: Date.now(),
       archived: false,
       dateCreated: new Date().toISOString(),
-      color: 0,
+      color: "",
       tasks: [],
     };
 

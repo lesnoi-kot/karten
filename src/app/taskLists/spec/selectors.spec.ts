@@ -1,5 +1,4 @@
 import { RootState } from "app";
-import { FetchState } from "utils/types";
 
 import {
   selectTaskListIds,
@@ -30,7 +29,7 @@ let store: RootState = {
           dateCreated: "2022-08-25T15:26:59.673Z",
           dateLastViewed: "2022-08-25T15:27:00.890Z",
           cover: "",
-          color: 0,
+          color: "",
         },
       },
     },
@@ -43,7 +42,7 @@ let store: RootState = {
           position: 1000,
           archived: false,
           dateCreated: "2022-08-25T15:26:59.673Z",
-          color: 0,
+          color: "",
         },
         B: {
           id: "B",
@@ -52,7 +51,7 @@ let store: RootState = {
           position: 2000,
           archived: false,
           dateCreated: "2022-08-25T15:26:59.673Z",
-          color: 0,
+          color: "",
         },
         C: {
           id: "C",
@@ -61,7 +60,7 @@ let store: RootState = {
           position: 0,
           archived: false,
           dateCreated: "2022-08-25T15:26:59.673Z",
-          color: 0,
+          color: "",
         },
       },
     },

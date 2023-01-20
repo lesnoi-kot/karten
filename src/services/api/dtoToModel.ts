@@ -1,3 +1,4 @@
+import { ENTITY_COLOR } from "models/constants";
 import { Board, Project, TaskList, Task, Comment } from "models/types";
 import {
   ProjectDTO,
@@ -23,7 +24,7 @@ export function convertBoardDTO(dto: BoardDTO): Board {
     name: dto.name,
     dateCreated: dto.date_created,
     dateLastViewed: dto.date_last_viewed,
-    color: dto.color,
+    color: convertNumberToColor(dto.color),
     cover: dto.cover ?? "",
     taskLists: dto.task_lists ? dto.task_lists.map(convertTaskListDTO) : [],
   };
@@ -37,7 +38,7 @@ export function convertTaskListDTO(dto: TaskListDTO): TaskList {
     archived: dto.archived,
     name: dto.name,
     dateCreated: dto.date_created,
-    color: dto.color,
+    color: convertNumberToColor(dto.color),
     tasks: dto.tasks ? dto.tasks.map(convertTaskDTO) : [],
   };
 }
@@ -63,4 +64,12 @@ export function convertCommentDTO(dto: CommentDTO): Comment {
     author: dto.author,
     dateCreated: dto.date_created,
   };
+}
+
+function convertNumberToColor(color: number): string {
+  if (!color) {
+    return ENTITY_COLOR.gray;
+  }
+
+  return "#" + color.toString(16);
 }
