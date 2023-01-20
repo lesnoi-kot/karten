@@ -1,11 +1,4 @@
-import {
-  createSlice,
-  PayloadAction,
-  Action,
-  AnyAction,
-} from "@reduxjs/toolkit";
-
-import { RootState } from "app";
+import { createSlice, PayloadAction, AnyAction } from "@reduxjs/toolkit";
 
 type WidgetState = {
   isOpen: boolean;
@@ -40,6 +33,8 @@ export const {
       state.title = action.payload.title;
       state.text = action.payload.text;
       state.okAction = action.payload.okAction;
+      state.okButtonText = action.payload.okButtonText;
+      state.cancelButtonText = action.payload.cancelButtonText;
     },
     closeDialog: (state) => {
       Object.assign(state, initialState);
@@ -48,6 +43,3 @@ export const {
 });
 
 export default reducer;
-export const { showDialog, closeDialog } = actions;
-
-export const selectState = (state: RootState) => state.widgets.confirmDialog;

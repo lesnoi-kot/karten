@@ -8,7 +8,7 @@ import {
 import {
   reducer as confirmDialogReducer,
   sliceName as confirmDialogSliceName,
-} from "components/ConfirmDialog/slice";
+} from "app/widgets/confirmDialog/slice";
 
 import {
   reducer as snackbarsReducer,

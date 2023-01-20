@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Button,
@@ -9,21 +9,30 @@ import {
   DialogActions,
 } from "@mui/material";
 
-import { actions, selectState } from "./slice";
+import { actions, selectState } from "app/widgets/confirmDialog";
+import { useRequestInfoOfAction } from "app/apiInteraction/hooks";
 
 export function ConfirmDialog() {
   const dispatch = useDispatch();
   const { isOpen, text, title, okAction, okButtonText, cancelButtonText } =
     useSelector(selectState);
+  const { isLoaded } = useRequestInfoOfAction(okAction);
 
   const onClose = () => dispatch(actions.closeDialog());
 
   const onOK = () => {
     if (okAction) {
       dispatch(okAction);
+    } else {
+      onClose();
     }
-    onClose();
   };
+
+  useEffect(() => {
+    if (isLoaded) {
+      dispatch(actions.closeDialog());
+    }
+  }, [dispatch, isLoaded]);
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
