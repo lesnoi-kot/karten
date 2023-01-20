@@ -1,27 +1,44 @@
+import { useMemo, useRef, memo } from "react";
 import {
   Card,
   CardContent,
   CardHeader,
-  Typography,
   Avatar,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import IconButton from "@mui/material/IconButton";
 
-import { selectProjectById } from "app/projects/selectors";
+import { selectProjectById } from "app/projects/index";
 import { selectBoardsIdsByProjectId } from "app/boards/selectors";
-import { useAppSelector } from "app/hooks";
+import { actions as apiActions } from "app/apiInteraction";
+import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice";
+import { useAppDispatch, useAppSelector } from "app/hooks";
 import { ID } from "models/types";
+import { ENTITY_COLOR } from "models/constants";
 import { buildURL } from "utils/routes";
 
 import BoardPreviewList from "components/Board/BoardPreviewList";
+import useToggle from "components/hooks/useToggle";
 import Link from "components/Link";
 
 function ProjectInfo({ id }: { id: ID }) {
+  const dispatch = useAppDispatch();
+  const menuRef = useRef(null);
   const project = useAppSelector((state) => selectProjectById(state, id));
   const boards = useAppSelector((state) =>
     selectBoardsIdsByProjectId(state, id),
   );
+  const [menuIsVisible, showMenu, hideMenu] = useToggle(false);
+
+  const avatarBgColor = useMemo(() => {
+    if (project) {
+      return Object.values(ENTITY_COLOR)[
+        project.name[0].charCodeAt(0) % Object.keys(ENTITY_COLOR).length
+      ];
+    }
+  }, [project]);
 
   if (!project) {
     return null;
@@ -30,31 +47,65 @@ function ProjectInfo({ id }: { id: ID }) {
   return (
     <Card elevation={1} id={`project-${id}`}>
       <CardHeader
-        avatar={<Avatar variant="rounded">{project.name[0]}</Avatar>}
+        avatar={
+          <Avatar variant="rounded" sx={{ bgcolor: avatarBgColor }}>
+            {project.name[0]}
+          </Avatar>
+        }
         action={
-          <IconButton aria-label="settings">
+          <IconButton aria-label="settings" ref={menuRef} onClick={showMenu}>
             <MoreVertIcon />
           </IconButton>
         }
-        title={project.name}
+        title={
+          <Link
+            to={buildURL("pages:project", { projectId: id })}
+            color="text.primary"
+          >
+            {project.name}
+          </Link>
+        }
         titleTypographyProps={{
-          variant: "h5",
+          variant: "h6",
           component: "h3",
         }}
       />
       <CardContent>
-        <Link
-          to={buildURL("pages:project", { projectId: id })}
-          underline="none"
-        >
-          <Typography variant="h6" component="h3" gutterBottom>
-            {project.name}
-          </Typography>
-        </Link>
         <BoardPreviewList ids={boards} showComposer projectId={id} />
       </CardContent>
+
+      <Menu
+        anchorEl={menuRef.current}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        open={menuIsVisible}
+        onClose={hideMenu}
+      >
+        <MenuItem
+          onClick={() => {
+            hideMenu();
+          }}
+        >
+          Clear
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            dispatch(
+              confirmDialogActions.showDialog({
+                okAction: apiActions.deleteProject(id),
+                okButtonText: "yes",
+                title: "Warning",
+                text: `Delete project "${project.name}"?`,
+              }),
+            );
+            hideMenu();
+          }}
+        >
+          Delete
+        </MenuItem>
+      </Menu>
     </Card>
   );
 }
 
-export default ProjectInfo;
+export default memo(ProjectInfo);

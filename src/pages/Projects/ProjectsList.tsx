@@ -1,10 +1,8 @@
 import { Stack, Typography } from "@mui/material";
-import WorkspacesIcon from "@mui/icons-material/Workspaces";
 
 import { selectProjectsIds } from "app/projects/selectors";
 import { useAppSelector } from "app/hooks";
 
-import NewProjectStub from "./NewProjectStub";
 import ProjectInfo from "./ProjectInfo";
 
 export default function ProjectsList() {
@@ -20,7 +18,6 @@ export default function ProjectsList() {
         display="flex"
         alignItems="center"
       >
-        <WorkspacesIcon />
         Projects
       </Typography>
 
@@ -29,7 +26,6 @@ export default function ProjectsList() {
           <ProjectInfo key={projectId} id={projectId} />
         ))}
       </Stack>
-      <NewProjectStub />
     </>
   );
 }

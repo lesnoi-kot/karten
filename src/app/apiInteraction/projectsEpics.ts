@@ -8,12 +8,13 @@ import { showSnackbar } from "app/snackbars";
 
 import { Epic } from "../types";
 import { actions } from "./slice";
+import { selectProjectById } from "app/projects/selectors";
 
 export const getProjectsEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.getProjects.match),
-    switchMap(({ meta: { requestKey } }) =>
-      from(api.getProjects()).pipe(
+    switchMap(({ meta: { requestKey, signal } }) =>
+      from(api.getProjects({ signal })).pipe(
         mergeMap((projectsArr) => {
           const { projects, boards } = normalizeProjects(projectsArr);
 
@@ -23,7 +24,12 @@ export const getProjectsEpic: Epic = (action$, store$, { api }) =>
             actions.requestLoaded(requestKey),
           );
         }),
-        catchError((error) => of(actions.requestFailed(error, requestKey))),
+        catchError((error) =>
+          of(
+            actions.requestFailed(error, requestKey),
+            showSnackbar({ message: String(error), type: "error" }),
+          ),
+        ),
       ),
     ),
   );
@@ -52,7 +58,14 @@ export const addProjectEpic: Epic = (action$, store$, { api }) =>
     switchMap(({ payload, meta: { requestKey } }) =>
       from(api.addProject(payload)).pipe(
         mergeMap((project) => {
-          return of(projectSet(project), actions.requestLoaded(requestKey));
+          return of(
+            projectSet(project),
+            actions.requestLoaded(requestKey),
+            showSnackbar({
+              message: `Project "${payload.name}" is created!`,
+              type: "success",
+            }),
+          );
         }),
         catchError((error) =>
           of(
@@ -94,9 +107,18 @@ export const deleteProjectEpic: Epic = (action$, store$, { api }) =>
     filter(actions.deleteProject.match),
     switchMap(({ payload: projectId, meta: { requestKey } }) =>
       from(api.deleteProject(projectId)).pipe(
-        mergeMap(() =>
-          of(projectDeleted(projectId), actions.requestLoaded(requestKey)),
-        ),
+        mergeMap(() => {
+          const project = selectProjectById(store$.value, projectId);
+
+          return of(
+            projectDeleted(projectId),
+            actions.requestLoaded(requestKey),
+            showSnackbar({
+              message: `Project "${project?.name}" was deleted!`,
+              type: "info",
+            }),
+          );
+        }),
         catchError((error) =>
           of(
             actions.requestFailed(error, requestKey),

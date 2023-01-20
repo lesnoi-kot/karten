@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { Box, CircularProgress, Container } from "@mui/material";
 
 import { actions as apiActions } from "app/apiInteraction";
@@ -9,6 +10,7 @@ import ErrorSplash from "components/ui/ErrorSplash";
 
 import RecentlyViewed from "./RecentlyViewed";
 import ProjectsList from "./ProjectsList";
+import NewProjectStub from "./NewProjectStub";
 
 function Projects() {
   const { load, reload, isLoading, isLoaded, isFailed, error } = useRequest(
@@ -17,27 +19,26 @@ function Projects() {
 
   useEffect(() => load(undefined), [load]);
 
-  if (isLoading) {
-    return (
-      <Box textAlign="center" mt={3}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (isFailed) {
-    return <ErrorSplash message={error} retry={reload} />;
-  }
-
-  if (!isLoaded) {
-    return null;
-  }
-
   return (
-    <Container maxWidth="lg">
-      <RecentlyViewed />
-      <ProjectsList />
-    </Container>
+    <>
+      <Helmet title="Projects | Karten" />
+
+      {isLoading && (
+        <Box textAlign="center" mt={3}>
+          <CircularProgress />
+        </Box>
+      )}
+
+      {isFailed && <ErrorSplash message={error} retry={reload} />}
+
+      {isLoaded && (
+        <Container maxWidth="lg">
+          <RecentlyViewed />
+          <ProjectsList />
+          <NewProjectStub />
+        </Container>
+      )}
+    </>
   );
 }
 

@@ -22,7 +22,6 @@ function RecentlyViewed() {
         display="flex"
         alignItems="center"
       >
-        <AccessTimeIcon />
         Recently viewed
       </Typography>
 
