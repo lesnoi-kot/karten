@@ -1,4 +1,4 @@
-import { createSlice, nanoid } from "@reduxjs/toolkit";
+import { createSlice, nanoid, AnyAction } from "@reduxjs/toolkit";
 
 import { ID } from "models/types";
 import { FetchState } from "utils/types";
@@ -61,6 +61,17 @@ export const {
       }),
     },
 
+    requestCleanup: {
+      reducer: (state, action: APIAction<void>) => {
+        const { requestKey } = action.meta;
+        delete state.requestsInfo[requestKey];
+      },
+      prepare: (requestKey: string) => ({
+        payload: undefined,
+        meta: { requestKey },
+      }),
+    },
+
     /*
       Projects
     */
@@ -114,12 +125,22 @@ function requestWithPayload<P>() {
     reducer: (state: APISlice, action: APIAction<P>) => {
       state.requestsInfo[action.meta.requestKey] = {
         state: FetchState.PENDING,
-        action,
+        action: {
+          type: action.type,
+          payload: action.payload,
+        },
       };
     },
-    prepare: (payload: P, requestKey?: string) => ({
+    prepare: (payload: P, requestKey?: string, signal?: AbortSignal) => ({
       payload,
-      meta: { requestKey: requestKey ?? nanoid() },
+      meta: {
+        requestKey: requestKey ?? nanoid(),
+        signal,
+      },
     }),
   };
+}
+
+export function isAPIAction(action: AnyAction): action is APIAction<unknown> {
+  return Boolean(action && "meta" in action && action.meta?.requestKey);
 }

@@ -1,11 +1,12 @@
 import { useCallback, useRef, useMemo, useEffect } from "react";
-import { ActionCreator, nanoid } from "@reduxjs/toolkit";
+import { ActionCreator, AnyAction, nanoid } from "@reduxjs/toolkit";
 
 import { FetchState } from "utils/types";
 import { useAppDispatch, useAppSelector } from "app/hooks";
 
 import { selectRequestInfo } from "./selectors";
 import { APIAction, RequestInfo } from "./types";
+import { isAPIAction, actions } from "./slice";
 
 type UseRequestInfoReturnType = Partial<RequestInfo> & {
   isLoading: boolean;
@@ -41,39 +42,67 @@ export const useRequestInfo = (
   };
 };
 
+export const useRequestInfoOfAction = (action: AnyAction | null) => {
+  return useRequestInfo(
+    action && isAPIAction(action) ? action.meta.requestKey : "",
+  );
+};
+
 const noPayload = Symbol("no payload");
 type Callback = () => void;
 
 type UseRequestReturnType<P> = UseRequestInfoReturnType & {
   reload(): void;
+  cancel(): void;
   load(payload: P): void;
+  getAction(payload: P): APIAction<P>;
   onSuccess(callback: Callback): void;
 };
 
 export function useRequest<P>(
   actionCreator: ActionCreator<APIAction<P>>,
+  options?: {
+    requestKey?: string;
+  },
 ): UseRequestReturnType<P> {
   const dispatch = useAppDispatch();
   const prevPayload = useRef<P | Symbol>(noPayload);
   const successHandler = useRef<Callback>(() => {});
-  const requestKey = useMemo(() => nanoid(), []);
+  const requestKey = useMemo(() => nanoid(), [actionCreator]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(actions.requestCleanup(requestKey));
+    };
+  }, [dispatch, requestKey]);
+
+  const getAction = useCallback(
+    (payload: P) => {
+      prevPayload.current = payload;
+      return actionCreator(payload, requestKey);
+    },
+    [actionCreator, requestKey],
+  );
 
   const load = useCallback(
     (payload: P) => {
-      prevPayload.current = payload;
-      dispatch(actionCreator(payload, requestKey));
+      dispatch(getAction(payload));
     },
-    [dispatch, actionCreator, requestKey],
+    [dispatch, getAction],
   );
 
   const reload = useCallback(() => {
     if (prevPayload.current !== noPayload) {
-      dispatch(actionCreator(prevPayload.current, requestKey));
+      dispatch(getAction(prevPayload.current as P));
     }
-  }, [dispatch, prevPayload, actionCreator, requestKey]);
+  }, [dispatch, getAction, prevPayload]);
 
   const onSuccess = useCallback((callback: Callback) => {
     successHandler.current = callback;
+  }, []);
+
+  const cancel = useCallback(() => {
+    // TODO
   }, []);
 
   const requestInfo = useRequestInfo(requestKey);
@@ -88,6 +117,8 @@ export function useRequest<P>(
     ...requestInfo,
     load,
     reload,
+    cancel,
     onSuccess,
+    getAction,
   };
 }

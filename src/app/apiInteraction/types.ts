@@ -7,5 +7,10 @@ export type RequestInfo = {
   action: AnyAction;
   error?: string;
 };
-export type WithRequestKey = { requestKey: string };
-export type APIAction<T> = PayloadAction<T, string, WithRequestKey>;
+
+export type APIMeta = {
+  requestKey: string;
+  signal?: AbortSignal;
+};
+
+export type APIAction<T> = PayloadAction<T, string, APIMeta>;

@@ -24,7 +24,11 @@ export function createStore() {
   const store = configureStore({
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(reduxLogger, epicMiddleware),
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActionPaths: ["meta.signal"],
+        },
+      }).concat(reduxLogger, epicMiddleware),
     devTools: true,
   });
 
