@@ -1,4 +1,5 @@
 import { useMemo, useRef, memo } from "react";
+import { generatePath } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -17,7 +18,6 @@ import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { ID } from "models/types";
 import { ENTITY_COLOR } from "models/constants";
-import { buildURL } from "utils/routes";
 
 import BoardPreviewList from "components/Board/BoardPreviewList";
 import useToggle from "components/hooks/useToggle";
@@ -58,10 +58,7 @@ function ProjectInfo({ id }: { id: ID }) {
           </IconButton>
         }
         title={
-          <Link
-            to={buildURL("pages:project", { projectId: id })}
-            color="text.primary"
-          >
+          <Link to={generatePath("/projects/:id", { id })} color="text.primary">
             {project.name}
           </Link>
         }

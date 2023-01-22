@@ -1,28 +1,37 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 
-import routes, { defaultRoute, Route as RouteMeta } from "configs/routes";
-import Page from "pages/Page";
-
-function generateRoutes(routes: RouteMeta[]) {
-  return routes.map((route) => {
-    const children = route.childrens ? generateRoutes(route.childrens) : null;
-
-    return (
-      <Route key={route.name} path={route.path} element={<route.component />}>
-        {children}
-      </Route>
-    );
-  });
-}
+import LayoutWithNavbar from "components/layouts/LayoutWithNavbar";
+import ProjectsPage from "pages/Projects";
+import ProjectPage from "pages/Project";
+import BoardPage from "pages/Board";
+import { BoardMenu } from "pages/Board/BoardMenu";
+import { ProjectsMenu } from "pages/Projects/ProjectsMenu";
 
 function App() {
   return (
-    <Routes>
-      <Route element={<Page />}>
-        {generateRoutes(routes)}
-        <Route path="*" element={<Navigate to={defaultRoute.path} />} />
-      </Route>
-    </Routes>
+    <BrowserRouter basename="/">
+      <Routes>
+        <Route path="/welcome" element={<div>Fancy landing</div>} />
+
+        <Route
+          element={
+            <LayoutWithNavbar>
+              <Routes>
+                <Route index path="/projects" element={<ProjectsMenu />} />
+                <Route path="/projects/:id" element={<div>Project menu</div>} />
+                <Route path="/boards/:id" element={<BoardMenu />} />
+              </Routes>
+            </LayoutWithNavbar>
+          }
+        >
+          <Route index path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/:id" element={<ProjectPage />} />
+          <Route path="/boards/:id" element={<BoardPage />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/projects" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

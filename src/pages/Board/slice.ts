@@ -1,13 +1,12 @@
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router";
+import { useNavigate, generatePath } from "react-router-dom";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { actions as apiActions } from "app/apiInteraction";
 import { actions as boardsActions } from "app/boards";
 import { RootState } from "app/types";
 import { ID } from "models/types";
-import { buildURL } from "utils/routes";
 import { pageUnloaded } from "app/actions";
 
 interface BoardPageState {
@@ -67,7 +66,8 @@ export const useDashboardMethods = (boardId: ID) => {
   const onTaskClick = useCallback(
     (taskId: ID) => {
       dispatch(taskSelected(taskId));
-      navigate(buildURL("pages:task", { boardId, taskId }), { replace: true });
+      // TODO fix
+      // navigate(generatePath("pages:task", { boardId, taskId }), { replace: true });
     },
     [dispatch, navigate, boardId],
   );
@@ -75,7 +75,7 @@ export const useDashboardMethods = (boardId: ID) => {
   const onTaskModalClose = useCallback(() => {
     dispatch(taskClosed());
 
-    navigate(buildURL("pages:board", { boardId }), { replace: true });
+    navigate(generatePath("/boards/:id", { id: boardId }), { replace: true });
   }, [dispatch, navigate, boardId]);
 
   return {

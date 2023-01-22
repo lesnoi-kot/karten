@@ -12,7 +12,7 @@ import RecentlyViewed from "./RecentlyViewed";
 import ProjectsList from "./ProjectsList";
 import NewProjectStub from "./NewProjectStub";
 
-function Projects() {
+function ProjectsPage() {
   const { load, reload, isLoading, isLoaded, isFailed, error } = useRequest(
     apiActions.getProjects,
   );
@@ -42,4 +42,4 @@ function Projects() {
   );
 }
 
-export default makePage(Projects);
+export default makePage(ProjectsPage);

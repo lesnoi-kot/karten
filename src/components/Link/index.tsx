@@ -1,21 +1,10 @@
-import React from "react";
 import { Link as ReactRouterLink } from "react-router-dom";
 import MUILink, { LinkProps } from "@mui/material/Link";
 
-import { buildURL } from "utils/routes";
-
 type Props = LinkProps & {
-  to?: string;
-  route?: string;
-  params?: any;
+  to: string;
 };
 
-export default function Link(props: Props) {
-  let { to = "" } = props;
-
-  if (props.route) {
-    to = buildURL(props.route, props.params);
-  }
-
+export default function Link({ to, ...props }: Props) {
   return <MUILink component={ReactRouterLink} {...props} to={to} />;
 }

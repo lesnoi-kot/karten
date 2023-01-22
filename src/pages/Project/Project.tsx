@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, generatePath } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { Helmet } from "react-helmet";
 import { Box, Grid, CircularProgress } from "@mui/material";
 
 import { useAppSelector } from "app/hooks";
-import { buildURL } from "utils/routes";
 
 import { BoardPreview, NewBoardStub } from "components/Board";
 import Heading from "components/ui/Heading";
@@ -18,7 +18,7 @@ import makePage from "pages/makePageHOC";
 
 function Project() {
   const dispatch = useDispatch();
-  const { projectId = "" } = useParams();
+  const { id: projectId = "" } = useParams();
   const project = useAppSelector((state) =>
     selectProjectById(state, projectId),
   );
@@ -33,6 +33,8 @@ function Project() {
 
   return (
     <>
+      <Helmet title={`${project?.name ?? "Project"} | Karten`} />
+
       <Box mt={2} mb={5} textAlign="center">
         <Heading>{project?.name ?? ""}</Heading>
       </Box>
@@ -56,7 +58,7 @@ function Project() {
               key={id}
               item
               component={Link}
-              to={buildURL("pages:board", { boardId: id })}
+              to={generatePath("/boards/:id", { id })}
               underline="none"
             >
               <BoardPreview id={id} />

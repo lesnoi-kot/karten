@@ -1,6 +1,6 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import clsx from "clsx";
 import {
   Box,
   List,
@@ -8,7 +8,6 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Drawer,
   Typography,
 } from "@mui/material";
 import ArrowBack from "@mui/icons-material/ArrowBack";
@@ -17,51 +16,39 @@ import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 import Link from "components/Link";
-import { ID } from "models/types";
 import { actions as apiActions } from "app/apiInteraction";
-import { showDialog } from "components/ConfirmDialog/slice";
+import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice";
 
-import styles from "./styles.module.css";
-
-type Props = {
-  boardId: ID;
-  open: boolean;
-  onClose(): void;
-};
-
-export function BoardMenu({ boardId, open, onClose }: Props) {
+export function BoardMenu() {
+  const { id: boardId = "", taskId: selectedTaskId = "" } = useParams();
   const dispatch = useDispatch();
 
   const onBoardDelete = () => {
     dispatch(
-      showDialog({
+      confirmDialogActions.showDialog({
         title: "Warning",
         text: "You are about to delete this board",
         okAction: apiActions.deleteBoardRequest(boardId),
-      })
+      }),
     );
-    onClose();
+    // onClose();
   };
 
   const onBoardClear = () => {
     dispatch(
-      showDialog({
+      confirmDialogActions.showDialog({
         title: "Warning",
         text: "You are about to delete all lists in this board",
         okAction: apiActions.clearBoardRequest(boardId),
-      })
+      }),
     );
-    onClose();
+    // onClose();
   };
 
   const onBackgroundChange = () => {};
 
   return (
-    <Drawer
-      open={open}
-      onClose={onClose}
-      PaperProps={{ className: clsx(styles.boardMenu) }}
-    >
+    <>
       <Box px={2} py={2} textAlign="center">
         <Typography variant="h5">Menu</Typography>
       </Box>
@@ -69,7 +56,7 @@ export function BoardMenu({ boardId, open, onClose }: Props) {
       <Divider />
 
       <List>
-        <ListItem component={Link} route="pages:projects">
+        <ListItem component={Link} to="/projects">
           <ListItemIcon>
             <ArrowBack />
           </ListItemIcon>
@@ -99,7 +86,7 @@ export function BoardMenu({ boardId, open, onClose }: Props) {
           <ListItemText primary="Delete board" />
         </ListItem>
       </List>
-    </Drawer>
+    </>
   );
 }
 

@@ -1,4 +1,4 @@
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import {
   responsiveFontSizes,
@@ -7,9 +7,6 @@ import {
 } from "@mui/material/styles";
 import type {} from "@mui/material/themeCssVarsAugmentation";
 import CssBaseline from "@mui/material/CssBaseline";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { BrowserRouter } from "react-router-dom";
 
 import App from "./App";
 import { createStore } from "./app/store";
@@ -43,19 +40,13 @@ const theme = responsiveFontSizes(
   }),
 );
 
-const container = document.getElementById("root");
-const root = createRoot(container!);
 const store = createStore();
 
-root.render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <Experimental_CssVarsProvider theme={theme}>
       <CssBaseline enableColorScheme />
-      <BrowserRouter basename="/">
-        <DndProvider backend={HTML5Backend}>
-          <App />
-        </DndProvider>
-      </BrowserRouter>
+      <App />
     </Experimental_CssVarsProvider>
   </Provider>,
 );

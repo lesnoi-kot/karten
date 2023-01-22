@@ -1,7 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { AppBar, Toolbar, Box, IconButton, Badge } from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import { AppBar, Toolbar, Box, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import { useAppDispatch } from "app/hooks";
@@ -23,44 +21,36 @@ export function NavbarTitle() {
   );
 }
 
-export default function Navbar() {
+type Props = {
+  drawerMenuElement?: React.ReactNode;
+};
+
+export default function Navbar({ drawerMenuElement }: Props) {
   const dispatch = useAppDispatch();
 
   return (
     <AppBar position="static">
       <Toolbar>
-        <Box id="navbar-page-content" />
-        <IconButton
-          edge="start"
-          onClick={() => {
-            dispatch(drawerMenuActions.toggle());
-          }}
-        >
-          <MenuIcon />
-        </IconButton>
+        {drawerMenuElement && (
+          <IconButton
+            edge="start"
+            color="inherit"
+            sx={{ marginRight: 2 }}
+            onClick={() => {
+              dispatch(drawerMenuActions.toggle());
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
+
         <NavbarTitle />
         <Box sx={{ flexGrow: 1 }} />
 
-        <ColorThemeSwitch />
-
-        <IconButton color="inherit" edge="end" size="large">
-          <Badge badgeContent={17} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
+        <ColorThemeSwitch sx={{ display: { xs: "none", sm: "block" } }} />
       </Toolbar>
 
-      <DrawerMenu />
+      {drawerMenuElement && <DrawerMenu>{drawerMenuElement}</DrawerMenu>}
     </AppBar>
   );
-}
-
-export function NavbarContent({ children }: { children: React.ReactNode }) {
-  const target = document.getElementById("navbar-page-content");
-
-  if (!target) {
-    return null;
-  }
-
-  return ReactDOM.createPortal(children, target);
 }

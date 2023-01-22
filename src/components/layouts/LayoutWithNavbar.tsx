@@ -3,13 +3,16 @@ import { Outlet } from "react-router-dom";
 import { Container } from "@mui/material";
 
 import Navbar from "components/Navbar";
+import Widgets from "pages/Page/Widgets";
 
-import Widgets from "./Widgets";
+type Props = {
+  children: React.ReactNode;
+};
 
-function BasePage() {
+export default function LayoutWithNavbar({ children }: Props) {
   return (
     <>
-      <Navbar />
+      <Navbar drawerMenuElement={children} />
       <Container disableGutters maxWidth={false}>
         <Outlet />
       </Container>
@@ -17,5 +20,3 @@ function BasePage() {
     </>
   );
 }
-
-export default BasePage;

@@ -8,22 +8,19 @@ import logger from "services/logger";
 import { actions as apiActions } from "app/apiInteraction";
 import { useRequest } from "app/apiInteraction/hooks";
 import { useAppSelector } from "app/hooks";
-import { buildURL } from "utils/routes";
 
 import { TaskModal } from "components/Task";
-import { NavbarContent } from "components/Navbar";
 import ErrorSplash from "components/ui/ErrorSplash";
 import makePage from "pages/makePageHOC";
 
 import { useDashboardMethods, selectShouldRedirectToProject } from "./slice";
 import BoardName from "./BoardName";
-import BoardMenu from "./BoardMenu";
 import ScrollableSpace from "./ScrollableSpace";
 import TaskLists from "./TaskLists";
 import PageTitle from "./PageTitle";
 
 function BoardPage() {
-  const { boardId = "", taskId: selectedTaskId = "" } = useParams();
+  const { id: boardId = "", taskId: selectedTaskId = "" } = useParams();
   const { load, reload, isLoading, isLoaded, isFailed, state, error } =
     useRequest(apiActions.boardRequest);
   const { onTaskClick, onTaskModalClose } = useDashboardMethods(boardId);
@@ -32,7 +29,7 @@ function BoardPage() {
   useEffect(() => load(boardId), [load, boardId]);
 
   if (shouldRedirectToProject) {
-    return <Navigate to={buildURL("pages:projects")} />;
+    return <Navigate to="/projects" />;
   }
 
   logger.debug("Render: DashboardPage", { boardId, fetchState: state });
@@ -40,15 +37,12 @@ function BoardPage() {
   return (
     <DndProvider backend={HTML5Backend}>
       <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />
+
       {isLoaded && (
         <Box my={2} textAlign="center">
           <BoardName boardId={boardId} />
         </Box>
       )}
-
-      <NavbarContent>
-        <BoardMenu boardId={boardId} />
-      </NavbarContent>
 
       {isLoading && (
         <Box textAlign="center">
