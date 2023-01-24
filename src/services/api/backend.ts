@@ -1,3 +1,5 @@
+import cookies from "js-cookie";
+
 import { ID, Project, Board, TaskList, Task, Comment } from "models/types";
 
 import {
@@ -29,9 +31,8 @@ import {
   TaskListDTO,
 } from "./types";
 
-const headers = {
-  "Content-Type": "application/json; charset=UTF-8",
-};
+const CSRF_COOKIE = "_csrf";
+const CSRF_TOKEN_HEADER = "X-CSRF-Token";
 
 export class APIService implements API {
   apiRootURL: string;
@@ -56,72 +57,79 @@ export class APIService implements API {
     }
   }
 
+  private fetchJSON(path: string, method: string = "GET", body?: {}) {
+    const headers = new Headers();
+    const fetchOptions: RequestInit = {
+      method,
+      headers,
+      credentials: "same-origin",
+      mode: "same-origin",
+    };
+
+    if (method !== "GET") {
+      headers.append(CSRF_TOKEN_HEADER, cookies.get(CSRF_COOKIE) ?? "");
+    }
+
+    if (body) {
+      fetchOptions.body = JSON.stringify(body);
+      headers.append("Content-Type", "application/json; charset=UTF-8");
+    }
+
+    return fetch(`${this.apiRootURL}${path}`, fetchOptions);
+  }
+
   async getProjects(): Promise<Project[]> {
-    const res = await fetch(`${this.apiRootURL}/projects`);
+    const res = await this.fetchJSON("/projects");
     const dtos = await this.unwrapResponse<ProjectDTO[]>(res);
     return dtos.map(convertProjectDTO);
   }
 
   async getProject(id: string): Promise<Project> {
-    const res = await fetch(`${this.apiRootURL}/projects/${id}`);
+    const res = await this.fetchJSON(`/projects/${id}`);
     return convertProjectDTO(await this.unwrapResponse<ProjectDTO>(res));
   }
 
   async editProject(args: EditProjectArgs): Promise<Project> {
-    const res = await fetch(`${this.apiRootURL}/projects/${args.id}`, {
-      headers,
-      method: "PATCH",
-      body: JSON.stringify({ name: args.name }),
+    const res = await this.fetchJSON(`/projects/${args.id}`, "PATCH", {
+      name: args.name,
     });
     return convertProjectDTO(await this.unwrapResponse<ProjectDTO>(res));
   }
 
   async addProject(args: AddProjectArgs): Promise<Project> {
-    const res = await fetch(`${this.apiRootURL}/projects`, {
-      headers,
-      method: "POST",
-      body: JSON.stringify(args),
-    });
+    const res = await this.fetchJSON(`/projects`, "POST", args);
     return convertProjectDTO(await this.unwrapResponse<ProjectDTO>(res));
   }
 
   async deleteProject(id: string) {
-    const res = await fetch(`${this.apiRootURL}/projects/${id}`, {
-      method: "DELETE",
-    });
+    const res = await this.fetchJSON(`/projects/${id}`, "DELETE");
     await this.checkResponseError(res);
   }
 
   /* ------------ */
 
   async getBoard(id: string): Promise<Board> {
-    const res = await fetch(`${this.apiRootURL}/boards/${id}`);
+    const res = await this.fetchJSON(`/boards/${id}`);
     return convertBoardDTO(await this.unwrapResponse<BoardDTO>(res));
   }
 
   async editBoard(args: EditBoardArgs): Promise<Board> {
-    const res = await fetch(`${this.apiRootURL}/projects/${args.id}`, {
-      headers,
-      method: "PATCH",
-      body: JSON.stringify({ name: args.name }),
+    const res = await this.fetchJSON(`/projects/${args.id}`, "PATCH", {
+      name: args.name,
     });
     return convertBoardDTO(await this.unwrapResponse<BoardDTO>(res));
   }
 
   async deleteBoard(id: string): Promise<void> {
-    const res = await fetch(`${this.apiRootURL}/boards/${id}`, {
-      method: "DELETE",
-    });
+    const res = await this.fetchJSON(`/boards/${id}`, "DELETE");
     await this.checkResponseError(res);
   }
 
   async addBoard(args: AddBoardArgs): Promise<Board> {
     const { projectId, name } = args;
 
-    const res = await fetch(`${this.apiRootURL}/projects/${projectId}/boards`, {
-      headers,
-      method: "POST",
-      body: JSON.stringify({ name }),
+    const res = await this.fetchJSON(`/projects/${projectId}/boards`, "POST", {
+      name,
     });
     return convertBoardDTO(await this.unwrapResponse<BoardDTO>(res));
   }
@@ -129,82 +137,65 @@ export class APIService implements API {
   /* ------------ */
 
   async getTaskList(id: string): Promise<TaskList> {
-    const res = await fetch(`${this.apiRootURL}/task-lists/${id}`);
+    const res = await this.fetchJSON(`/task-lists/${id}`);
     return convertTaskListDTO(await this.unwrapResponse<TaskListDTO>(res));
   }
 
   async editTaskList(args: EditTaskListArgs): Promise<TaskList> {
-    const res = await fetch(`${this.apiRootURL}/task-lists/${args.id}`, {
-      headers,
-      method: "PATCH",
-      body: JSON.stringify({ name: args.name, position: args.position }),
+    const res = await this.fetchJSON(`/task-lists/${args.id}`, "PATCH", {
+      name: args.name,
+      position: args.position,
     });
 
     return convertTaskListDTO(await this.unwrapResponse<TaskListDTO>(res));
   }
 
   async deleteTaskList(id: string) {
-    const res = await fetch(`${this.apiRootURL}/task-lists/${id}`, {
-      method: "DELETE",
-    });
+    const res = await this.fetchJSON(`/task-lists/${id}`, "DELETE");
     await this.checkResponseError(res);
   }
 
-  async addTaskList(args: AddTaskListArgs): Promise<TaskList> {
-    const res = await fetch(
-      `${this.apiRootURL}/boards/${args.boardId}/task-lists`,
-      {
-        headers,
-        method: "POST",
-        body: JSON.stringify({ name: args.name }),
-      },
-    );
+  async addTaskList({ boardId, name }: AddTaskListArgs): Promise<TaskList> {
+    const res = await this.fetchJSON(`/boards/${boardId}/task-lists`, "POST", {
+      name,
+    });
     return convertTaskListDTO(await this.unwrapResponse<TaskListDTO>(res));
   }
 
   /* ------------ */
 
   async getTask(id: string): Promise<Task> {
-    const res = await fetch(`${this.apiRootURL}/tasks/${id}`);
+    const res = await this.fetchJSON(`/tasks/${id}`);
     return convertTaskDTO(await this.unwrapResponse<TaskDTO>(res));
   }
 
   async editTask(args: EditTaskArgs): Promise<Task> {
-    const res = await fetch(`${this.apiRootURL}/tasks/${args.id}`, {
-      headers,
-      method: "PATCH",
-      body: JSON.stringify({
-        name: args.name,
-        position: args.position,
-        text: args.text,
-      }),
+    const res = await this.fetchJSON(`/tasks/${args.id}`, "PATCH", {
+      name: args.name,
+      position: args.position,
+      text: args.text,
     });
 
     return convertTaskDTO(await this.unwrapResponse<TaskDTO>(res));
   }
 
   async deleteTask(id: string): Promise<void> {
-    const res = await fetch(`${this.apiRootURL}/tasks/${id}`, {
-      method: "DELETE",
-    });
+    const res = await this.fetchJSON(`/tasks/${id}`, "DELETE");
     await this.checkResponseError(res);
   }
 
   async deleteTasks(args: ID[]): Promise<void> {
-    // TODO
+    throw new Error("Not implemented!");
   }
 
   async addTask(args: AddTaskArgs): Promise<Task> {
-    const res = await fetch(
-      `${this.apiRootURL}/task-lists/${args.taskListId}/tasks`,
+    const res = await this.fetchJSON(
+      `/task-lists/${args.taskListId}/tasks`,
+      "POST",
       {
-        headers,
-        method: "POST",
-        body: JSON.stringify({
-          name: args.name,
-          text: args.text ?? "",
-          position: args.position,
-        }),
+        name: args.name,
+        text: args.text ?? "",
+        position: args.position,
       },
     );
     return convertTaskDTO(await this.unwrapResponse<TaskDTO>(res));
@@ -212,32 +203,21 @@ export class APIService implements API {
 
   /* ------------ */
 
-  async addComment(args: AddCommentArgs): Promise<Comment> {
-    const res = await fetch(
-      `${this.apiRootURL}/tasks/${args.taskId}/comments`,
-      {
-        headers,
-        method: "POST",
-        body: JSON.stringify({ text: args.text }),
-      },
-    );
+  async addComment({ taskId, text }: AddCommentArgs): Promise<Comment> {
+    const res = await this.fetchJSON(`/tasks/${taskId}/comments`, "POST", {
+      text,
+    });
     return convertCommentDTO(await this.unwrapResponse<CommentDTO>(res));
   }
 
-  async editComment(args: EditCommentArgs): Promise<Comment> {
-    const res = await fetch(`${this.apiRootURL}/comments/${args.id}`, {
-      headers,
-      method: "PATCH",
-      body: JSON.stringify({ text: args.text }),
-    });
+  async editComment({ id, text }: EditCommentArgs): Promise<Comment> {
+    const res = await this.fetchJSON(`/comments/${id}`, "PATCH", { text });
 
     return convertCommentDTO(await this.unwrapResponse<CommentDTO>(res));
   }
 
   async deleteComment(id: string): Promise<void> {
-    const res = await fetch(`${this.apiRootURL}/comments/${id}`, {
-      method: "DELETE",
-    });
+    const res = await this.fetchJSON(`/comments/${id}`, "DELETE");
     await this.checkResponseError(res);
   }
 }

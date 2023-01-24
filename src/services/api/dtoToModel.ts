@@ -71,5 +71,5 @@ function convertNumberToColor(color: number): string {
     return ENTITY_COLOR.gray;
   }
 
-  return "#" + color.toString(16);
+  return "#" + color.toString(16).padEnd(6, "0");
 }

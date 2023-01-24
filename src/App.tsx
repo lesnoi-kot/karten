@@ -9,7 +9,7 @@ import { ProjectsMenu } from "pages/Projects/ProjectsMenu";
 
 function App() {
   return (
-    <BrowserRouter basename="/">
+    <BrowserRouter basename={process.env.PUBLIC_URL || "/"}>
       <Routes>
         <Route path="/welcome" element={<div>Fancy landing</div>} />
 

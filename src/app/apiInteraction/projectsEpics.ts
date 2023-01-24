@@ -14,7 +14,7 @@ export const getProjectsEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.getProjects.match),
     switchMap(({ meta: { requestKey, signal } }) =>
-      from(api.getProjects({ signal })).pipe(
+      from(api.getProjects()).pipe(
         mergeMap((projectsArr) => {
           const { projects, boards } = normalizeProjects(projectsArr);
 

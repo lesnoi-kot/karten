@@ -9,6 +9,10 @@ export type ResponseError = {
   error?: string;
 };
 
+export type RequestOptions = {
+  signal?: AbortSignal;
+};
+
 export type CommentDTO = {
   id: ID;
   task_id: ID;
