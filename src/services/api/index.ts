@@ -1,4 +1,4 @@
-import { settings } from "configs/settings";
+import { settings } from "settings";
 
 import { API } from "./types";
 import { APIService } from "./backend";

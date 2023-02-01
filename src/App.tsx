@@ -1,5 +1,7 @@
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 
+import { settings } from "settings";
+
 import LayoutWithNavbar from "components/layouts/LayoutWithNavbar";
 import ProjectsPage from "pages/Projects";
 import ProjectPage from "pages/Project";
@@ -9,9 +11,9 @@ import { ProjectsMenu } from "pages/Projects/ProjectsMenu";
 
 function App() {
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL || "/"}>
+    <BrowserRouter basename={settings.publicURL}>
       <Routes>
-        <Route path="/welcome" element={<div>Fancy landing</div>} />
+        <Route index path="/welcome" element={<div>Fancy landing</div>} />
 
         <Route
           element={
@@ -27,9 +29,8 @@ function App() {
           <Route index path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:id" element={<ProjectPage />} />
           <Route path="/boards/:id" element={<BoardPage />} />
+          <Route path="*" element={<Navigate to="/projects" />} />
         </Route>
-
-        <Route path="*" element={<Navigate to="/projects" />} />
       </Routes>
     </BrowserRouter>
   );
