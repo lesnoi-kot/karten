@@ -47,6 +47,7 @@ export type BoardDTO = {
   id: ID;
   project_id: ID;
   archived: boolean;
+  favorite: boolean;
   name: string;
   date_created: string;
   date_last_viewed: string;
@@ -58,6 +59,9 @@ export type BoardDTO = {
 export type ProjectDTO = {
   id: ID;
   name: string;
+  avatar: ID | null;
+  avatar_url?: string;
+  avatar_thumbnail_url?: string;
   boards?: BoardDTO[];
 };
 

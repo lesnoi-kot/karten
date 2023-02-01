@@ -1,5 +1,4 @@
 import { RootState } from "app";
-import { FetchState } from "utils/types";
 
 import { selectBoardsIds } from "../selectors";
 
@@ -13,6 +12,8 @@ let store: RootState = {
         sadPoe: {
           id: "1",
           name: "Board of sad Poe",
+          avatar_thumbnail_url: "",
+          avatar_url: "",
         },
       },
     },
@@ -22,6 +23,7 @@ let store: RootState = {
           id: "1",
           projectId: "sadPoe",
           name: "Book ideas",
+          favorite: false,
           archived: false,
           dateCreated: "2022-08-25T15:26:59.673Z",
           dateLastViewed: "2022-08-25T15:27:00.890Z",

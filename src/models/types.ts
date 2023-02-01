@@ -40,6 +40,7 @@ export type Board = {
   id: UUID;
   projectId: UUID;
   archived: boolean;
+  favorite: boolean;
   name: string;
   dateCreated: DateString;
   dateLastViewed: DateString;
@@ -51,5 +52,7 @@ export type Board = {
 export type Project = {
   id: UUID;
   name: string;
+  avatar_url: string;
+  avatar_thumbnail_url: string;
   boards?: Board[];
 };

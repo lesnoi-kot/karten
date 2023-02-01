@@ -12,6 +12,8 @@ export function convertProjectDTO(dto: ProjectDTO): Project {
   return {
     id: dto.id,
     name: dto.name,
+    avatar_url: dto.avatar_url ?? "",
+    avatar_thumbnail_url: dto.avatar_thumbnail_url ?? "",
     boards: dto.boards ? dto.boards.map(convertBoardDTO) : [],
   };
 }
@@ -21,6 +23,7 @@ export function convertBoardDTO(dto: BoardDTO): Board {
     id: dto.id,
     projectId: dto.project_id,
     archived: dto.archived,
+    favorite: dto.favorite,
     name: dto.name,
     dateCreated: dto.date_created,
     dateLastViewed: dto.date_last_viewed,

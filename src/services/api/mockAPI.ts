@@ -78,6 +78,8 @@ export default class MockAPI implements API {
     const project: Project = {
       id: Date.now().toString(),
       name: args.name,
+      avatar_thumbnail_url: "",
+      avatar_url: "",
       boards: [],
     };
 
@@ -198,6 +200,7 @@ export default class MockAPI implements API {
       projectId: "sadPoe",
       name,
       archived: false,
+      favorite: false,
       dateCreated: new Date().toISOString(),
       dateLastViewed: new Date().toISOString(),
       color: "",

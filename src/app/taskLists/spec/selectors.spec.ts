@@ -16,6 +16,8 @@ let store: RootState = {
         sadPoe: {
           id: "1",
           name: "Board of sad Poe",
+          avatar_thumbnail_url: "",
+          avatar_url: "",
         },
       },
     },
@@ -24,6 +26,7 @@ let store: RootState = {
         "1": {
           id: "1",
           projectId: "sadPoe",
+          favorite: false,
           name: "Book ideas",
           archived: false,
           dateCreated: "2022-08-25T15:26:59.673Z",

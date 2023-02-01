@@ -1,4 +1,4 @@
-import { settings } from "configs/settings";
+import { settings } from "settings";
 
 import { Logger } from "./types";
 import DevLogger from "./dev";

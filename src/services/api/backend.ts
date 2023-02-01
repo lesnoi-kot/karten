@@ -62,8 +62,8 @@ export class APIService implements API {
     const fetchOptions: RequestInit = {
       method,
       headers,
-      credentials: "same-origin",
-      mode: "same-origin",
+      mode: "cors",
+      credentials: "include", // Send and receive cookies from the api endpoint.
     };
 
     if (method !== "GET") {
