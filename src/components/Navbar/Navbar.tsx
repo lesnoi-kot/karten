@@ -9,9 +9,7 @@ import Heading from "components/ui/Heading";
 import Link from "components/Link";
 import ColorThemeSwitch from "components/ColorThemeSwitch";
 
-import DrawerMenu from "./DrawerMenu";
-
-export function NavbarTitle() {
+function NavbarTitle() {
   return (
     <Heading variant="h4">
       <Link to="/" color="inherit" underline="none">
@@ -22,16 +20,19 @@ export function NavbarTitle() {
 }
 
 type Props = {
-  drawerMenuElement?: React.ReactNode;
+  renderMenuButton: boolean;
 };
 
-export default function Navbar({ drawerMenuElement }: Props) {
+export default function Navbar({ renderMenuButton }: Props) {
   const dispatch = useAppDispatch();
 
   return (
-    <AppBar position="static">
+    <AppBar
+      position="static"
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+    >
       <Toolbar>
-        {drawerMenuElement && (
+        {renderMenuButton && (
           <IconButton
             edge="start"
             color="inherit"
@@ -49,8 +50,6 @@ export default function Navbar({ drawerMenuElement }: Props) {
 
         <ColorThemeSwitch sx={{ display: { xs: "none", sm: "block" } }} />
       </Toolbar>
-
-      {drawerMenuElement && <DrawerMenu>{drawerMenuElement}</DrawerMenu>}
     </AppBar>
   );
 }
