@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import {
   Button,
@@ -12,6 +12,7 @@ import {
 
 import { actions } from "app/apiInteraction";
 import { useRequest } from "app/apiInteraction/hooks";
+import FilePicker from "components/ui/FilePicker/FilePicker";
 
 type Props = {
   isOpen: boolean;
@@ -19,13 +20,18 @@ type Props = {
 };
 
 export default function NewProjectDialog({ onClose, isOpen }: Props) {
-  const { load, onSuccess, isLoading, isLoaded, state } = useRequest(
-    actions.addProject,
-  );
+  const { load, onSuccess, isLoading } = useRequest(actions.addProject);
   const [projectName, setProjectName] = useState("");
+  const [projectAvatar, setProjectAvatar] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setProjectName("");
+    }
+  }, [isOpen]);
 
   const onSubmit = () => {
-    load({ name: projectName });
+    load({ name: projectName, avatar: projectAvatar });
   };
   onSuccess(onClose);
 
@@ -47,12 +53,23 @@ export default function NewProjectDialog({ onClose, isOpen }: Props) {
           onChange={(e) => setProjectName(e.target.value)}
           disabled={isLoading}
         />
+
+        <FilePicker
+          caption="Add project logo"
+          accept="image/png, image/jpeg, image/webp"
+          showPreview
+          onChange={(avatars) => setProjectAvatar(avatars[0] ?? null)}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={isLoading}>
           Cancel
         </Button>
-        <LoadingButton loading={isLoading} onClick={onSubmit}>
+        <LoadingButton
+          loading={isLoading}
+          disabled={projectName.trim() === ""}
+          onClick={onSubmit}
+        >
           Create project
         </LoadingButton>
       </DialogActions>

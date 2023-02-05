@@ -34,6 +34,19 @@ import {
 const CSRF_COOKIE = "_csrf";
 const CSRF_TOKEN_HEADER = "X-CSRF-Token";
 
+const defaultFetchOptions = {
+  mode: "cors",
+  credentials: "include", // Send and receive cookies from the api endpoint.
+} as const;
+
+type FormBody = {
+  [field: string]: string | null | Blob;
+};
+
+type JSONBody = {
+  [field: string]: string | number | undefined | null | JSONBody;
+};
+
 export class APIService implements API {
   apiRootURL: string;
 
@@ -42,6 +55,10 @@ export class APIService implements API {
       apiRootURL = apiRootURL.substring(0, apiRootURL.length - 1);
     }
     this.apiRootURL = apiRootURL;
+  }
+
+  private endpointURL(path: string): string {
+    return `${this.apiRootURL}${path}`;
   }
 
   private async unwrapResponse<T>(response: globalThis.Response): Promise<T> {
@@ -57,13 +74,12 @@ export class APIService implements API {
     }
   }
 
-  private fetchJSON(path: string, method: string = "GET", body?: {}) {
+  private fetchJSON(path: string, method: string = "GET", body?: JSONBody) {
     const headers = new Headers();
     const fetchOptions: RequestInit = {
+      ...defaultFetchOptions,
       method,
       headers,
-      mode: "cors",
-      credentials: "include", // Send and receive cookies from the api endpoint.
     };
 
     if (method !== "GET") {
@@ -75,7 +91,27 @@ export class APIService implements API {
       headers.append("Content-Type", "application/json; charset=UTF-8");
     }
 
-    return fetch(`${this.apiRootURL}${path}`, fetchOptions);
+    return fetch(this.endpointURL(path), fetchOptions);
+  }
+
+  private fetchMultipart(path: string, method: string = "GET", body: FormBody) {
+    const headers = new Headers();
+    const form = new FormData();
+
+    const fetchOptions: RequestInit = {
+      ...defaultFetchOptions,
+      method,
+      headers,
+      body: form,
+    };
+
+    headers.append(CSRF_TOKEN_HEADER, cookies.get(CSRF_COOKIE) ?? "");
+
+    for (const key in body) {
+      form.append(key, body[key] ?? "");
+    }
+
+    return fetch(this.endpointURL(path), fetchOptions);
   }
 
   async getProjects(): Promise<Project[]> {
@@ -97,7 +133,7 @@ export class APIService implements API {
   }
 
   async addProject(args: AddProjectArgs): Promise<Project> {
-    const res = await this.fetchJSON(`/projects`, "POST", args);
+    const res = await this.fetchMultipart(`/projects`, "POST", args);
     return convertProjectDTO(await this.unwrapResponse<ProjectDTO>(res));
   }
 

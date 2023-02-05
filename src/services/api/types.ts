@@ -67,6 +67,7 @@ export type ProjectDTO = {
 
 export type AddProjectArgs = {
   name: string;
+  avatar: File | null;
 };
 
 export type AddBoardArgs = {
