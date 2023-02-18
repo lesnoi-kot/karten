@@ -1,8 +1,8 @@
-import { API } from "services/api";
+import { DataStore } from "services/api";
 import { apiService } from "../services";
 
 type InjectedServices = {
-  apiService: API;
+  apiService: DataStore;
 };
 
 export const useServices = (): InjectedServices => {

@@ -1,3 +1,3 @@
-import { getAPI } from "services/api";
+import { getDataStore } from "services/api";
 
-export const apiService = getAPI();
+export const apiService = getDataStore();

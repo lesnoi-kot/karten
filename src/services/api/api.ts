@@ -1,6 +1,14 @@
 import cookies from "js-cookie";
 
-import { ID, Project, Board, TaskList, Task, Comment } from "models/types";
+import {
+  ID,
+  Project,
+  Board,
+  TaskList,
+  Task,
+  Comment,
+  KartenFile,
+} from "models/types";
 
 import {
   convertProjectDTO,
@@ -8,14 +16,16 @@ import {
   convertTaskListDTO,
   convertTaskDTO,
   convertCommentDTO,
+  convertFilesDTO,
 } from "./dtoToModel";
+
 import {
   AddBoardArgs,
   AddCommentArgs,
   AddProjectArgs,
   AddTaskArgs,
   AddTaskListArgs,
-  API,
+  DataStore,
   APIError,
   BoardDTO,
   CommentDTO,
@@ -24,6 +34,7 @@ import {
   EditProjectArgs,
   EditTaskArgs,
   EditTaskListArgs,
+  FileDTO,
   ProjectDTO,
   ResponseError,
   ResponseOK,
@@ -47,7 +58,7 @@ type JSONBody = {
   [field: string]: string | number | undefined | null | JSONBody;
 };
 
-export class APIService implements API {
+export class APIService implements DataStore {
   apiRootURL: string;
 
   constructor(apiRootURL: string) {
@@ -162,11 +173,22 @@ export class APIService implements API {
   }
 
   async addBoard(args: AddBoardArgs): Promise<Board> {
-    const { projectId, name } = args;
+    const { projectId, name, color, cover, coverId } = args;
+    const body: FormBody = { name };
 
-    const res = await this.fetchJSON(`/projects/${projectId}/boards`, "POST", {
-      name,
-    });
+    if (cover) {
+      body.cover = cover;
+    } else if (coverId) {
+      body.cover_id = coverId;
+    } else if (color) {
+      body.color = String(color);
+    }
+
+    const res = await this.fetchMultipart(
+      `/projects/${projectId}/boards`,
+      "POST",
+      body,
+    );
     return convertBoardDTO(await this.unwrapResponse<BoardDTO>(res));
   }
 
@@ -191,10 +213,12 @@ export class APIService implements API {
     await this.checkResponseError(res);
   }
 
-  async addTaskList({ boardId, name }: AddTaskListArgs): Promise<TaskList> {
-    const res = await this.fetchJSON(`/boards/${boardId}/task-lists`, "POST", {
-      name,
-    });
+  async addTaskList({ boardId, ...body }: AddTaskListArgs): Promise<TaskList> {
+    const res = await this.fetchJSON(
+      `/boards/${boardId}/task-lists`,
+      "POST",
+      body,
+    );
     return convertTaskListDTO(await this.unwrapResponse<TaskListDTO>(res));
   }
 
@@ -255,5 +279,12 @@ export class APIService implements API {
   async deleteComment(id: string): Promise<void> {
     const res = await this.fetchJSON(`/comments/${id}`, "DELETE");
     await this.checkResponseError(res);
+  }
+
+  /* ------------ */
+
+  async getBoardCovers(): Promise<KartenFile[]> {
+    const res = await this.fetchJSON("/cover-images");
+    return convertFilesDTO(await this.unwrapResponse<FileDTO[]>(res));
   }
 }

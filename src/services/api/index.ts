@@ -1,11 +1,12 @@
+import { once } from "ramda";
 import { settings } from "settings";
 
-import { API } from "./types";
-import { APIService } from "./backend";
+import { DataStore } from "./types";
+import { APIService } from "./api";
 
 export { default as MockAPI } from "./mockAPI";
 export * from "./types";
 
-export function getAPI(): API {
-  return new APIService(settings.apiURL);
-}
+export const getDataStore = once(
+  (): DataStore => new APIService(settings.apiURL),
+);

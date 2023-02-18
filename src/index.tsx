@@ -1,6 +1,13 @@
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "react-query";
+import {
   responsiveFontSizes,
   Experimental_CssVarsProvider,
   experimental_extendTheme,
@@ -8,8 +15,11 @@ import {
 import type {} from "@mui/material/themeCssVarsAugmentation";
 import CssBaseline from "@mui/material/CssBaseline";
 
+import { APIContext } from "context/APIProvider";
+import { getDataStore } from "services/api";
+import { createStore } from "app/store";
+
 import App from "./App";
-import { createStore } from "./app/store";
 
 import "./index.css";
 
@@ -41,12 +51,17 @@ const theme = responsiveFontSizes(
 );
 
 const store = createStore();
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <Experimental_CssVarsProvider theme={theme}>
       <CssBaseline enableColorScheme />
-      <App />
+      <QueryClientProvider client={queryClient}>
+        <APIContext.Provider value={getDataStore()}>
+          <App />
+        </APIContext.Provider>
+      </QueryClientProvider>
     </Experimental_CssVarsProvider>
   </Provider>,
 );
