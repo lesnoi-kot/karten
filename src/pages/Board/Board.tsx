@@ -18,9 +18,11 @@ import BoardName from "./BoardName";
 import ScrollableSpace from "./ScrollableSpace";
 import TaskLists from "./TaskLists";
 import PageTitle from "./PageTitle";
+import { selectBoard } from "app/boards/selectors";
 
 function BoardPage() {
   const { id: boardId = "", taskId: selectedTaskId = "" } = useParams();
+  const board = useAppSelector((state) => selectBoard(state, boardId));
   const { load, reload, isLoading, isLoaded, isFailed, state, error } =
     useRequest(apiActions.boardRequest);
   const { onTaskClick, onTaskModalClose } = useDashboardMethods(boardId);
@@ -32,35 +34,42 @@ function BoardPage() {
     return <Navigate to="/projects" />;
   }
 
-  logger.debug("Render: DashboardPage", { boardId, fetchState: state });
-
   return (
     <DndProvider backend={HTML5Backend}>
-      <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />
+      <Box
+        sx={{
+          backgroundImage: board?.coverURL
+            ? `url("${board.coverURL}")`
+            : undefined,
+          backgroundSize: "cover",
+        }}
+      >
+        <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />
 
-      {isLoaded && (
-        <Box my={2} textAlign="center">
-          <BoardName boardId={boardId} />
-        </Box>
-      )}
+        {isLoaded && (
+          <Box textAlign="center">
+            <BoardName boardId={boardId} />
+          </Box>
+        )}
 
-      {isLoading && (
-        <Box textAlign="center">
-          <CircularProgress />
-        </Box>
-      )}
+        {isLoading && (
+          <Box textAlign="center">
+            <CircularProgress />
+          </Box>
+        )}
 
-      {isFailed && <ErrorSplash message={error} retry={reload} />}
+        {isFailed && <ErrorSplash message={error} retry={reload} />}
 
-      {isLoaded && (
-        <ScrollableSpace disabled>
-          <TaskLists boardId={boardId} onTaskClick={onTaskClick} />
-        </ScrollableSpace>
-      )}
+        {isLoaded && (
+          <ScrollableSpace disabled>
+            <TaskLists boardId={boardId} onTaskClick={onTaskClick} />
+          </ScrollableSpace>
+        )}
 
-      {selectedTaskId && (
-        <TaskModal onClose={onTaskModalClose} taskId={selectedTaskId} />
-      )}
+        {selectedTaskId && (
+          <TaskModal onClose={onTaskModalClose} taskId={selectedTaskId} />
+        )}
+      </Box>
     </DndProvider>
   );
 }

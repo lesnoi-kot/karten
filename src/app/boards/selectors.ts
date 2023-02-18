@@ -23,11 +23,21 @@ export const selectBoardsIdsByProjectId = createSelector(
   [selectBoards, extraParam<ID>()],
   (boards, projectId) =>
     values(boards).filter(propEq("projectId", projectId)).map(prop("id")),
+  {
+    memoizeOptions: {
+      maxSize: 20,
+    },
+  },
 );
 
 export const selectBoardsCountOfProject = createSelector(
   [selectBoardsArray, extraParam<ID>()],
   (boards, projectId) => count(propEq("projectId", projectId), boards),
+  {
+    memoizeOptions: {
+      maxSize: 20,
+    },
+  },
 );
 
 export const selectLastViewedBoards = createSelector(

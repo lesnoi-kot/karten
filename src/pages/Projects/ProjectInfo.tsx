@@ -48,7 +48,11 @@ function ProjectInfo({ id }: { id: ID }) {
     <Card elevation={1} id={`project-${id}`}>
       <CardHeader
         avatar={
-          <Avatar variant="rounded" sx={{ bgcolor: avatarBgColor }}>
+          <Avatar
+            src={project.avatarThumbnailURL}
+            variant="rounded"
+            sx={{ bgcolor: avatarBgColor }}
+          >
             {project.name[0]}
           </Avatar>
         }

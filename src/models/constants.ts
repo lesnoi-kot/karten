@@ -8,5 +8,4 @@ export const ENTITY_COLOR = {
   lime: "#4bbf6b",
   sky: "#00aecc",
   black: "#000000",
-  gray: "#777777",
 };

@@ -1,24 +1,42 @@
 import React from "react";
-import { Box, BoxProps } from "@mui/material";
+import cx from "classnames";
+import { Box, Paper, PaperProps } from "@mui/material";
 
 import styles from "./styles.module.css";
 
 type Props = {
   children: React.ReactNode;
+  color?: string;
+  coverURL?: string;
 };
 
-export function PreviewCard({ children }: Props) {
+export function PreviewCard({ children, color, coverURL }: Props) {
   return (
-    <Box className={styles.card} padding={1}>
-      <Box className={styles.cardText}>{children}</Box>
-    </Box>
+    <Paper
+      variant="outlined"
+      sx={{
+        padding: 1,
+        position: "relative",
+        bgcolor: color,
+        backgroundImage: coverURL ? `url("${coverURL}")` : undefined,
+        backgroundSize: "cover",
+        color: "white",
+        boxShadow: "none",
+        border: "none",
+      }} // TODO reallocation
+      className={styles.card}
+    >
+      {children}
+    </Paper>
   );
 }
 
-export function PreviewCardIconButton({ children, ...props }: BoxProps) {
+export function PreviewCardIconButton(props: PaperProps) {
   return (
-    <Box className={styles.cardButton} padding={1} {...props}>
-      {children}
-    </Box>
+    <Paper
+      className={cx(styles.card, styles.cardButton)}
+      variant="outlined"
+      {...props}
+    />
   );
 }

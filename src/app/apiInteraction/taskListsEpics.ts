@@ -26,7 +26,7 @@ export const taskListAddEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.addTaskListRequest.match),
     mergeMap(({ payload: { boardId, name }, meta: { requestKey } }) =>
-      from(api.addTaskList({ boardId, name })).pipe(
+      from(api.addTaskList({ boardId, name, position: Date.now() })).pipe(
         mergeMap((taskList) =>
           of(taskListSet(taskList), actions.requestLoaded(requestKey)),
         ),

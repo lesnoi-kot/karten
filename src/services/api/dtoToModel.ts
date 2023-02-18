@@ -1,19 +1,27 @@
 import { ENTITY_COLOR } from "models/constants";
-import { Board, Project, TaskList, Task, Comment } from "models/types";
+import {
+  Board,
+  Project,
+  TaskList,
+  Task,
+  Comment,
+  KartenFile,
+} from "models/types";
 import {
   ProjectDTO,
   BoardDTO,
   TaskListDTO,
   TaskDTO,
   CommentDTO,
+  FileDTO,
 } from "./types";
 
 export function convertProjectDTO(dto: ProjectDTO): Project {
   return {
     id: dto.id,
     name: dto.name,
-    avatar_url: dto.avatar_url ?? "",
-    avatar_thumbnail_url: dto.avatar_thumbnail_url ?? "",
+    avatarURL: dto.avatar_url ?? "",
+    avatarThumbnailURL: dto.avatar_thumbnail_url ?? "",
     boards: dto.boards ? dto.boards.map(convertBoardDTO) : [],
   };
 }
@@ -28,7 +36,7 @@ export function convertBoardDTO(dto: BoardDTO): Board {
     dateCreated: dto.date_created,
     dateLastViewed: dto.date_last_viewed,
     color: convertNumberToColor(dto.color),
-    cover: dto.cover ?? "",
+    coverURL: dto.cover_url ?? "",
     taskLists: dto.task_lists ? dto.task_lists.map(convertTaskListDTO) : [],
   };
 }
@@ -71,8 +79,22 @@ export function convertCommentDTO(dto: CommentDTO): Comment {
 
 function convertNumberToColor(color: number): string {
   if (!color) {
-    return ENTITY_COLOR.gray;
+    return ENTITY_COLOR.blue;
   }
 
   return "#" + color.toString(16).padEnd(6, "0");
+}
+
+export function convertFileDTO(dto: FileDTO): KartenFile {
+  return {
+    id: dto.id,
+    url: dto.url,
+    name: dto.name,
+    mimeType: dto.mime_type,
+    size: dto.size,
+  };
+}
+
+export function convertFilesDTO(dtos: FileDTO[]): KartenFile[] {
+  return dtos.map(convertFileDTO);
 }

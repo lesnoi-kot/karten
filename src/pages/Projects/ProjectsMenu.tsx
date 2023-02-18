@@ -19,7 +19,7 @@ export function ProjectsMenu() {
   return (
     <>
       <Box px={2} py={2} textAlign="center">
-        <Typography variant="h5">Menu</Typography>
+        <Typography variant="h5">Projects</Typography>
       </Box>
 
       <Divider />

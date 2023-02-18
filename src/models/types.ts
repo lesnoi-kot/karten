@@ -45,14 +45,22 @@ export type Board = {
   dateCreated: DateString;
   dateLastViewed: DateString;
   color: Color;
-  cover: string;
+  coverURL: string;
   taskLists?: TaskList[];
 };
 
 export type Project = {
   id: UUID;
   name: string;
-  avatar_url: string;
-  avatar_thumbnail_url: string;
+  avatarURL: string;
+  avatarThumbnailURL: string;
   boards?: Board[];
+};
+
+export type KartenFile = {
+  id: string;
+  url: string;
+  name: string;
+  mimeType: string;
+  size: number;
 };

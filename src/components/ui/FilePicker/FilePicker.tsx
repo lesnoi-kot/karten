@@ -50,9 +50,7 @@ export default function FilePicker({
       />
 
       <label htmlFor={id}>
-        <Button startIcon={<AttachFileIcon />} onClick={onClick}>
-          {caption}
-        </Button>
+        <Button onClick={onClick}>{caption}</Button>
       </label>
 
       {files.length > 0 && (

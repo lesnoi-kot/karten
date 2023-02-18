@@ -5,8 +5,8 @@ const mock: MockStorage = {
     sadPoe: {
       id: "1",
       name: "Board of sad Poe",
-      avatar_url: "",
-      avatar_thumbnail_url: "",
+      avatarURL: "",
+      avatarThumbnailURL: "",
     },
   },
 
@@ -20,7 +20,7 @@ const mock: MockStorage = {
       dateCreated: new Date().toISOString(),
       dateLastViewed: new Date().toISOString(),
       color: "",
-      cover: "",
+      coverURL: "",
       taskLists: [],
     },
     "2": {
@@ -32,7 +32,7 @@ const mock: MockStorage = {
       dateCreated: new Date().toISOString(),
       dateLastViewed: new Date().toISOString(),
       color: "",
-      cover: "",
+      coverURL: "",
       taskLists: [],
     },
     "3": {
@@ -44,7 +44,7 @@ const mock: MockStorage = {
       dateCreated: new Date().toISOString(),
       dateLastViewed: new Date().toISOString(),
       color: "",
-      cover: "",
+      coverURL: "",
       taskLists: [],
     },
     "4": {
@@ -56,7 +56,7 @@ const mock: MockStorage = {
       dateCreated: new Date().toISOString(),
       dateLastViewed: new Date().toISOString(),
       color: "",
-      cover: "",
+      coverURL: "",
       taskLists: [],
     },
   },

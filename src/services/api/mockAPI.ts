@@ -1,7 +1,15 @@
 import { is, clone } from "ramda";
 import { nanoid } from "@reduxjs/toolkit";
 
-import { ID, Task, Board, Comment, Project, TaskList } from "models/types";
+import {
+  ID,
+  Task,
+  Board,
+  Comment,
+  Project,
+  TaskList,
+  KartenFile,
+} from "models/types";
 import { sleep } from "utils/async";
 
 import {
@@ -10,7 +18,7 @@ import {
   AddProjectArgs,
   AddTaskArgs,
   AddTaskListArgs,
-  API,
+  DataStore,
   APIError,
   EditBoardArgs,
   EditCommentArgs,
@@ -34,7 +42,7 @@ export type MockStorage = {
   comments: Record<ID, Comment>;
 };
 
-export default class MockAPI implements API {
+export default class MockAPI implements DataStore {
   private mockStorage: MockStorage;
 
   constructor(mock: MockStorage) {
@@ -78,8 +86,8 @@ export default class MockAPI implements API {
     const project: Project = {
       id: Date.now().toString(),
       name: args.name,
-      avatar_thumbnail_url: "",
-      avatar_url: "",
+      avatarThumbnailURL: "",
+      avatarURL: "",
       boards: [],
     };
 
@@ -204,7 +212,7 @@ export default class MockAPI implements API {
       dateCreated: new Date().toISOString(),
       dateLastViewed: new Date().toISOString(),
       color: "",
-      cover: "",
+      coverURL: "",
       taskLists: [],
     };
 
@@ -360,5 +368,9 @@ export default class MockAPI implements API {
     }
 
     return comment;
+  }
+
+  async getBoardCovers(): Promise<KartenFile[]> {
+    return [];
   }
 }

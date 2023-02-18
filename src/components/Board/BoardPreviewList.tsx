@@ -1,12 +1,12 @@
 import { Stack } from "@mui/material";
 
 import { ID } from "models/types";
-import { buildURL } from "utils/routes";
 
 import Link from "components/Link";
 
 import BoardPreview from "./BoardPreview";
 import NewBoardStub from "./NewBoardStub";
+import { generatePath } from "react-router-dom";
 
 type Props = {
   ids: ID[];
@@ -20,7 +20,7 @@ function BoardPreviewList({ ids, showComposer = false, projectId }: Props) {
       {ids.map((boardId) => (
         <Link
           key={boardId}
-          to={buildURL("pages:board", { boardId })}
+          to={generatePath("/boards/:id", { id: boardId })}
           underline="none"
         >
           <BoardPreview id={boardId} />

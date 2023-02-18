@@ -1,4 +1,12 @@
-import { ID, Board, Project, Task, TaskList, Comment } from "models/types";
+import {
+  ID,
+  Board,
+  Project,
+  Task,
+  TaskList,
+  Comment,
+  KartenFile,
+} from "models/types";
 
 export type ResponseOK<T> = {
   data: T;
@@ -45,6 +53,7 @@ export type TaskListDTO = {
 
 export type BoardDTO = {
   id: ID;
+  short_id: ID;
   project_id: ID;
   archived: boolean;
   favorite: boolean;
@@ -52,17 +61,26 @@ export type BoardDTO = {
   date_created: string;
   date_last_viewed: string;
   color: number;
-  cover?: string | null;
+  cover_url?: string;
   task_lists?: TaskListDTO[];
 };
 
 export type ProjectDTO = {
   id: ID;
+  short_id: ID;
   name: string;
   avatar: ID | null;
   avatar_url?: string;
   avatar_thumbnail_url?: string;
   boards?: BoardDTO[];
+};
+
+export type FileDTO = {
+  id: string;
+  url: string;
+  name: string;
+  mime_type: string;
+  size: number;
 };
 
 export type AddProjectArgs = {
@@ -73,11 +91,16 @@ export type AddProjectArgs = {
 export type AddBoardArgs = {
   projectId: ID;
   name: string;
+  color?: number;
+  cover?: File | null;
+  coverId?: string | null;
 };
 
 export type AddTaskListArgs = {
   boardId: ID;
   name: string;
+  color?: number;
+  position?: number;
 };
 
 export type AddTaskArgs = {
@@ -123,7 +146,7 @@ export type EditCommentArgs = {
   text: string;
 };
 
-export interface API {
+export interface DataStore {
   getProjects(): Promise<Project[]>;
   getProject(id: ID): Promise<Project>;
   addProject(args: AddProjectArgs): Promise<Project>;
@@ -149,6 +172,8 @@ export interface API {
   addComment(args: AddCommentArgs): Promise<Comment>;
   editComment(args: EditCommentArgs): Promise<Comment>;
   deleteComment(id: ID): Promise<void>;
+
+  getBoardCovers(): Promise<KartenFile[]>;
 }
 
 export const ERROR_CODES = {
