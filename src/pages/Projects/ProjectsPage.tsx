@@ -10,7 +10,7 @@ import ErrorSplash from "components/ui/ErrorSplash";
 
 import RecentlyViewed from "./RecentlyViewed";
 import ProjectsList from "./ProjectsList";
-import NewProjectStub from "./NewProjectStub";
+import NewProjectActionButton from "./NewProjectActionButton";
 
 function ProjectsPage() {
   const { load, reload, isLoading, isLoaded, isFailed, error } = useRequest(
@@ -35,7 +35,7 @@ function ProjectsPage() {
         <Container maxWidth="lg">
           <RecentlyViewed />
           <ProjectsList />
-          <NewProjectStub />
+          <NewProjectActionButton />
         </Container>
       )}
     </>

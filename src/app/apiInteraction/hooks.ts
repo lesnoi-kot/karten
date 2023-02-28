@@ -62,6 +62,7 @@ type UseRequestReturnType<P> = UseRequestInfoReturnType & {
 export function useRequest<P>(
   actionCreator: ActionCreator<APIAction<P>>,
   options?: {
+    onSuccess?: () => void;
     requestKey?: string;
   },
 ): UseRequestReturnType<P> {
@@ -110,8 +111,12 @@ export function useRequest<P>(
   useEffect(() => {
     if (requestInfo.isLoaded) {
       successHandler.current();
+
+      if (options?.onSuccess) {
+        options.onSuccess();
+      }
     }
-  }, [dispatch, requestInfo.isLoaded]);
+  }, [requestInfo.isLoaded, options?.onSuccess]);
 
   return {
     ...requestInfo,

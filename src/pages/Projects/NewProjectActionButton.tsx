@@ -1,16 +1,16 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Fab, SxProps, Theme } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 import NewProjectDialog from "components/Project/NewProjectDialog";
 
-const fabStyle: SxProps<Theme> = {
+const sxFab: SxProps<Theme> = {
   position: "fixed",
   bottom: (theme) => theme.spacing(3),
   right: (theme) => theme.spacing(3),
 };
 
-export default function NewProjectStub() {
+function NewProjectActionButton() {
   const [isOpen, setOpen] = useState(false);
 
   const openDialog = () => {
@@ -23,12 +23,7 @@ export default function NewProjectStub() {
 
   return (
     <>
-      <Fab
-        color="secondary"
-        variant="extended"
-        sx={fabStyle}
-        onClick={openDialog}
-      >
+      <Fab color="secondary" variant="extended" sx={sxFab} onClick={openDialog}>
         <AddIcon />
         Add new project
       </Fab>
@@ -37,3 +32,5 @@ export default function NewProjectStub() {
     </>
   );
 }
+
+export default memo(NewProjectActionButton);
