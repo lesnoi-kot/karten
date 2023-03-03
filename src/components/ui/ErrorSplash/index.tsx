@@ -8,7 +8,8 @@ type Props = {
 
 function ErrorSplash({ message, title, retry }: Props) {
   return (
-    <Box textAlign="center" bgcolor="lightcyan" pt={2}>
+    // TODO themed bgcolor="lightblue" or lightcyan
+    <Box textAlign="center" pt={2}>
       <Typography variant="h2" paragraph>
         {title ?? "Something went wrong"}
       </Typography>

@@ -2,20 +2,32 @@
 
 ## TODO
 
-- сортировка борд по просмотренности
-
 - комменты и описания с эмоджи и md
 
 - sticky названия листа
-
-- Анимированный оверскролл
 
 - авторизация через 0Auth
 
 - разные фавиконки в зависимости от страницы
 
-- темная тема, сохранять в локал сторадже и передавать в preloadedState
-
 - i18n
 
 - React transition
+
+- Page bottom margin
+
+- <React.StrictMode>
+
+- StarredBoards
+
+- short link
+
+- Text overflow elispsis
+
+- Project logo
+
+- Soft deletes
+
+- Cancel request on unmount useEffect
+
+- Dynamic import on pages and complex components

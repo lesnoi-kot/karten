@@ -8,13 +8,12 @@ export function makePage(Page: React.ComponentType) {
     const dispatch = useDispatch();
 
     useEffect(() => {
-      dispatch(pageLoaded({ name: Page.displayName }));
+      dispatch(pageLoaded({ name: Page.name }));
 
       return () => {
-        dispatch(pageUnloaded({ name: Page.displayName }));
+        dispatch(pageUnloaded({ name: Page.name }));
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [dispatch]);
 
     return <Page {...props} />;
   }
