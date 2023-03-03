@@ -1,8 +1,5 @@
 import React from "react";
-import cx from "classnames";
-import { Box, Paper, PaperProps } from "@mui/material";
-
-import styles from "./styles.module.css";
+import { Paper, PaperProps, SxProps, Theme } from "@mui/material";
 
 type Props = {
   children: React.ReactNode;
@@ -10,21 +7,28 @@ type Props = {
   coverURL?: string;
 };
 
+const sxCard: SxProps<Theme> = {
+  position: "relative",
+  width: "200px",
+  height: "100px",
+  padding: 1,
+  "word-wrap": "break-word",
+  color: "white",
+  cursor: "pointer",
+  boxShadow: "none",
+  border: "none",
+  backgroundSize: "cover",
+};
+
 export function PreviewCard({ children, color, coverURL }: Props) {
   return (
     <Paper
       variant="outlined"
       sx={{
-        padding: 1,
-        position: "relative",
+        ...sxCard,
         bgcolor: color,
         backgroundImage: coverURL ? `url("${coverURL}")` : undefined,
-        backgroundSize: "cover",
-        color: "white",
-        boxShadow: "none",
-        border: "none",
       }} // TODO reallocation
-      className={styles.card}
     >
       {children}
     </Paper>
@@ -34,8 +38,13 @@ export function PreviewCard({ children, color, coverURL }: Props) {
 export function PreviewCardIconButton(props: PaperProps) {
   return (
     <Paper
-      className={cx(styles.card, styles.cardButton)}
       variant="outlined"
+      sx={{
+        ...sxCard,
+        display: "flex",
+        "justify-content": "center",
+        "align-items": "center",
+      }}
       {...props}
     />
   );

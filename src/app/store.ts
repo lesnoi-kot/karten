@@ -26,7 +26,7 @@ export function createStore() {
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {
-          ignoredActionPaths: ["meta.signal"],
+          ignoredActionPaths: ["meta.signal", "payload.avatar", "payload.file"],
         },
       }).concat(reduxLogger, epicMiddleware),
     devTools: true,

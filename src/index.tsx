@@ -1,12 +1,7 @@
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from "react-query";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { amber, orange } from "@mui/material/colors";
 import {
   responsiveFontSizes,
   Experimental_CssVarsProvider,
@@ -25,23 +20,24 @@ import "./index.css";
 
 const theme = responsiveFontSizes(
   experimental_extendTheme({
-    colorSchemes: {
-      dark: {
-        palette: {
-          primary: {
-            main: "#000",
+    components: {
+      MuiFormLabel: {
+        styleOverrides: {
+          asterisk: {
+            color: "tomato",
+            "&$error": {
+              color: "tomato",
+            },
           },
         },
       },
+    },
+    colorSchemes: {
+      dark: {
+        palette: {},
+      },
       light: {
-        palette: {
-          background: {
-            default: "#f0f2f4",
-          },
-          primary: {
-            main: "#ff9800",
-          },
-        },
+        palette: {},
       },
     },
     typography: {
