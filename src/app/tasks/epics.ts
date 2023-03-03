@@ -42,7 +42,7 @@ export const moveTaskEpic: Epic = (action$, store$, { api }) =>
     filter(actions.taskMoved.match),
     filter(
       ({ payload: { dropTaskId, dropTaskListId } }) =>
-        !Boolean(dropTaskListId) && Boolean(dropTaskId),
+        !dropTaskListId && Boolean(dropTaskId),
     ),
     mergeMap(({ payload: { taskId, dropTaskId, isBefore } }) => {
       const dropTask = selectTaskById(store$.value, dropTaskId!)!;

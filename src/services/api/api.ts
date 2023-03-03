@@ -85,7 +85,7 @@ export class APIService implements DataStore {
     }
   }
 
-  private fetchJSON(path: string, method: string = "GET", body?: JSONBody) {
+  private fetchJSON(path: string, method = "GET", body?: JSONBody) {
     const headers = new Headers();
     const fetchOptions: RequestInit = {
       ...defaultFetchOptions,
@@ -105,7 +105,7 @@ export class APIService implements DataStore {
     return fetch(this.endpointURL(path), fetchOptions);
   }
 
-  private fetchMultipart(path: string, method: string = "GET", body: FormBody) {
+  private fetchMultipart(path: string, method = "GET", body: FormBody) {
     const headers = new Headers();
     const form = new FormData();
 

@@ -32,7 +32,6 @@ export function createStore() {
     devTools: true,
   });
 
-  // @ts-ignore
   epicMiddleware.run(rootEpic);
 
   return store;

@@ -15,7 +15,7 @@ type UseTaskDNDArgs = {
 
 export const useTaskDND = ({ taskId, taskRef }: UseTaskDNDArgs) => {
   const dispatch = useDispatch();
-  const prevOffset = useRef<XYCoord>(null);
+  const prevOffset = useRef<XYCoord | null>(null);
 
   const [{ isDragging }, dragRef, dragPreviewRef] = useDrag(
     () => ({
@@ -56,8 +56,8 @@ export const useTaskDND = ({ taskId, taskRef }: UseTaskDNDArgs) => {
               isBefore,
             }),
           );
-        } else {
-          const yDiff = offset.y - prevOffset.current!.y;
+        } else if (prevOffset.current) {
+          const yDiff = offset.y - prevOffset.current.y;
 
           if (yDiff !== 0) {
             dispatch(
@@ -70,7 +70,6 @@ export const useTaskDND = ({ taskId, taskRef }: UseTaskDNDArgs) => {
           }
         }
 
-        // @ts-expect-error
         prevOffset.current = offset;
       },
     }),

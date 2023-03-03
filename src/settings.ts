@@ -1,9 +1,6 @@
-const isDevelopment = process.env.NODE_ENV === "development";
-const isProduction = process.env.NODE_ENV === "production";
-
 export const settings = {
-  logger: isDevelopment ? "dev" : "none",
-  reduxDevToolsEnabled: Boolean(isDevelopment),
-  apiURL: process.env.REACT_APP_API_URL,
-  publicURL: process.env.PUBLIC_URL,
+  logger: import.meta.env.DEV ? "dev" : "none",
+  reduxDevToolsEnabled: import.meta.env.DEV,
+  apiURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.BASE_URL,
 };

@@ -1,5 +1,5 @@
 import * as selectors from "./selectors";
-import { actions } from ".";
+import { actions } from "./slice";
 
 export const { tasksSet, taskSet, taskUpdated, taskDeleted, tasksDeleted } =
   actions;

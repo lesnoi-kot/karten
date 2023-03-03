@@ -67,7 +67,7 @@ export function useRequest<P>(
   },
 ): UseRequestReturnType<P> {
   const dispatch = useAppDispatch();
-  const prevPayload = useRef<P | Symbol>(noPayload);
+  const prevPayload = useRef<P | symbol>(noPayload);
   const successHandler = useRef<Callback>(() => {});
   const requestKey = useMemo(() => nanoid(), [actionCreator]);
 

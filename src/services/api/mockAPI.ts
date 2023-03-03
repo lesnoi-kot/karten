@@ -27,7 +27,7 @@ import {
   EditTaskListArgs,
 } from "./types";
 
-async function emulateDelay(rate: number = 1) {
+async function emulateDelay(rate = 1) {
   await sleep(200 + Math.random() * 500 * rate);
 }
 

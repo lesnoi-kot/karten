@@ -2,7 +2,7 @@ import { RootState } from "app";
 
 import { selectBoardsIds } from "../selectors";
 
-let store: RootState = {
+const store: RootState = {
   apiInteraction: {
     requestsInfo: {},
   },

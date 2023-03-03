@@ -11,7 +11,7 @@ import { ProjectsMenu } from "pages/Projects/ProjectsMenu";
 
 function App() {
   return (
-    <BrowserRouter basename={settings.publicURL}>
+    <BrowserRouter basename={settings.baseURL}>
       <Routes>
         <Route index path="/welcome" element={<div>Fancy landing</div>} />
 

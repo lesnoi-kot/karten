@@ -1,5 +1,3 @@
-import React from "react";
-
 type Props = {
   source?: string;
   meta?: object;
@@ -7,7 +5,7 @@ type Props = {
 };
 
 export default function Stub({ source = "", meta, message }: Props) {
-  if (process.env.NODE_ENV === "production") {
+  if (import.meta.env.VITE_NODE_ENV === "production") {
     return null;
   }
 

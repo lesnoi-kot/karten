@@ -14,14 +14,13 @@ type Props = {
 
 export function PageTitle({ boardId, selectedTaskId }: Props) {
   const taskName = useSelector((state: RootState) =>
-    selectTaskNameById(state, selectedTaskId)
+    selectTaskNameById(state, selectedTaskId),
   );
   const boardName = useSelector((state: RootState) =>
-    selectBoardName(state, boardId)
+    selectBoardName(state, boardId),
   );
 
   return (
-    /* @ts-ignore https://github.com/nfl/react-helmet/issues/646 */
     <Helmet>
       <title>
         {taskName ? `${taskName} | ` : ""}
