@@ -157,6 +157,8 @@ export interface DataStore {
   addBoard(args: AddBoardArgs): Promise<Board>;
   editBoard(args: EditBoardArgs): Promise<Board>;
   deleteBoard(id: ID): Promise<void>;
+  favoriteBoard(id: ID): Promise<void>;
+  unfavoriteBoard(id: ID): Promise<void>;
 
   getTaskList(id: ID): Promise<TaskList>;
   addTaskList(args: AddTaskListArgs): Promise<TaskList>;

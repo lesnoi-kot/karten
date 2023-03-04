@@ -11,7 +11,9 @@ export const selectBoards = (state: RootState): BoardsMap =>
   state.entities[sliceName].items;
 
 export const selectBoardsIds = createSelector(selectBoards, Object.keys);
-export const selectBoardsArray = createSelector(selectBoards, Object.values);
+export const selectBoardsArray = createSelector(selectBoards, (boards) =>
+  Object.values(boards),
+);
 
 export const selectBoard = (state: RootState, id: ID): Board | null =>
   selectBoards(state)[id] ?? null;
@@ -51,4 +53,9 @@ export const selectLastViewedBoards = createSelector(
       .sort((a, b) => Number(b.dateLastViewed) - Number(a.dateLastViewed))
       .map(prop("id"))
       .slice(0, 4),
+);
+
+export const selectFavoriteBoards = createSelector(
+  selectBoardsArray,
+  (boards) => boards.filter((board) => board.favorite).map(prop("id")),
 );

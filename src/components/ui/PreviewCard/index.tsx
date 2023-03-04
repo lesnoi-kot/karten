@@ -1,49 +1,48 @@
-import React from "react";
-import { Paper, PaperProps, SxProps, Theme } from "@mui/material";
+import { Paper, PaperProps } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
-type Props = {
-  children: React.ReactNode;
+const Card = styled(Paper)<PaperProps>(({ theme }) => ({
+  position: "relative",
+  width: "200px",
+  height: "100px",
+  padding: theme.spacing(1),
+  wordWrap: "break-word",
+  color: "white",
+  cursor: "pointer",
+  boxShadow: "none",
+  backgroundSize: "cover",
+  "&:hover": {
+    filter: "brightness(.95)",
+  },
+}));
+
+type Props = PaperProps & {
   color?: string;
   coverURL?: string;
 };
 
-const sxCard: SxProps<Theme> = {
-  position: "relative",
-  width: "200px",
-  height: "100px",
-  padding: 1,
-  "word-wrap": "break-word",
-  color: "white",
-  cursor: "pointer",
-  boxShadow: "none",
-  border: "none",
-  backgroundSize: "cover",
-};
-
-export function PreviewCard({ children, color, coverURL }: Props) {
+export function PreviewCard({ color, coverURL, ...props }: Props) {
   return (
-    <Paper
+    <Card
       variant="outlined"
       sx={{
-        ...sxCard,
+        border: "none",
         bgcolor: color,
         backgroundImage: coverURL ? `url("${coverURL}")` : undefined,
-      }} // TODO reallocation
-    >
-      {children}
-    </Paper>
+      }}
+      {...props}
+    />
   );
 }
 
 export function PreviewCardIconButton(props: PaperProps) {
   return (
-    <Paper
+    <Card
       variant="outlined"
       sx={{
-        ...sxCard,
         display: "flex",
-        "justify-content": "center",
-        "align-items": "center",
+        justifyContent: "center",
+        alignItems: "center",
       }}
       {...props}
     />

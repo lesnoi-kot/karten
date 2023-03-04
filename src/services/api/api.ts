@@ -192,6 +192,16 @@ export class APIService implements DataStore {
     return convertBoardDTO(await this.unwrapResponse<BoardDTO>(res));
   }
 
+  async favoriteBoard(id: ID) {
+    const res = await this.fetchJSON(`/boards/${id}/favorite`, "PUT");
+    await this.checkResponseError(res);
+  }
+
+  async unfavoriteBoard(id: ID) {
+    const res = await this.fetchJSON(`/boards/${id}/favorite`, "DELETE");
+    await this.checkResponseError(res);
+  }
+
   /* ------------ */
 
   async getTaskList(id: string): Promise<TaskList> {

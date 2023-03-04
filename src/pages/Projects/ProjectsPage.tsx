@@ -11,6 +11,7 @@ import ErrorSplash from "components/ui/ErrorSplash";
 import RecentlyViewed from "./RecentlyViewed";
 import ProjectsList from "./ProjectsList";
 import NewProjectActionButton from "./NewProjectActionButton";
+import StarredBoards from "./StarredBoards";
 
 function ProjectsPage() {
   const { load, reload, isLoading, isLoaded, isFailed, error } = useRequest(
@@ -33,6 +34,7 @@ function ProjectsPage() {
 
       {isLoaded && (
         <Container maxWidth="lg">
+          <StarredBoards />
           <RecentlyViewed />
           <ProjectsList />
           <NewProjectActionButton />

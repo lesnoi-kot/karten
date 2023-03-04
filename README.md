@@ -18,8 +18,6 @@
 
 - <React.StrictMode>
 
-- StarredBoards
-
 - short link
 
 - Text overflow elispsis

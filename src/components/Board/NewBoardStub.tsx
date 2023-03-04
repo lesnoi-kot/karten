@@ -19,7 +19,7 @@ export default function NewBoardStub({ projectId }: { projectId: ID }) {
   return (
     <>
       <PreviewCardIconButton onClick={openDialog} title="Create new board">
-        <AddIcon fontSize="medium" />
+        <AddIcon color="primary" fontSize="medium" />
       </PreviewCardIconButton>
       <NewBoardDialog
         projectId={projectId}

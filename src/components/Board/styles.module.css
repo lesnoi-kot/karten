@@ -1,2 +1,10 @@
-.board {}
+.preview-card {}
 
+.toolbar {
+  opacity: 0;
+  transition: opacity .2s ease-in;
+}
+
+.preview-card:hover .toolbar {
+  opacity: 1;
+}

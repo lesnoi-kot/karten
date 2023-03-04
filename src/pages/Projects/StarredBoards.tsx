@@ -1,12 +1,12 @@
 import { Box, Typography } from "@mui/material";
 
-import { selectLastViewedBoards } from "app/boards/selectors";
+import { selectFavoriteBoards } from "app/boards/selectors";
 import { useAppSelector } from "app/hooks";
 
 import BoardPreviewList from "components/Board/BoardPreviewList";
 
 function StarredBoards() {
-  const boards = useAppSelector(selectLastViewedBoards);
+  const boards = useAppSelector(selectFavoriteBoards);
 
   if (boards.length === 0) {
     return null;

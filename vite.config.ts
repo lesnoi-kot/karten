@@ -17,5 +17,10 @@ export default defineConfig(({ mode }) => {
     test: {
       globals: true,
     },
+    css: {
+      modules: {
+        localsConvention: "camelCaseOnly",
+      },
+    },
   };
 });
