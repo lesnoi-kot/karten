@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogActions,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 import { actions, selectState } from "app/widgets/confirmDialog";
 import { useRequestInfoOfAction } from "app/apiInteraction/hooks";
@@ -16,7 +17,7 @@ export function ConfirmDialog() {
   const dispatch = useDispatch();
   const { isOpen, text, title, okAction, okButtonText, cancelButtonText } =
     useSelector(selectState);
-  const { isLoaded } = useRequestInfoOfAction(okAction);
+  const { isLoaded, isLoading } = useRequestInfoOfAction(okAction);
 
   const onClose = () => dispatch(actions.closeDialog());
 
@@ -44,9 +45,14 @@ export function ConfirmDialog() {
         <Button onClick={onClose} color="primary">
           {cancelButtonText || "Cancel"}
         </Button>
-        <Button onClick={onOK} color="primary" autoFocus>
+        <LoadingButton
+          onClick={onOK}
+          color="primary"
+          autoFocus
+          loading={isLoading}
+        >
           {okButtonText || "OK"}
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

@@ -152,6 +152,8 @@ export interface DataStore {
   addProject(args: AddProjectArgs): Promise<Project>;
   editProject(args: EditProjectArgs): Promise<Project>;
   deleteProject(id: ID): Promise<void>;
+  clearProject(id: ID): Promise<void>;
+  deleteAllProjects(): Promise<void>;
 
   getBoard(id: ID): Promise<Board>;
   addBoard(args: AddBoardArgs): Promise<Board>;

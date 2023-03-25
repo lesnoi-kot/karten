@@ -12,8 +12,6 @@
 
 - i18n
 
-- React transition
-
 - Page bottom margin
 
 - <React.StrictMode>

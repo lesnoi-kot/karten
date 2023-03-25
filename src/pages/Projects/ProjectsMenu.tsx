@@ -1,5 +1,4 @@
 import React from "react";
-import { useDispatch } from "react-redux";
 import {
   Box,
   List,
@@ -9,12 +8,34 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
-import ArrowBack from "@mui/icons-material/ArrowBack";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import AddIcon from "@mui/icons-material/Add";
 
-import Link from "components/Link";
+import { actions as apiActions } from "app/apiInteraction";
+import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
+import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice";
+import { useAppDispatch } from "app/hooks";
+
+import { actions } from "./slice";
 
 export function ProjectsMenu() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+
+  const showNewProjectDialog = () => {
+    dispatch(drawerMenuActions.close());
+    dispatch(actions.showNewProjectDialog());
+  };
+
+  const deleteAllProjects = () => {
+    dispatch(drawerMenuActions.close());
+    dispatch(
+      confirmDialogActions.showDialog({
+        title: "Warning",
+        text: "You are about to delete all projects",
+        okAction: apiActions.deleteAllProjects(),
+      }),
+    );
+  };
 
   return (
     <>
@@ -25,11 +46,17 @@ export function ProjectsMenu() {
       <Divider />
 
       <List>
-        <ListItem component={Link} to="/projects">
+        <ListItem button onClick={showNewProjectDialog}>
           <ListItemIcon>
-            <ArrowBack />
+            <AddIcon />
           </ListItemIcon>
-          <ListItemText primary="Back to main" />
+          <ListItemText primary="Add project" />
+        </ListItem>
+        <ListItem button onClick={deleteAllProjects}>
+          <ListItemIcon>
+            <DeleteForeverIcon />
+          </ListItemIcon>
+          <ListItemText primary="Delete all" />
         </ListItem>
       </List>
       <Divider />

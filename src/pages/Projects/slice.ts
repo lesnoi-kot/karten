@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { RootState } from "app";
 
 export const {
   actions,
@@ -17,5 +18,7 @@ export const {
       state.newProjectDialogOpened = false;
     },
   },
-  extraReducers: (builder) => {},
 });
+
+export const selectIsNewProjectDialogOpened = (state: RootState): boolean =>
+  state.pages.projects.newProjectDialogOpened;

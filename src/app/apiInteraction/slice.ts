@@ -80,6 +80,8 @@ export const {
     addProject: requestWithPayload<AddProjectArgs>(),
     updateProject: requestWithPayload<EditProjectArgs>(),
     deleteProject: requestWithPayload<ID>(),
+    clearProject: requestWithPayload<ID>(),
+    deleteAllProjects: requestWithPayload<void>(),
 
     /*
       Tasks

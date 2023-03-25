@@ -153,6 +153,16 @@ export class APIService implements DataStore {
     await this.checkResponseError(res);
   }
 
+  async clearProject(projectId: ID) {
+    const res = await this.fetchJSON(`/projects/${projectId}/boards`, "DELETE");
+    await this.checkResponseError(res);
+  }
+
+  async deleteAllProjects() {
+    const res = await this.fetchJSON(`/projects/`, "DELETE");
+    await this.checkResponseError(res);
+  }
+
   /* ------------ */
 
   async getBoard(id: string): Promise<Board> {

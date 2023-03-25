@@ -1,8 +1,11 @@
-import { useState, memo } from "react";
+import { memo } from "react";
 import { Fab, SxProps, Theme } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 import NewProjectDialog from "components/Project/NewProjectDialog";
+import { useAppDispatch, useAppSelector } from "app/hooks";
+
+import { actions, selectIsNewProjectDialogOpened } from "./slice";
 
 const sxFab: SxProps<Theme> = {
   position: "fixed",
@@ -11,14 +14,15 @@ const sxFab: SxProps<Theme> = {
 };
 
 function NewProjectActionButton() {
-  const [isOpen, setOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const isOpen = useAppSelector(selectIsNewProjectDialogOpened);
 
   const openDialog = () => {
-    setOpen(true);
+    dispatch(actions.showNewProjectDialog());
   };
 
   const closeDialog = () => {
-    setOpen(false);
+    dispatch(actions.closeNewProjectDialog());
   };
 
   return (

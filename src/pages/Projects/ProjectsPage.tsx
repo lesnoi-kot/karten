@@ -33,7 +33,7 @@ function ProjectsPage() {
       {isFailed && <ErrorSplash message={error} retry={reload} />}
 
       {isLoaded && (
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" sx={{ paddingBottom: 3 }}>
           <StarredBoards />
           <RecentlyViewed />
           <ProjectsList />

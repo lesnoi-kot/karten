@@ -6,6 +6,11 @@ import {
 } from "pages/Board/slice";
 
 import {
+  reducer as projectsPageReducer,
+  sliceName as projectsPageSliceName,
+} from "pages/Projects/slice";
+
+import {
   reducer as confirmDialogReducer,
   sliceName as confirmDialogSliceName,
 } from "app/widgets/confirmDialog/slice";
@@ -60,6 +65,7 @@ export const rootReducer = combineReducers({
 
   pages: combineReducers({
     [boardPageSliceName]: boardPageReducer,
+    [projectsPageSliceName]: projectsPageReducer,
   }),
 
   widgets: combineReducers({

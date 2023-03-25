@@ -2,7 +2,13 @@ import { of, from } from "rxjs";
 import { filter, switchMap, mergeMap, catchError } from "rxjs/operators";
 
 import { boardsSet } from "app/boards";
-import { projectsSet, projectSet, projectDeleted } from "app/projects";
+import {
+  projectsSet,
+  projectSet,
+  projectDeleted,
+  projectCleared,
+  projectsDeleted,
+} from "app/projects";
 import { normalizeProjects, normalizeProject } from "app/projects/utils";
 import { showSnackbar } from "app/snackbars";
 
@@ -62,7 +68,7 @@ export const addProjectEpic: Epic = (action$, store$, { api }) =>
             projectSet(project),
             actions.requestLoaded(requestKey),
             showSnackbar({
-              message: `Project "${payload.name}" is created!`,
+              message: `Project "${payload.name}" has been created`,
               type: "success",
             }),
           );
@@ -114,7 +120,59 @@ export const deleteProjectEpic: Epic = (action$, store$, { api }) =>
             projectDeleted(projectId),
             actions.requestLoaded(requestKey),
             showSnackbar({
-              message: `Project "${project?.name}" was deleted!`,
+              message: `Project "${project?.name}" has been deleted!`,
+              type: "info",
+            }),
+          );
+        }),
+        catchError((error) =>
+          of(
+            actions.requestFailed(error, requestKey),
+            showSnackbar({ message: error, type: "error" }),
+          ),
+        ),
+      ),
+    ),
+  );
+
+export const deleteProjectsEpic: Epic = (action$, store$, { api }) =>
+  action$.pipe(
+    filter(actions.deleteAllProjects.match),
+    switchMap(({ meta: { requestKey } }) =>
+      from(api.deleteAllProjects()).pipe(
+        mergeMap(() =>
+          of(
+            actions.requestLoaded(requestKey),
+            projectsDeleted(),
+            showSnackbar({
+              message: `All projects have been deleted!`,
+              type: "info",
+            }),
+          ),
+        ),
+        catchError((error) =>
+          of(
+            actions.requestFailed(error, requestKey),
+            showSnackbar({ message: error, type: "error" }),
+          ),
+        ),
+      ),
+    ),
+  );
+
+export const clearProjectEpic: Epic = (action$, store$, { api }) =>
+  action$.pipe(
+    filter(actions.clearProject.match),
+    switchMap(({ payload: projectId, meta: { requestKey } }) =>
+      from(api.clearProject(projectId)).pipe(
+        mergeMap(() => {
+          const project = selectProjectById(store$.value, projectId);
+
+          return of(
+            actions.requestLoaded(requestKey),
+            projectCleared(projectId),
+            showSnackbar({
+              message: `Project "${project?.name}" has been cleared`,
               type: "info",
             }),
           );

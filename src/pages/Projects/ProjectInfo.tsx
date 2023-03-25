@@ -45,7 +45,11 @@ function ProjectInfo({ id }: { id: ID }) {
   }
 
   return (
-    <Card elevation={1} id={`project-${id}`}>
+    <Card
+      elevation={0}
+      id={`project-${id}`}
+      sx={{ background: (theme) => theme.palette.surfaces.light }}
+    >
       <CardHeader
         avatar={
           <Avatar
@@ -87,8 +91,25 @@ function ProjectInfo({ id }: { id: ID }) {
             hideMenu();
           }}
         >
-          Clear
+          Change logo
         </MenuItem>
+        {boards.length > 0 && (
+          <MenuItem
+            onClick={() => {
+              dispatch(
+                confirmDialogActions.showDialog({
+                  okAction: apiActions.clearProject(id),
+                  okButtonText: "yes",
+                  title: "Warning",
+                  text: `Clear project "${project.name}"?`,
+                }),
+              );
+              hideMenu();
+            }}
+          >
+            Clear
+          </MenuItem>
+        )}
         <MenuItem
           onClick={() => {
             dispatch(

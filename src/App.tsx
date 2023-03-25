@@ -8,6 +8,7 @@ import ProjectPage from "pages/Project";
 import BoardPage from "pages/Board";
 import { BoardMenu } from "pages/Board/BoardMenu";
 import { ProjectsMenu } from "pages/Projects/ProjectsMenu";
+import { ProjectMenu } from "pages/Project/ProjectMenu";
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
             <LayoutWithNavbar>
               <Routes>
                 <Route index path="/projects" element={<ProjectsMenu />} />
-                <Route path="/projects/:id" element={<div>Project menu</div>} />
+                <Route path="/projects/:id" element={<ProjectMenu />} />
                 <Route path="/boards/:id" element={<BoardMenu />} />
               </Routes>
             </LayoutWithNavbar>

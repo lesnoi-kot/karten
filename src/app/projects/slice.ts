@@ -29,5 +29,9 @@ export const {
     projectDeleted: (state, { payload }: PayloadAction<ID>) => {
       delete state.items[payload];
     },
+    projectsDeleted: (state) => {
+      state.items = {};
+    },
+    projectCleared: (state, { payload }: PayloadAction<ID>) => {},
   },
 });
