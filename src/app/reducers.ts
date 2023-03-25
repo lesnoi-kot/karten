@@ -26,6 +26,11 @@ import {
 } from "app/widgets/drawerMenu";
 
 import {
+  reducer as newBoardDialogReducer,
+  sliceName as newBoardDialogSliceName,
+} from "app/widgets/newBoardDialog";
+
+import {
   reducer as projectsReducer,
   sliceName as projectsSliceName,
 } from "./projects";
@@ -72,5 +77,6 @@ export const rootReducer = combineReducers({
     [confirmDialogSliceName]: confirmDialogReducer,
     [snackbarsSliceName]: snackbarsReducer,
     [drawerMenuSliceName]: drawerMenuReducer,
+    [newBoardDialogSliceName]: newBoardDialogReducer,
   }),
 });

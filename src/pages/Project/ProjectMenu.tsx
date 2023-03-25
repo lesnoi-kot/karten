@@ -17,6 +17,7 @@ import { selectProjectById } from "app/projects/selectors";
 import { actions as apiActions } from "app/apiInteraction";
 import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice";
 import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
+import { actions as newBoardDialogActions } from "app/widgets/newBoardDialog";
 
 export function ProjectMenu() {
   const { id: projectId = "" } = useParams();
@@ -29,40 +30,39 @@ export function ProjectMenu() {
     return null;
   }
 
+  const onProjectAdd = () => {
+    dispatch(drawerMenuActions.close());
+    dispatch(newBoardDialogActions.showDialog(projectId));
+  };
+
+  const onProjectClear = () => {
+    dispatch(drawerMenuActions.close());
+    dispatch(
+      confirmDialogActions.showDialog({
+        okAction: apiActions.clearProject(projectId),
+        okButtonText: "yes",
+        title: "Warning",
+        text: `Delete all boards in the project "${project.name}"?`,
+      }),
+    );
+  };
+
   return (
     <>
       <Box px={2} py={2} textAlign="center">
-        <Typography variant="h5">Boards</Typography>
+        <Typography variant="h5">{project.name}</Typography>
       </Box>
 
       <Divider />
 
       <List>
-        <ListItem
-          button
-          onClick={() => {
-            dispatch(drawerMenuActions.close());
-          }}
-        >
+        <ListItem button onClick={onProjectAdd}>
           <ListItemIcon>
             <AddIcon />
           </ListItemIcon>
           <ListItemText primary="Add board" />
         </ListItem>
-        <ListItem
-          button
-          onClick={() => {
-            dispatch(drawerMenuActions.close());
-            dispatch(
-              confirmDialogActions.showDialog({
-                okAction: apiActions.clearProject(projectId),
-                okButtonText: "yes",
-                title: "Warning",
-                text: `Delete all boards in the project "${project.name}"?`,
-              }),
-            );
-          }}
-        >
+        <ListItem button onClick={onProjectClear}>
           <ListItemIcon>
             <DeleteForeverIcon />
           </ListItemIcon>
