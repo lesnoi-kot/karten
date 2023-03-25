@@ -22,15 +22,14 @@ export const appTheme = responsiveFontSizes(
       dark: {
         palette: {
           surfaces: {
-            light: "#191919",
+            50: "#191919",
+            100: grey[900],
           },
         },
       },
       light: {
         palette: {
-          surfaces: {
-            light: grey[50],
-          },
+          surfaces: grey,
         },
       },
     },

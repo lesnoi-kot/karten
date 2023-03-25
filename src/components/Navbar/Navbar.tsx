@@ -12,7 +12,7 @@ import ColorThemeSwitch from "components/ColorThemeSwitch";
 function NavbarTitle() {
   return (
     <Heading variant="h4">
-      <Link to="/" color="inherit" underline="none">
+      <Link to="/projects" color="inherit" underline="none">
         Karten
       </Link>
     </Heading>

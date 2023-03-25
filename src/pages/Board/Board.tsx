@@ -42,10 +42,11 @@ function BoardPage() {
     <DndProvider backend={HTML5Backend}>
       <Box
         sx={{
-          backgroundImage: board?.coverURL
+          backgroundImage: board.coverURL
             ? `url("${board.coverURL}")`
             : undefined,
           backgroundSize: "cover",
+          height: "calc(100vh - 64px)",
         }}
       >
         <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />

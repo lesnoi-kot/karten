@@ -1,31 +1,20 @@
-import { useCallback, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 
 import { ID } from "models/types";
-import { NewBoardDialog } from "components/Board";
 import { PreviewCardIconButton } from "components/ui/PreviewCard";
+import { useAppDispatch } from "app/hooks";
+import { actions } from "app/widgets/newBoardDialog";
 
 export default function NewBoardStub({ projectId }: { projectId: ID }) {
-  const [isOpen, setOpen] = useState(false);
+  const dispatch = useAppDispatch();
 
-  const openDialog = () => {
-    setOpen(true);
+  const showDialog = () => {
+    dispatch(actions.showDialog(projectId));
   };
 
-  const closeDialog = useCallback(() => {
-    setOpen(false);
-  }, [setOpen]);
-
   return (
-    <>
-      <PreviewCardIconButton onClick={openDialog} title="Create new board">
-        <AddIcon color="primary" fontSize="medium" />
-      </PreviewCardIconButton>
-      <NewBoardDialog
-        projectId={projectId}
-        isOpen={isOpen}
-        onClose={closeDialog}
-      />
-    </>
+    <PreviewCardIconButton onClick={showDialog} title="Create new board">
+      <AddIcon color="primary" fontSize="medium" />
+    </PreviewCardIconButton>
   );
 }

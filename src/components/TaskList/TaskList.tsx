@@ -73,7 +73,7 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
 
   return (
     <Box className={styles.wrapper} ref={setWrapperRef}>
-      <Box ref={setRef} py={1} className={styles.list}>
+      <Box ref={setRef} py={1} borderRadius="2px" bgcolor="surfaces.50">
         <Box fontWeight="bold" paddingLeft={2} mb={1} display="flex">
           <EditableTextField
             value={name}
@@ -97,8 +97,8 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
         </Box>
       </Box>
 
-      {isDragging && (
-        <DragAndDropPlaceholder rect={ref?.getBoundingClientRect()} />
+      {isDragging && ref?.getBoundingClientRect() && (
+        <DragAndDropPlaceholder rect={ref.getBoundingClientRect()} />
       )}
     </Box>
   );

@@ -38,7 +38,7 @@ function TaskPreview({ id, onClick }: Props) {
       variant="outlined"
     >
       <CardHeader
-        title={name + ` - ${position}`}
+        title={name}
         sx={{ padding: "8px" }}
         disableTypography
         action={

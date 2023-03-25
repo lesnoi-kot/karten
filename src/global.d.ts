@@ -1,5 +1,6 @@
 import "react-redux";
 import type { RootState } from "app/types";
+import type { Color } from "@mui/material";
 
 type VoidFunction = () => void;
 
@@ -9,14 +10,10 @@ declare module "react-redux" {
 
 declare module "@mui/material/styles" {
   interface Palette {
-    surfaces: {
-      light: string;
-    };
+    surfaces: Color;
   }
 
   interface PaletteOptions {
-    surfaces: {
-      light?: string;
-    };
+    surfaces: Partial<Color>;
   }
 }

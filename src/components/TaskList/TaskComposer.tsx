@@ -23,11 +23,11 @@ function TaskComposer({ taskListId }: { taskListId: ID }) {
   const textFieldRef = useRef<HTMLTextAreaElement>(null);
   const [formIsVisible, toggleForm] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
-  const { isLoading, load, onSuccess } = useRequest(apiActions.addTaskRequest);
-
-  onSuccess(() => {
-    setTaskTitle("");
-    textFieldRef?.current?.select();
+  const { isLoading, load } = useRequest(apiActions.addTaskRequest, {
+    onSuccess() {
+      setTaskTitle("");
+      textFieldRef?.current?.select();
+    },
   });
 
   const showForm = () => {

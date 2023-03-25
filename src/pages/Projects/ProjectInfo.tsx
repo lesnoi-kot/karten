@@ -48,7 +48,7 @@ function ProjectInfo({ id }: { id: ID }) {
     <Card
       elevation={0}
       id={`project-${id}`}
-      sx={{ background: (theme) => theme.palette.surfaces.light }}
+      sx={{ background: (theme) => theme.palette.surfaces[50] }}
     >
       <CardHeader
         avatar={

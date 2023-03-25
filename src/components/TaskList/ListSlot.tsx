@@ -19,14 +19,14 @@ const ListSlot = ({ children, taskId }: Props) => {
     taskRef,
   });
 
+  const rect: DOMRect | undefined = taskRef?.getBoundingClientRect();
+
   dragRef(dragPreviewRef(taskRef));
 
   return (
     <Box ref={dropRef} position="relative" px={1}>
       <Box ref={setTaskRef}>{children}</Box>
-      {isDragging && (
-        <DragAndDropPlaceholder rect={taskRef?.getBoundingClientRect()} />
-      )}
+      {isDragging && rect && <DragAndDropPlaceholder rect={rect} />}
     </Box>
   );
 };

@@ -1,7 +1,7 @@
 import { useState, useRef, KeyboardEventHandler } from "react";
 import cx from "classnames";
 
-import { Box, TextField } from "@mui/material";
+import { Box, TextField, Collapse } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { LoadingButton } from "@mui/lab";
 
@@ -21,7 +21,10 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
   const openField = () => {
     setTaskListName("");
     setFieldVisible(true);
-    inputRef.current?.focus();
+
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
   };
 
   const closeField = () => {
@@ -62,13 +65,13 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
   };
 
   return (
-    <Box py={1} px={2} className={cx(styles.list, styles.newList)}>
-      <ListSection paddingLeft={1} justifyItems="center">
-        {isFieldVisible && (
+    <Box py={2} px={2} className={cx(styles.list, styles.newList)}>
+      <ListSection mb={0}>
+        <Collapse in={isFieldVisible}>
           <>
             <TextField
-              autoFocus
               margin="dense"
+              size="small"
               id="name"
               inputRef={inputRef}
               fullWidth
@@ -79,9 +82,9 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
               onKeyDown={onKeyDown}
               autoComplete="off"
             />
-            <Box mt={2} />
+            <Box mt={1} />
           </>
-        )}
+        </Collapse>
         <LoadingButton
           variant="outlined"
           color="primary"

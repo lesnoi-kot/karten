@@ -84,10 +84,16 @@ export function BoardMenu() {
           <ListItemIcon>
             <DeleteForeverIcon />
           </ListItemIcon>
-          <ListItemText primary="Delete board" />
+          <ListItemText primary="Delete" />
         </ListItem>
 
-        <ListItem component={Link} to={`/projects/${board.projectId}`}>
+        <ListItem
+          component={Link}
+          to={`/projects/${board.projectId}`}
+          onClick={() => {
+            dispatch(drawerMenuActions.close());
+          }}
+        >
           <ListItemIcon>
             <ArrowBack />
           </ListItemIcon>
