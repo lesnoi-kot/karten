@@ -79,6 +79,7 @@ function FavoriteButton({
         e.preventDefault();
         onClick();
       }}
+      disableRipple
       size="small"
       title={
         value

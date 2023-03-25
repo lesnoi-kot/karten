@@ -8,14 +8,17 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
 
-export default function ColorThemeSwitch(props: ToggleButtonGroupProps) {
+type Props = ToggleButtonGroupProps & {
+  iconColor?: string;
+};
+
+export default function ColorThemeSwitch({ iconColor, ...props }: Props) {
   const { colorScheme, setColorScheme } = useColorScheme();
 
   return (
     <ToggleButtonGroup
       {...props}
       value={colorScheme}
-      size="small"
       exclusive
       aria-label="Switch color scheme"
       onChange={(e, value) => {
@@ -24,11 +27,11 @@ export default function ColorThemeSwitch(props: ToggleButtonGroupProps) {
     >
       <ToggleButton
         value="dark"
-        key="left"
+        key="dark"
         aria-label="Dark mode"
         title="Dark mode"
       >
-        <DarkModeIcon color="inherit" />
+        <DarkModeIcon color="inherit" htmlColor={iconColor} />
       </ToggleButton>
 
       {/* <ToggleButton value="system" key="system">
@@ -41,7 +44,7 @@ export default function ColorThemeSwitch(props: ToggleButtonGroupProps) {
         aria-label="Light mode"
         title="Light mode"
       >
-        <LightModeIcon color="inherit" />
+        <LightModeIcon color="inherit" htmlColor={iconColor} />
       </ToggleButton>
     </ToggleButtonGroup>
   );

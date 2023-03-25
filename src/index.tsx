@@ -1,63 +1,31 @@
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { amber, orange } from "@mui/material/colors";
-import {
-  responsiveFontSizes,
-  Experimental_CssVarsProvider,
-  experimental_extendTheme,
-} from "@mui/material/styles";
-import type {} from "@mui/material/themeCssVarsAugmentation";
+import { Experimental_CssVarsProvider as CssVarsProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import type {} from "@mui/material/themeCssVarsAugmentation";
 
 import { APIContext } from "context/APIProvider";
 import { getDataStore } from "services/api";
 import { createStore } from "app/store";
 
 import App from "./App";
-
+import { appTheme } from "./theme";
 import "./index.css";
-
-const theme = responsiveFontSizes(
-  experimental_extendTheme({
-    components: {
-      MuiFormLabel: {
-        styleOverrides: {
-          asterisk: {
-            color: "tomato",
-            "&$error": {
-              color: "tomato",
-            },
-          },
-        },
-      },
-    },
-    colorSchemes: {
-      dark: {
-        palette: {},
-      },
-      light: {
-        palette: {},
-      },
-    },
-    typography: {
-      fontSize: 16,
-    },
-  }),
-);
 
 const store = createStore();
 const queryClient = new QueryClient();
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
-    <Experimental_CssVarsProvider theme={theme}>
+    <CssVarsProvider theme={appTheme}>
       <CssBaseline enableColorScheme />
       <QueryClientProvider client={queryClient}>
         <APIContext.Provider value={getDataStore()}>
           <App />
         </APIContext.Provider>
       </QueryClientProvider>
-    </Experimental_CssVarsProvider>
+    </CssVarsProvider>
   </Provider>,
 );

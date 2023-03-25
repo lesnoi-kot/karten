@@ -1,8 +1,9 @@
-import { Drawer, IconButton, PaperProps } from "@mui/material";
+import { Box, Drawer, IconButton, PaperProps, Divider } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { actions, selectIsOpen } from "app/widgets/drawerMenu";
+import ColorThemeSwitch from "components/ColorThemeSwitch";
 
 type Props = {
   children: React.ReactNode;
@@ -14,7 +15,7 @@ const paperProps: PaperProps = {
   },
 };
 
-const closeIconSx = {
+const sxCloseIcon = {
   display: { xs: "block", sm: "none" },
   position: "absolute",
   right: 0,
@@ -36,10 +37,16 @@ export default function DrawerMenu({ children }: Props) {
       anchor="left"
       variant="temporary"
     >
-      <IconButton sx={closeIconSx} onClick={onClose}>
+      <IconButton sx={sxCloseIcon} onClick={onClose}>
         <CloseIcon />
       </IconButton>
-      {children}
+
+      <Box sx={{ flexGrow: "1" }}>{children}</Box>
+
+      <Divider />
+      <Box py={1} width="100%">
+        <ColorThemeSwitch sx={{ display: "flex", justifyContent: "center" }} />
+      </Box>
     </Drawer>
   );
 }

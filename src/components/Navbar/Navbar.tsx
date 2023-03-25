@@ -48,7 +48,11 @@ export default function Navbar({ renderMenuButton }: Props) {
         <NavbarTitle />
         <Box sx={{ flexGrow: 1 }} />
 
-        <ColorThemeSwitch sx={{ display: { xs: "none", sm: "block" } }} />
+        <ColorThemeSwitch
+          size="small"
+          iconColor="white"
+          sx={{ display: { xs: "none", sm: "block" } }}
+        />
       </Toolbar>
     </AppBar>
   );
