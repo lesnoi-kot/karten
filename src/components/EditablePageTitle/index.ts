@@ -1,0 +1,1 @@
+export { EditablePageTitle } from "./EditablePageTitle";

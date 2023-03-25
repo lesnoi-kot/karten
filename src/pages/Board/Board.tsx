@@ -8,17 +8,17 @@ import logger from "services/logger";
 import { actions as apiActions } from "app/apiInteraction";
 import { useRequest } from "app/apiInteraction/hooks";
 import { useAppSelector } from "app/hooks";
+import { selectBoard } from "app/boards/selectors";
 
+import makePage from "pages/makePageHOC";
 import { TaskModal } from "components/Task";
 import ErrorSplash from "components/ui/ErrorSplash";
-import makePage from "pages/makePageHOC";
 
 import { useDashboardMethods, selectShouldRedirectToProject } from "./slice";
-import BoardName from "./BoardName";
 import ScrollableSpace from "./ScrollableSpace";
+import BoardName from "./BoardName";
 import TaskLists from "./TaskLists";
 import PageTitle from "./PageTitle";
-import { selectBoard } from "app/boards/selectors";
 
 function BoardPage() {
   const { id: boardId = "", taskId: selectedTaskId = "" } = useParams();
@@ -34,6 +34,10 @@ function BoardPage() {
     return <Navigate to="/projects" />;
   }
 
+  if (!board) {
+    return null;
+  }
+
   return (
     <DndProvider backend={HTML5Backend}>
       <Box
@@ -46,14 +50,8 @@ function BoardPage() {
       >
         <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />
 
-        {isLoaded && (
-          <Box textAlign="center">
-            <BoardName boardId={boardId} />
-          </Box>
-        )}
-
         {isLoading && (
-          <Box textAlign="center">
+          <Box textAlign="center" pt={3}>
             <CircularProgress />
           </Box>
         )}
@@ -61,9 +59,15 @@ function BoardPage() {
         {isFailed && <ErrorSplash message={error} retry={reload} />}
 
         {isLoaded && (
-          <ScrollableSpace disabled>
-            <TaskLists boardId={boardId} onTaskClick={onTaskClick} />
-          </ScrollableSpace>
+          <>
+            <Box pt={2} pb={3} textAlign="center">
+              <BoardName boardId={boardId} />
+            </Box>
+
+            <ScrollableSpace disabled>
+              <TaskLists boardId={boardId} onTaskClick={onTaskClick} />
+            </ScrollableSpace>
+          </>
         )}
 
         {selectedTaskId && (

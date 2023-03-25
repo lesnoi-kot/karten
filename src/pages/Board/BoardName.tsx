@@ -1,21 +1,15 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 
-import { RootState } from "app";
-import EditableTextField from "components/EditableTextField";
 import { actions } from "app/apiInteraction";
 import { ID } from "models/types";
 import { selectBoard } from "app/boards/selectors";
+import { useAppSelector } from "app/hooks";
+import { EditablePageTitle } from "components/EditablePageTitle";
 
-import styles from "./styles.module.css";
-
-type Props = {
-  boardId: ID;
-};
-
-export function BoardName({ boardId }: Props) {
+export function BoardName({ boardId }: { boardId: ID }) {
   const dispatch = useDispatch();
-  const board = useSelector((state: RootState) => selectBoard(state, boardId));
+  const board = useAppSelector((state) => selectBoard(state, boardId));
 
   if (!board) {
     return null;
@@ -27,16 +21,7 @@ export function BoardName({ boardId }: Props) {
     }
   };
 
-  return (
-    <EditableTextField
-      value={board.name}
-      onChange={onNameChange}
-      className={styles.boardName}
-      inputProps={{
-        className: styles.boardName,
-      }}
-    />
-  );
+  return <EditablePageTitle value={board.name} onChange={onNameChange} />;
 }
 
 export default React.memo(BoardName);

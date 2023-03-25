@@ -12,16 +12,25 @@ import {
 } from "@mui/material";
 import ArrowBack from "@mui/icons-material/ArrowBack";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
-import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import EditIcon from "@mui/icons-material/Edit";
 
 import Link from "components/Link";
 import { actions as apiActions } from "app/apiInteraction";
 import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice";
+import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
+import { useAppSelector } from "app/hooks";
+import { selectBoard } from "app/boards/selectors";
 
 export function BoardMenu() {
-  const { id: boardId = "", taskId: selectedTaskId = "" } = useParams();
+  const { id: boardId = "" } = useParams();
   const dispatch = useDispatch();
+
+  const board = useAppSelector((state) => selectBoard(state, boardId));
+
+  if (!board) {
+    return null;
+  }
 
   const onBoardDelete = () => {
     dispatch(
@@ -31,7 +40,7 @@ export function BoardMenu() {
         okAction: apiActions.deleteBoardRequest(boardId),
       }),
     );
-    // onClose();
+    dispatch(drawerMenuActions.close());
   };
 
   const onBoardClear = () => {
@@ -42,34 +51,26 @@ export function BoardMenu() {
         okAction: apiActions.clearBoardRequest(boardId),
       }),
     );
-    // onClose();
+    dispatch(drawerMenuActions.close());
   };
 
-  const onBackgroundChange = () => {};
+  const onBackgroundChange = () => {
+    dispatch(drawerMenuActions.close());
+  };
 
   return (
-    <>
+    <Box display="flex" flexDirection="column" height="100%">
       <Box px={2} py={2} textAlign="center">
-        <Typography variant="h5">Menu</Typography>
+        <Typography variant="h5">{board.name}</Typography>
       </Box>
-
       <Divider />
 
-      <List>
-        <ListItem component={Link} to="/projects">
-          <ListItemIcon>
-            <ArrowBack />
-          </ListItemIcon>
-          <ListItemText primary="Back to main" />
-        </ListItem>
-      </List>
-      <Divider />
       <List>
         <ListItem button onClick={onBackgroundChange}>
           <ListItemIcon>
-            <PhotoLibraryIcon />
+            <EditIcon />
           </ListItemIcon>
-          <ListItemText primary="Change background" />
+          <ListItemText primary="Edit" />
         </ListItem>
 
         <ListItem button onClick={onBoardClear}>
@@ -85,8 +86,16 @@ export function BoardMenu() {
           </ListItemIcon>
           <ListItemText primary="Delete board" />
         </ListItem>
+
+        <ListItem component={Link} to={`/projects/${board.projectId}`}>
+          <ListItemIcon>
+            <ArrowBack />
+          </ListItemIcon>
+          <ListItemText primary="Back to the project" />
+        </ListItem>
       </List>
-    </>
+      <Divider />
+    </Box>
   );
 }
 
