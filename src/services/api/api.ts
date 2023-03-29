@@ -254,6 +254,7 @@ export class APIService implements DataStore {
       name: args.name,
       position: args.position,
       text: args.text,
+      task_list_id: args.taskListId,
     });
 
     return convertTaskDTO(await this.unwrapResponse<TaskDTO>(res));

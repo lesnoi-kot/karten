@@ -56,19 +56,17 @@ type UseRequestReturnType<P> = UseRequestInfoReturnType & {
   cancel(): void;
   load(payload: P): void;
   getAction(payload: P): APIAction<P>;
-  onSuccess(callback: Callback): void;
 };
 
 export function useRequest<P>(
   actionCreator: ActionCreator<APIAction<P>>,
   options?: {
-    onSuccess?: () => void;
+    onSuccess?: Callback;
     requestKey?: string;
   },
 ): UseRequestReturnType<P> {
   const dispatch = useAppDispatch();
   const prevPayload = useRef<P | symbol>(noPayload);
-  const successHandler = useRef<Callback>(() => {});
   const requestKey = useMemo(() => nanoid(), [actionCreator]);
 
   useEffect(() => {
@@ -98,10 +96,6 @@ export function useRequest<P>(
     }
   }, [dispatch, getAction, prevPayload]);
 
-  const onSuccess = useCallback((callback: Callback) => {
-    successHandler.current = callback;
-  }, []);
-
   const cancel = useCallback(() => {
     // TODO
   }, []);
@@ -109,21 +103,16 @@ export function useRequest<P>(
   const requestInfo = useRequestInfo(requestKey);
 
   useEffect(() => {
-    if (requestInfo.isLoaded) {
-      successHandler.current();
-
-      if (options?.onSuccess) {
-        options.onSuccess();
-      }
+    if (requestInfo.isLoaded && options?.onSuccess) {
+      options.onSuccess();
     }
-  }, [requestInfo.isLoaded, options?.onSuccess]);
+  }, [requestInfo.isLoaded]);
 
   return {
     ...requestInfo,
     load,
     reload,
     cancel,
-    onSuccess,
     getAction,
   };
 }

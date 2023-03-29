@@ -13,7 +13,6 @@ import ListSection from "./ListSection";
 import styles from "./styles.module.css";
 
 function NewListPlaceholder({ boardId }: { boardId: ID }) {
-  const { load, onSuccess, isLoading } = useRequest(actions.addTaskListRequest);
   const [isFieldVisible, setFieldVisible] = useState(false);
   const [taskListName, setTaskListName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -32,7 +31,11 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
     setTaskListName("");
   };
 
-  onSuccess(closeField);
+  const { load, isLoading } = useRequest(actions.addTaskListRequest, {
+    onSuccess() {
+      openField();
+    },
+  });
 
   const submit = () => {
     if (taskListName) {
@@ -65,7 +68,7 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
   };
 
   return (
-    <Box py={2} px={2} className={cx(styles.list, styles.newList)}>
+    <Box px={2} className={cx(styles.list, styles.newList)}>
       <ListSection mb={0}>
         <Collapse in={isFieldVisible}>
           <>
