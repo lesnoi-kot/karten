@@ -24,6 +24,7 @@
     "classnames": "^2.3.1",
     "history": "^5.2.0",
     "js-cookie": "^3.0.1",
+    "micromark": "^3.1.0",
     "normalizr": "^3.6.1",
     "pretty-bytes": "^6.0.0",
     "ramda": "^0.28.0",
