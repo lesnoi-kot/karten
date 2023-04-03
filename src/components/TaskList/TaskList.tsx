@@ -87,7 +87,7 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
         <Stack direction="column" gap={0.5}>
           {taskIds.map((taskId) => (
             <ListSlot key={taskId} taskId={taskId}>
-              <TaskPreview id={taskId} onClick={onTaskClick} />
+              <TaskPreview id={taskId} onClick={() => onTaskClick(taskId)} />
             </ListSlot>
           ))}
         </Stack>

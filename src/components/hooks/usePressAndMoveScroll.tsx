@@ -6,11 +6,11 @@ type ReturnType<T> = [
   RefObject<T>,
   MouseEventHandler,
   MouseEventHandler,
-  MouseEventHandler
+  MouseEventHandler,
 ];
 
 export default function usePressAndMoveScroll<
-  T extends HTMLElement
+  T extends HTMLElement,
 >(): ReturnType<T> {
   const scrollable = useRef<T>(null);
   const pressed = useRef<boolean>(false);
@@ -18,16 +18,16 @@ export default function usePressAndMoveScroll<
   const onMouseDown: MouseEventHandler = useCallback((e) => {
     if (!scrollable.current) return;
 
-    // console.log("!!!!!", e.target);
-    pressed.current = true;
-    scrollable.current.classList.add(styles.grabbing);
+    if ((e.target as HTMLElement).closest('[draggable="true"]') === null) {
+      pressed.current = true;
+      scrollable.current.classList.add(styles.grabbing);
+    }
   }, []);
 
   const onMouseUp: MouseEventHandler = useCallback((e) => {
     if (!scrollable.current) return;
-    pressed.current = false;
-    // console.log("??????", e.target);
 
+    pressed.current = false;
     scrollable.current.classList.remove(styles.grabbing);
   }, []);
 
@@ -35,10 +35,9 @@ export default function usePressAndMoveScroll<
     (e) => {
       const el = scrollable.current;
       if (!el || !pressed.current) return;
-      // console.log("============", e.target);
       el.scroll({ left: el.scrollLeft - e.movementX });
     },
-    [pressed]
+    [pressed],
   );
 
   return [scrollable, onMouseDown, onMouseUp, onMouseMove];

@@ -1,7 +1,10 @@
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { Experimental_CssVarsProvider as CssVarsProvider } from "@mui/material/styles";
+import {
+  Experimental_CssVarsProvider as CssVarsProvider,
+  StyledEngineProvider,
+} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import type {} from "@mui/material/themeCssVarsAugmentation";
 
@@ -21,11 +24,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <CssVarsProvider theme={appTheme}>
       <CssBaseline enableColorScheme />
-      <QueryClientProvider client={queryClient}>
-        <APIContext.Provider value={getDataStore()}>
-          <App />
-        </APIContext.Provider>
-      </QueryClientProvider>
+      <StyledEngineProvider injectFirst>
+        <QueryClientProvider client={queryClient}>
+          <APIContext.Provider value={getDataStore()}>
+            <App />
+          </APIContext.Provider>
+        </QueryClientProvider>
+      </StyledEngineProvider>
     </CssVarsProvider>
   </Provider>,
 );

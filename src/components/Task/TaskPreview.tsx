@@ -2,21 +2,25 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Card, CardHeader, IconButton, CardProps } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { styled } from "@mui/material/styles";
 
 import { RootState } from "app";
 import { ID } from "models/types";
 import { selectTaskById } from "app/tasks/selectors";
 import { actions as apiActions } from "app/apiInteraction";
 
-import styles from "./styles.module.css";
 import Stub from "../Stub";
 
-export type Props = Omit<CardProps, "onClick"> & {
-  id: ID;
-  onClick(id: ID): void;
-};
+export type Props = CardProps & { id: ID };
 
-function TaskPreview({ id, onClick }: Props) {
+const TaskCard = styled(Card)<CardProps>(() => ({
+  width: "100%",
+  cursor: "pointer",
+  whiteSpace: "pre",
+  userSelect: "none",
+}));
+
+function TaskPreview({ id, ...cardProps }: Props) {
   const dispatch = useDispatch();
   const task = useSelector((state: RootState) => selectTaskById(state, id));
 
@@ -29,17 +33,13 @@ function TaskPreview({ id, onClick }: Props) {
     dispatch(apiActions.deleteTaskRequest(id));
   };
 
-  const { name, position } = task;
+  const { name } = task;
 
   return (
-    <Card
-      className={styles.taskPreview}
-      onClick={() => onClick(id)}
-      variant="outlined"
-    >
+    <TaskCard variant="outlined" {...cardProps}>
       <CardHeader
         title={name}
-        sx={{ padding: "8px" }}
+        sx={{ padding: 1 }}
         disableTypography
         action={
           <IconButton
@@ -51,7 +51,7 @@ function TaskPreview({ id, onClick }: Props) {
           </IconButton>
         }
       />
-    </Card>
+    </TaskCard>
   );
 }
 

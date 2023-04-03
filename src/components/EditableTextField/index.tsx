@@ -1,4 +1,4 @@
-import React, {
+import {
   useState,
   useRef,
   useEffect,
@@ -11,7 +11,7 @@ import clsx from "clsx";
 
 import styles from "./styles.module.css";
 
-type Props = Omit<InputProps, "onChange"> & {
+export type Props = Omit<InputProps, "onChange"> & {
   value: string;
   disableSubmitOnEnter?: boolean;
   onChange(newValue: string): void;
@@ -43,6 +43,7 @@ export function EditableText({
   const onKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === "Escape") {
       textFieldRef.current?.blur();
+      e.stopPropagation();
     } else if (!disableSubmitOnEnter && e.key === "Enter") {
       textFieldRef.current?.blur();
     }

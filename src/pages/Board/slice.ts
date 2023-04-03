@@ -66,8 +66,7 @@ export const useDashboardMethods = (boardId: ID) => {
   const onTaskClick = useCallback(
     (taskId: ID) => {
       dispatch(taskSelected(taskId));
-      // TODO fix
-      // navigate(generatePath("pages:task", { boardId, taskId }), { replace: true });
+      navigate({ search: `?taskId=${taskId}` }, { replace: false });
     },
     [dispatch, navigate, boardId],
   );

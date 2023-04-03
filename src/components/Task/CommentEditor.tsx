@@ -29,6 +29,15 @@ function CommentEditor({
         onChange={(e) => setTempText(e.target.value)}
         multiline
         fullWidth
+        autoFocus
+        onFocus={(e) =>
+          e.target.setSelectionRange(
+            e.target.value.length,
+            e.target.value.length,
+          )
+        }
+        margin="dense"
+        size="small"
         placeholder="Write a comment"
         className={styles.textfield}
         variant="outlined"

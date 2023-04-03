@@ -9,12 +9,12 @@ import { selectTaskNameById } from "app/tasks/selectors";
 
 type Props = {
   boardId: ID;
-  selectedTaskId: ID;
+  selectedTaskId: ID | null;
 };
 
 export function PageTitle({ boardId, selectedTaskId }: Props) {
   const taskName = useSelector((state: RootState) =>
-    selectTaskNameById(state, selectedTaskId),
+    selectedTaskId ? selectTaskNameById(state, selectedTaskId) : null,
   );
   const boardName = useSelector((state: RootState) =>
     selectBoardName(state, boardId),

@@ -45,9 +45,11 @@ function CommentComposer({ taskId }: Props) {
         onChange={(e) => setText(e.target.value)}
         multiline
         fullWidth
+        size="small"
+        margin="dense"
         placeholder="Write a comment"
         className={styles.textfield}
-        rows={focused ? 2 : 0}
+        minRows={focused ? 2 : 0}
         variant="outlined"
         onFocus={() => setFocused(true)}
         onBlur={() => !text && setFocused(false)}

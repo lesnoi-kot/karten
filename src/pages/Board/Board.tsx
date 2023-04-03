@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, useSearchParams } from "react-router-dom";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Box, CircularProgress } from "@mui/material";
@@ -21,12 +21,15 @@ import TaskLists from "./TaskLists";
 import PageTitle from "./PageTitle";
 
 function BoardPage() {
-  const { id: boardId = "", taskId: selectedTaskId = "" } = useParams();
+  const { id: boardId = "" } = useParams();
+  const [searchParams] = useSearchParams();
   const board = useAppSelector((state) => selectBoard(state, boardId));
-  const { load, reload, isLoading, isLoaded, isFailed, state, error } =
-    useRequest(apiActions.boardRequest);
+  const { load, reload, isLoading, isLoaded, isFailed, error } = useRequest(
+    apiActions.boardRequest,
+  );
   const { onTaskClick, onTaskModalClose } = useDashboardMethods(boardId);
   const shouldRedirectToProject = useAppSelector(selectShouldRedirectToProject);
+  const selectedTaskId = searchParams.get("taskId");
 
   useEffect(() => load(boardId), [load, boardId]);
 
@@ -47,6 +50,8 @@ function BoardPage() {
             : undefined,
           backgroundSize: "cover",
           height: "calc(100vh - 64px)",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />
@@ -65,7 +70,13 @@ function BoardPage() {
               <BoardName boardId={boardId} />
             </Box>
 
-            <ScrollableSpace disabled>
+            <ScrollableSpace
+              disabled={false}
+              px={2}
+              pb={2}
+              overflow="scroll"
+              flexGrow={1}
+            >
               <TaskLists boardId={boardId} onTaskClick={onTaskClick} />
             </ScrollableSpace>
           </>

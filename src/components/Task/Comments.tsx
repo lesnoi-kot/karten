@@ -1,11 +1,11 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Box, Grid, Typography } from "@mui/material";
+import CommentIcon from "@mui/icons-material/Comment";
 
 import { ID } from "models/types";
 import { selectCommentsId } from "app/comments/selectors";
 
-import styles from "./styles.module.css";
 import Comment from "./Comment";
 import CommentComposer from "./CommentComposer";
 import { RootState } from "app";
@@ -16,12 +16,13 @@ type Props = {
 
 function Comments({ taskId }: Props) {
   const comments = useSelector((state: RootState) =>
-    selectCommentsId(state, taskId)
+    selectCommentsId(state, taskId),
   );
 
   return (
     <Box>
       <Typography variant="h6" component="h2">
+        <CommentIcon />
         Comments ({comments.length})
       </Typography>
 

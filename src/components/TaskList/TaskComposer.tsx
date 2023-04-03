@@ -3,7 +3,7 @@ import React, { useState, useRef, KeyboardEventHandler } from "react";
 import {
   Box,
   Button,
-  Input,
+  TextField,
   IconButton,
   Collapse,
   Fade,
@@ -63,10 +63,11 @@ function TaskComposer({ taskListId }: { taskListId: ID }) {
   };
 
   const onKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && e.shiftKey) {
       submit();
     } else if (e.key === "Escape") {
       hideForm();
+      e.stopPropagation();
     }
   };
 
@@ -76,7 +77,7 @@ function TaskComposer({ taskListId }: { taskListId: ID }) {
         in={formIsVisible}
         onEntered={() => textFieldRef.current?.focus()}
       >
-        <Input
+        <TextField
           value={taskTitle}
           onChange={onChange}
           inputRef={textFieldRef}
@@ -84,7 +85,11 @@ function TaskComposer({ taskListId }: { taskListId: ID }) {
           onBlur={onBlur}
           placeholder="Enter title for this card..."
           fullWidth
-          rows={1}
+          minRows={2}
+          multiline
+          margin="dense"
+          variant="outlined"
+          size="small"
           onKeyDown={onKeyDown}
         />
         <Box mt={1} />
@@ -92,7 +97,6 @@ function TaskComposer({ taskListId }: { taskListId: ID }) {
           <Grid item>
             <LoadingButton
               variant="contained"
-              color="secondary"
               size="small"
               loading={isLoading}
               onClick={(event) => {
@@ -102,7 +106,7 @@ function TaskComposer({ taskListId }: { taskListId: ID }) {
               disabled={!taskTitle}
               startIcon={<CheckIcon />}
             >
-              Add
+              Add card
             </LoadingButton>
           </Grid>
           <Grid item>
@@ -123,7 +127,7 @@ function TaskComposer({ taskListId }: { taskListId: ID }) {
             onClick={showForm}
             disableElevation
           >
-            Add a task
+            Add a card
           </Button>
         </Fade>
       )}

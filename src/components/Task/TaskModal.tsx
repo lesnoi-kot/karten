@@ -1,33 +1,37 @@
-import React from "react";
-import { IconButton, Modal } from "@mui/material";
+import { Box, IconButton, Modal, ModalProps } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import ClearIcon from "@mui/icons-material/Clear";
 
-import styles from "./styles.module.css";
 import Task, { Props } from "./Task";
 
 type TaskModalProps = Props & {
   onClose(): void;
 };
 
-export function TaskModal({ onClose, ...props }: TaskModalProps) {
+const StyledModal = styled(Modal)<ModalProps>(({ theme }) => ({
+  marginTop: theme.spacing(5),
+  marginBottom: theme.spacing(5),
+  marginLeft: "auto",
+  marginRight: "auto",
+  height: "auto",
+  maxWidth: "768px",
+  width: "100%",
+  minHeight: "500px",
+  maxHeight: "100%",
+}));
+
+export function TaskModal({ onClose, ...taskProps }: TaskModalProps) {
   return (
-    <Modal
-      open
-      onClose={onClose}
-      disableAutoFocus
-      className={styles.modalWrapper}
-    >
+    <StyledModal open onClose={onClose}>
       <>
-        <IconButton
-          size="small"
-          className={styles.modalClose}
-          onClick={onClose}
-        >
-          <ClearIcon />
-        </IconButton>
-        <Task {...props} />
+        <Box position="absolute" mt={1} mr={1} right={0}>
+          <IconButton size="small" onClick={onClose}>
+            <ClearIcon />
+          </IconButton>
+        </Box>
+        <Task {...taskProps} />
       </>
-    </Modal>
+    </StyledModal>
   );
 }
 

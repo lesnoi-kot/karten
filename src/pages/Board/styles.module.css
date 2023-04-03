@@ -1,6 +1,0 @@
-.dashboard {
-  width: auto;
-  height: calc(100vh - 155px);
-  padding-left: 16px;
-  overflow-x: scroll;
-}

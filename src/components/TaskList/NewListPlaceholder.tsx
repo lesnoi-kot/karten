@@ -23,6 +23,11 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
 
     setTimeout(() => {
       inputRef.current?.focus();
+      document.getElementById("scrollable_space")?.scroll({
+        top: 0,
+        left: 1e9,
+        behavior: "smooth",
+      });
     }, 100);
   };
 
@@ -71,7 +76,7 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
     <Box px={2} className={cx(styles.list, styles.newList)}>
       <ListSection mb={0}>
         <Collapse in={isFieldVisible}>
-          <>
+          <Box mt={1}>
             <TextField
               margin="dense"
               size="small"
@@ -85,8 +90,7 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
               onKeyDown={onKeyDown}
               autoComplete="off"
             />
-            <Box mt={1} />
-          </>
+          </Box>
         </Collapse>
         <LoadingButton
           variant="outlined"
