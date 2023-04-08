@@ -1,6 +1,6 @@
-import React from "react";
 import { AppBar, Toolbar, Box, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import { useAppDispatch } from "app/hooks";
 import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
@@ -46,13 +46,22 @@ export default function Navbar({ renderMenuButton }: Props) {
         )}
 
         <NavbarTitle />
-        <Box sx={{ flexGrow: 1 }} />
-
-        <ColorThemeSwitch
-          size="small"
-          iconColor="white"
-          sx={{ display: { xs: "none", sm: "block" } }}
-        />
+        <Box
+          display="flex"
+          flexGrow="1"
+          flexDirection="row"
+          justifyContent="end"
+          gap={2}
+        >
+          <ColorThemeSwitch
+            size="small"
+            iconColor="white"
+            sx={{ display: { xs: "none", sm: "block" } }}
+          />
+          <IconButton color="inherit" /*onClick={onLogin}*/>
+            <AccountCircleIcon />
+          </IconButton>
+        </Box>
       </Toolbar>
     </AppBar>
   );

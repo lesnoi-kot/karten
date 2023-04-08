@@ -73,6 +73,11 @@ export const {
     },
 
     /*
+      Users
+    */
+    getCurrentUser: requestWithPayload<void>(),
+
+    /*
       Projects
     */
     getProjects: requestWithPayload<void>(),

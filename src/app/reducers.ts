@@ -52,6 +52,8 @@ import {
   sliceName as boardsSliceName,
 } from "./boards";
 
+import { reducer as usersReducer, sliceName as usersSliceName } from "./users";
+
 import {
   reducer as apiInteractionReducer,
   sliceName as apiInteractionSliceName,
@@ -66,6 +68,7 @@ export const rootReducer = combineReducers({
     [taskListsSliceName]: taskListsReducer,
     [tasksSliceName]: tasksReducer,
     [commentsSliceName]: commentsReducer,
+    [usersSliceName]: usersReducer,
   }),
 
   pages: combineReducers({

@@ -6,6 +6,7 @@ import {
   Task,
   Comment,
   KartenFile,
+  User,
 } from "models/types";
 import {
   ProjectDTO,
@@ -14,6 +15,7 @@ import {
   TaskDTO,
   CommentDTO,
   FileDTO,
+  UserDTO,
 } from "./types";
 
 export function convertProjectDTO(dto: ProjectDTO): Project {
@@ -97,4 +99,16 @@ export function convertFileDTO(dto: FileDTO): KartenFile {
 
 export function convertFilesDTO(dtos: FileDTO[]): KartenFile[] {
   return dtos.map(convertFileDTO);
+}
+
+export function convertUserDTO(dto: UserDTO): User {
+  return {
+    id: dto.id,
+    socialId: dto.social_id,
+    name: dto.name,
+    login: dto.login,
+    email: dto.email,
+    url: dto.url,
+    dateCreated: dto.date_created,
+  };
 }

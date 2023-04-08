@@ -1,22 +1,24 @@
 import cookies from "js-cookie";
 
 import {
-  ID,
-  Project,
   Board,
-  TaskList,
-  Task,
   Comment,
+  ID,
   KartenFile,
+  Project,
+  Task,
+  TaskList,
+  User,
 } from "models/types";
 
 import {
-  convertProjectDTO,
   convertBoardDTO,
-  convertTaskListDTO,
-  convertTaskDTO,
   convertCommentDTO,
   convertFilesDTO,
+  convertProjectDTO,
+  convertTaskDTO,
+  convertTaskListDTO,
+  convertUserDTO,
 } from "./dtoToModel";
 
 import {
@@ -25,10 +27,10 @@ import {
   AddProjectArgs,
   AddTaskArgs,
   AddTaskListArgs,
-  DataStore,
   APIError,
   BoardDTO,
   CommentDTO,
+  DataStore,
   EditBoardArgs,
   EditCommentArgs,
   EditProjectArgs,
@@ -40,6 +42,7 @@ import {
   ResponseOK,
   TaskDTO,
   TaskListDTO,
+  UserDTO,
 } from "./types";
 
 const CSRF_COOKIE = "_csrf";
@@ -307,5 +310,17 @@ export class APIService implements DataStore {
   async getBoardCovers(): Promise<KartenFile[]> {
     const res = await this.fetchJSON("/cover-images");
     return convertFilesDTO(await this.unwrapResponse<FileDTO[]>(res));
+  }
+
+  /* ------------ */
+
+  async getCurrentUser(): Promise<User | null> {
+    const res = await this.fetchJSON("/users/self");
+
+    if (res.status === 200) {
+      return convertUserDTO(await this.unwrapResponse<UserDTO>(res));
+    }
+
+    return null;
   }
 }

@@ -11,8 +11,8 @@ export const addCommentEpic: Epic = (action$, store$, { api }) =>
     filter(actions.addCommentRequest.match),
     mergeMap(({ payload: { taskId, text }, meta: { requestKey } }) =>
       from(api.addComment({ taskId, text })).pipe(
-        mergeMap((commentDTO) =>
-          of(commentSet(commentDTO), actions.requestLoaded(requestKey)),
+        mergeMap((comment) =>
+          of(commentSet(comment), actions.requestLoaded(requestKey)),
         ),
         catchError((error) => of(actions.requestFailed(error, requestKey))),
       ),

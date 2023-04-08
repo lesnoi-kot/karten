@@ -64,3 +64,13 @@ export type KartenFile = {
   mimeType: string;
   size: number;
 };
+
+export type User = {
+  id: string;
+  socialId: string;
+  name: string;
+  login: string;
+  email: string;
+  url: string;
+  dateCreated: string;
+};

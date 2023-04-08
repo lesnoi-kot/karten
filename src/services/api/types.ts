@@ -1,11 +1,12 @@
 import {
-  ID,
   Board,
+  Comment,
+  ID,
+  KartenFile,
   Project,
   Task,
   TaskList,
-  Comment,
-  KartenFile,
+  User,
 } from "models/types";
 
 export type ResponseOK<T> = {
@@ -73,6 +74,16 @@ export type ProjectDTO = {
   avatar_url?: string;
   avatar_thumbnail_url?: string;
   boards?: BoardDTO[];
+};
+
+export type UserDTO = {
+  id: string;
+  social_id: string;
+  name: string;
+  login: string;
+  email: string;
+  url: string;
+  date_created: string;
 };
 
 export type FileDTO = {
@@ -147,6 +158,8 @@ export type EditCommentArgs = {
 };
 
 export interface DataStore {
+  getCurrentUser(): Promise<User | null>;
+
   getProjects(): Promise<Project[]>;
   getProject(id: ID): Promise<Project>;
   addProject(args: AddProjectArgs): Promise<Project>;
