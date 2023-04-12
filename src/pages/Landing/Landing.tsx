@@ -1,10 +1,11 @@
-import { useDispatch } from "react-redux";
 import { Helmet } from "react-helmet";
 import { Navigate } from "react-router-dom";
 import { Box, Typography, Link, styled, BoxProps, Button } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
+import ScienceIcon from "@mui/icons-material/Science";
 
-import { useAppSelector } from "app/hooks";
+import { useAppDispatch, useAppSelector } from "app/hooks";
+import { actions as apiActions } from "app/apiInteraction";
 import { selectCurrentUser } from "app/users/selectors";
 import { getGitHubOAuthURL } from "services/auth";
 
@@ -17,7 +18,7 @@ const Wrapper = styled(Box)<BoxProps>(() => ({
 }));
 
 function Landing() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser);
 
   if (user) {
@@ -27,7 +28,7 @@ function Landing() {
   return (
     <Wrapper>
       <Helmet title="Karten" />
-      <Box width="75%" maxWidth="700px" margin="0 auto">
+      <Box width="75%" maxWidth="700px" margin="0 auto" color="white">
         <Typography variant="h1" color="white">
           Karten
         </Typography>
@@ -41,16 +42,30 @@ function Landing() {
           for personal and business purposes
         </Typography>
 
-        <Button
-          href={getGitHubOAuthURL()}
-          endIcon={<GitHubIcon />}
-          size="large"
-          component={Link}
-          variant="outlined"
-          sx={{ color: "white" }}
-        >
-          Log in with GitHub
-        </Button>
+        <Box display="flex" flexDirection="column" maxWidth="300px" gap={2}>
+          <Button
+            href={getGitHubOAuthURL()}
+            startIcon={<GitHubIcon />}
+            size="large"
+            variant="contained"
+            disableElevation
+            component={Link}
+            sx={{ color: "white" }}
+          >
+            Log in with GitHub
+          </Button>
+          <Button
+            startIcon={<ScienceIcon />}
+            size="large"
+            onClick={async () => {
+              dispatch(apiActions.logInAsGuest());
+            }}
+            variant="outlined"
+            sx={{ color: "white", borderColor: "rgb(200 200 200)" }}
+          >
+            Log in as a guest
+          </Button>
+        </Box>
       </Box>
     </Wrapper>
   );

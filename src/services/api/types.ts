@@ -103,7 +103,6 @@ export type AddBoardArgs = {
   projectId: ID;
   name: string;
   color?: number;
-  cover?: File | null;
   coverId?: string | null;
 };
 
@@ -157,8 +156,14 @@ export type EditCommentArgs = {
   text: string;
 };
 
+export type UploadImage = {
+  file: File;
+};
+
 export interface DataStore {
   getCurrentUser(): Promise<User | null>;
+  logOut(): Promise<void>;
+  logInAsGuest(): Promise<User>;
 
   getProjects(): Promise<Project[]>;
   getProject(id: ID): Promise<Project>;
@@ -191,6 +196,7 @@ export interface DataStore {
   deleteComment(id: ID): Promise<void>;
 
   getBoardCovers(): Promise<KartenFile[]>;
+  uploadImage(args: UploadImage): Promise<KartenFile>;
 }
 
 export const ERROR_CODES = {

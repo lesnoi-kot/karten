@@ -22,12 +22,15 @@ export const {
   name: "users",
   initialState,
   reducers: {
-    currentUserAdded: (state, { payload: user }: PayloadAction<User>) => {
+    userLoggedIn: (state, { payload: user }: PayloadAction<User>) => {
       state.items[user.id] = user;
       state.userId = user.id;
     },
     userAdded: (state, { payload: user }: PayloadAction<User>) => {
       state.items[user.id] = user;
+    },
+    userLoggedOut: (state) => {
+      state.userId = null;
     },
   },
 });

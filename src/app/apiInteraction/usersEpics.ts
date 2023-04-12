@@ -1,7 +1,7 @@
 import { of, from } from "rxjs";
 import { filter, mergeMap, catchError } from "rxjs/operators";
 
-import { currentUserAdded } from "app/users";
+import { userLoggedIn, userLoggedOut } from "app/users";
 
 import { Epic } from "../types";
 import { actions } from "./slice";
@@ -14,7 +14,31 @@ export const getCurrentUserEpic: Epic = (action$, store$, { api }) =>
         mergeMap((user) =>
           user === null
             ? of(actions.requestLoaded(requestKey))
-            : of(currentUserAdded(user), actions.requestLoaded(requestKey)),
+            : of(userLoggedIn(user), actions.requestLoaded(requestKey)),
+        ),
+        catchError((error) => of(actions.requestFailed(error, requestKey))),
+      ),
+    ),
+  );
+
+export const logOutEpic: Epic = (action$, store$, { api }) =>
+  action$.pipe(
+    filter(actions.logOut.match),
+    mergeMap(({ meta: { requestKey } }) =>
+      from(api.logOut()).pipe(
+        mergeMap(() => of(userLoggedOut(), actions.requestLoaded(requestKey))),
+        catchError((error) => of(actions.requestFailed(error, requestKey))),
+      ),
+    ),
+  );
+
+export const logInAsGuestEpic: Epic = (action$, store$, { api }) =>
+  action$.pipe(
+    filter(actions.logInAsGuest.match),
+    mergeMap(({ meta: { requestKey } }) =>
+      from(api.logInAsGuest()).pipe(
+        mergeMap((user) =>
+          of(userLoggedIn(user), actions.requestLoaded(requestKey)),
         ),
         catchError((error) => of(actions.requestFailed(error, requestKey))),
       ),

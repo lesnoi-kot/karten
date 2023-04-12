@@ -76,6 +76,8 @@ export const {
       Users
     */
     getCurrentUser: requestWithPayload<void>(),
+    logOut: requestWithPayload<void>(),
+    logInAsGuest: requestWithPayload<void>(),
 
     /*
       Projects

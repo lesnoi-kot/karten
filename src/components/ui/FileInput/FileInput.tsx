@@ -1,6 +1,7 @@
 import { useId, useRef, useCallback, HTMLProps } from "react";
 import prettyBytes from "pretty-bytes";
-import { Button, Box, ButtonProps } from "@mui/material";
+import { LoadingButton, LoadingButtonProps } from "@mui/lab";
+import { Box } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -40,7 +41,7 @@ export function FilesPreview({ files }: { files: File[] }) {
 
 type Props = {
   label?: string;
-  buttonProps: Partial<ButtonProps<"label">>;
+  buttonProps: Partial<LoadingButtonProps<"label">>;
   onChange: (files: File[]) => void;
 } & Omit<HTMLProps<HTMLInputElement>, "onChange">;
 
@@ -63,7 +64,7 @@ export function useFilePicker() {
 
   const FileInput = useCallback(
     ({ label, buttonProps, onChange, ...props }: Props) => (
-      <Button component="label" htmlFor={id} {...buttonProps}>
+      <LoadingButton component="label" htmlFor={id} {...buttonProps}>
         {label ?? ""}
         <input
           id={id}
@@ -78,7 +79,7 @@ export function useFilePicker() {
             }
           }}
         />
-      </Button>
+      </LoadingButton>
     ),
     [id],
   );

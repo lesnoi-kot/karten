@@ -1,6 +1,6 @@
 import { keys } from "ramda";
-import { useState, useEffect, useMemo } from "react";
-import { useQuery } from "react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "react-query";
 
 import {
   RadioGroup,
@@ -54,58 +54,38 @@ const sxColorTile: SxProps<Theme> = {
 
 export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
   const api = useAPI();
-
   const { data: covers } = useQuery("boards.covers", () =>
     api.getBoardCovers(),
   );
-
-  const { load, isLoading, isLoaded } = useRequest(actions.addBoardRequest);
+  const { load, isLoading } = useRequest(actions.addBoardRequest, {
+    onSuccess: onClose,
+  });
   const project = useAppSelector((state) =>
     selectProjectById(state, projectId),
   );
   const [boardName, setBoardName] = useState("");
   const [color, setColor] = useState<ColorName>("blue");
-  const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverId, setCoverId] = useState<string | null>(null);
+  const [coverURL, setCoverURL] = useState<string | null>(null);
   const { FileInput, clearFile } = useFilePicker();
 
-  const coverURL = useMemo<string | null>(() => {
-    if (coverFile) {
-      return URL.createObjectURL(coverFile);
-    }
-
-    if (coverId && covers) {
-      return covers.find((cover) => cover.id === coverId)?.url ?? null;
-    }
-
-    return null;
-  }, [covers, coverFile, coverId]);
-
-  const onSubmit = () => {
-    load({
-      projectId,
-      name: boardName,
-      cover: coverFile,
-      coverId,
-      color: colorToNumber(color),
-    });
-  };
+  const { mutate: uploadImage, isLoading: isUploadingImage } = useMutation({
+    mutationFn: (arg: any) => api.uploadImage(arg),
+    onSuccess: (uploadedImage) => {
+      setCoverId(uploadedImage.id);
+      setCoverURL(uploadedImage.url);
+    },
+  });
 
   useEffect(() => {
     if (!isOpen) {
       setBoardName("");
       setColor("blue");
-      setCoverFile(null);
+      setCoverURL(null);
       clearFile();
       setCoverId(null);
     }
-  }, [isOpen, clearFile]);
-
-  useEffect(() => {
-    if (isLoaded) {
-      onClose();
-    }
-  }, [onClose, isLoaded]);
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
@@ -145,8 +125,8 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
                     title={color}
                     onClick={() => {
                       setColor(color);
-                      setCoverFile(null);
                       setCoverId(null);
+                      setCoverURL(null);
                     }}
                     bgcolor={ENTITY_COLOR[color]}
                     sx={sxColorTile}
@@ -161,7 +141,7 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
                     height="40px"
                     onClick={() => {
                       setCoverId(cover.id);
-                      setCoverFile(null);
+                      setCoverURL(cover.url);
                     }}
                   >
                     <img width="100%" src={cover.url} alt="Preview" />
@@ -172,13 +152,15 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
                   label="Select file"
                   buttonProps={{
                     startIcon: <FileUploadIcon />,
+                    loading: isUploadingImage,
                     variant: "outlined",
                     size: "small",
                   }}
                   accept="image/png, image/jpeg, image/webp"
-                  onChange={(avatars) => {
-                    setCoverFile(avatars[0] ?? null);
-                    setCoverId(null);
+                  onChange={(files) => {
+                    if (files[0]) {
+                      uploadImage({ file: files[0] });
+                    }
                   }}
                 />
               </Stack>
@@ -204,7 +186,14 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
           Cancel
         </Button>
         <LoadingButton
-          onClick={onSubmit}
+          onClick={() => {
+            load({
+              projectId,
+              name: boardName,
+              coverId,
+              color: colorToNumber(color),
+            });
+          }}
           loading={isLoading}
           disabled={boardName.trim() === ""}
         >

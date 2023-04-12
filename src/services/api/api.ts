@@ -14,6 +14,7 @@ import {
 import {
   convertBoardDTO,
   convertCommentDTO,
+  convertFileDTO,
   convertFilesDTO,
   convertProjectDTO,
   convertTaskDTO,
@@ -42,6 +43,7 @@ import {
   ResponseOK,
   TaskDTO,
   TaskListDTO,
+  UploadImage,
   UserDTO,
 } from "./types";
 
@@ -186,18 +188,16 @@ export class APIService implements DataStore {
   }
 
   async addBoard(args: AddBoardArgs): Promise<Board> {
-    const { projectId, name, color, cover, coverId } = args;
-    const body: FormBody = { name };
+    const { projectId, name, color, coverId } = args;
+    const body: JSONBody = { name };
 
-    if (cover) {
-      body.cover = cover;
-    } else if (coverId) {
+    if (coverId) {
       body.cover_id = coverId;
     } else if (color) {
       body.color = String(color);
     }
 
-    const res = await this.fetchMultipart(
+    const res = await this.fetchJSON(
       `/projects/${projectId}/boards`,
       "POST",
       body,
@@ -322,5 +322,24 @@ export class APIService implements DataStore {
     }
 
     return null;
+  }
+
+  async logOut() {
+    const res = await this.fetchJSON("/users/self/logout", "POST");
+    await this.checkResponseError(res);
+  }
+
+  async logInAsGuest(): Promise<User> {
+    const res = await this.fetchJSON("/login", "POST");
+    return convertUserDTO(await this.unwrapResponse<UserDTO>(res));
+  }
+
+  /* ------------ */
+
+  async uploadImage(args: UploadImage): Promise<KartenFile> {
+    const res = await this.fetchMultipart("/files/image", "POST", {
+      file: args.file,
+    });
+    return convertFileDTO(await this.unwrapResponse<FileDTO>(res));
   }
 }
