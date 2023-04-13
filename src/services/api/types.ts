@@ -3,6 +3,7 @@ import {
   Comment,
   ID,
   KartenFile,
+  KartenImageFile,
   Project,
   Task,
   TaskList,
@@ -94,9 +95,13 @@ export type FileDTO = {
   size: number;
 };
 
+export type ImageFileDTO = FileDTO & {
+  thumbnails: FileDTO[];
+};
+
 export type AddProjectArgs = {
   name: string;
-  avatar: File | null;
+  avatarId?: string;
 };
 
 export type AddBoardArgs = {
@@ -158,6 +163,7 @@ export type EditCommentArgs = {
 
 export type UploadImage = {
   file: File;
+  makeThumbnail: boolean;
 };
 
 export interface DataStore {
@@ -196,7 +202,7 @@ export interface DataStore {
   deleteComment(id: ID): Promise<void>;
 
   getBoardCovers(): Promise<KartenFile[]>;
-  uploadImage(args: UploadImage): Promise<KartenFile>;
+  uploadImage(args: UploadImage): Promise<KartenImageFile>;
 }
 
 export const ERROR_CODES = {

@@ -22,6 +22,7 @@ import {
 import { LoadingButton } from "@mui/lab";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 
+import { UploadImage } from "services/api";
 import { actions } from "app/apiInteraction";
 import { colorToNumber } from "models";
 import { ENTITY_COLOR } from "models/constants";
@@ -70,7 +71,7 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
   const { FileInput, clearFile } = useFilePicker();
 
   const { mutate: uploadImage, isLoading: isUploadingImage } = useMutation({
-    mutationFn: (arg: any) => api.uploadImage(arg),
+    mutationFn: (arg: UploadImage) => api.uploadImage(arg),
     onSuccess: (uploadedImage) => {
       setCoverId(uploadedImage.id);
       setCoverURL(uploadedImage.url);
@@ -159,7 +160,7 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
                   accept="image/png, image/jpeg, image/webp"
                   onChange={(files) => {
                     if (files[0]) {
-                      uploadImage({ file: files[0] });
+                      uploadImage({ file: files[0], makeThumbnail: false });
                     }
                   }}
                 />

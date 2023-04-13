@@ -7,6 +7,7 @@ import {
   Comment,
   KartenFile,
   User,
+  KartenImageFile,
 } from "models/types";
 import {
   ProjectDTO,
@@ -16,6 +17,7 @@ import {
   CommentDTO,
   FileDTO,
   UserDTO,
+  ImageFileDTO,
 } from "./types";
 
 export function convertProjectDTO(dto: ProjectDTO): Project {
@@ -94,6 +96,17 @@ export function convertFileDTO(dto: FileDTO): KartenFile {
     name: dto.name,
     mimeType: dto.mime_type,
     size: dto.size,
+  };
+}
+
+export function convertImageFileDTO(dto: ImageFileDTO): KartenImageFile {
+  return {
+    id: dto.id,
+    url: dto.url,
+    name: dto.name,
+    mimeType: dto.mime_type,
+    size: dto.size,
+    thumbnails: dto.thumbnails?.map(convertFileDTO) ?? [],
   };
 }
 

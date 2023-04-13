@@ -1,4 +1,5 @@
-import { useMemo, useEffect, useState } from "react";
+import { useState } from "react";
+import { useMutation } from "react-query";
 import { LoadingButton } from "@mui/lab";
 import {
   Avatar,
@@ -17,7 +18,10 @@ import {
 } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 
+import { KartenImageFile } from "models/types";
+import { UploadImage } from "services/api";
 import { actions } from "app/apiInteraction";
+import { useAPI } from "context/APIProvider";
 import { useRequest } from "app/apiInteraction/hooks";
 import { useFilePicker } from "components/ui/FileInput/FileInput";
 
@@ -46,29 +50,25 @@ const sxImagePreviewContainer: SxProps<Theme> = {
 };
 
 function Content({ onClose }: Pick<Props, "onClose">) {
+  const api = useAPI();
   const [projectName, setProjectName] = useState("");
-  const [projectAvatar, setProjectAvatar] = useState<File | null>(null);
+  const [avatar, setAvatar] = useState<KartenImageFile | null>(null);
   const { FileInput, clearFile } = useFilePicker();
 
   const { load, isLoading } = useRequest(actions.addProject, {
     onSuccess: onClose,
   });
 
+  const { mutate: uploadImage, isLoading: isUploadingImage } = useMutation({
+    mutationFn: (arg: UploadImage) => api.uploadImage(arg),
+    onSuccess: (uploadedImage) => {
+      setAvatar(uploadedImage);
+    },
+  });
+
   const onSubmit = () => {
-    load({ name: projectName, avatar: projectAvatar });
+    load({ name: projectName, avatarId: avatar?.id });
   };
-
-  const avatarObjectURL = useMemo(() => {
-    return projectAvatar ? URL.createObjectURL(projectAvatar) : "";
-  }, [projectAvatar]);
-
-  useEffect(() => {
-    return () => {
-      if (avatarObjectURL) {
-        URL.revokeObjectURL(avatarObjectURL);
-      }
-    };
-  }, [avatarObjectURL]);
 
   return (
     <>
@@ -106,17 +106,22 @@ function Content({ onClose }: Pick<Props, "onClose">) {
                 startIcon: <FileUploadIcon />,
                 variant: "outlined",
                 size: "small",
+                loading: isUploadingImage,
               }}
-              onChange={(avatars) => setProjectAvatar(avatars[0] ?? null)}
+              onChange={(avatars) => {
+                if (avatars[0]) {
+                  uploadImage({ file: avatars[0], makeThumbnail: true });
+                }
+              }}
             />
 
-            {!!projectAvatar && (
+            {!!avatar && (
               <Button
                 variant="outlined"
                 size="small"
                 onClick={() => {
                   clearFile();
-                  setProjectAvatar(null);
+                  setAvatar(null);
                 }}
               >
                 Reset
@@ -124,11 +129,11 @@ function Content({ onClose }: Pick<Props, "onClose">) {
             )}
           </Box>
 
-          <Collapse in={!!avatarObjectURL}>
+          <Collapse in={!!avatar}>
             <Avatar
-              src={avatarObjectURL}
+              src={avatar?.thumbnails?.[0]?.url ?? ""}
               variant="rounded"
-              alt={projectAvatar?.name}
+              alt="Project avatar"
               title="Selected image for the project logo"
               sx={sxImagePreviewContainer}
             >
@@ -136,7 +141,7 @@ function Content({ onClose }: Pick<Props, "onClose">) {
             </Avatar>
           </Collapse>
 
-          {projectAvatar === null && (
+          {avatar === null && (
             <DialogContentText variant="body2">
               No image selected
             </DialogContentText>

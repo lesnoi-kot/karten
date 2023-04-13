@@ -5,6 +5,7 @@ import {
   Comment,
   ID,
   KartenFile,
+  KartenImageFile,
   Project,
   Task,
   TaskList,
@@ -14,7 +15,7 @@ import {
 import {
   convertBoardDTO,
   convertCommentDTO,
-  convertFileDTO,
+  convertImageFileDTO,
   convertFilesDTO,
   convertProjectDTO,
   convertTaskDTO,
@@ -38,6 +39,7 @@ import {
   EditTaskArgs,
   EditTaskListArgs,
   FileDTO,
+  ImageFileDTO,
   ProjectDTO,
   ResponseError,
   ResponseOK,
@@ -149,7 +151,10 @@ export class APIService implements DataStore {
   }
 
   async addProject(args: AddProjectArgs): Promise<Project> {
-    const res = await this.fetchMultipart(`/projects`, "POST", args);
+    const res = await this.fetchJSON(`/projects`, "POST", {
+      name: args.name,
+      avatar_id: args.avatarId,
+    });
     return convertProjectDTO(await this.unwrapResponse<ProjectDTO>(res));
   }
 
@@ -336,10 +341,15 @@ export class APIService implements DataStore {
 
   /* ------------ */
 
-  async uploadImage(args: UploadImage): Promise<KartenFile> {
-    const res = await this.fetchMultipart("/files/image", "POST", {
-      file: args.file,
-    });
-    return convertFileDTO(await this.unwrapResponse<FileDTO>(res));
+  async uploadImage(args: UploadImage): Promise<KartenImageFile> {
+    const queryParams = args.makeThumbnail ? "?thumb=yes" : "";
+    const res = await this.fetchMultipart(
+      `/files/image${queryParams}`,
+      "POST",
+      {
+        file: args.file,
+      },
+    );
+    return convertImageFileDTO(await this.unwrapResponse<ImageFileDTO>(res));
   }
 }

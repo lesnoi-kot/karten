@@ -65,6 +65,10 @@ export type KartenFile = {
   size: number;
 };
 
+export type KartenImageFile = KartenFile & {
+  thumbnails: KartenFile[];
+};
+
 export type User = {
   id: string;
   socialId: string;
