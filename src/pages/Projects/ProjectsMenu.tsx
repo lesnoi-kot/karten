@@ -1,12 +1,10 @@
 import React from "react";
 import {
-  Box,
   List,
-  ListItem,
+  ListSubheader,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
-  Typography,
 } from "@mui/material";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AddIcon from "@mui/icons-material/Add";
@@ -38,29 +36,20 @@ export function ProjectsMenu() {
   };
 
   return (
-    <>
-      <Box px={2} py={2} textAlign="center">
-        <Typography variant="h5">Projects</Typography>
-      </Box>
-
-      <Divider />
-
-      <List>
-        <ListItem button onClick={showNewProjectDialog}>
-          <ListItemIcon>
-            <AddIcon />
-          </ListItemIcon>
-          <ListItemText primary="Add project" />
-        </ListItem>
-        <ListItem button onClick={deleteAllProjects}>
-          <ListItemIcon>
-            <DeleteForeverIcon />
-          </ListItemIcon>
-          <ListItemText primary="Delete all" />
-        </ListItem>
-      </List>
-      <Divider />
-    </>
+    <List dense subheader={<ListSubheader>Projects</ListSubheader>}>
+      <ListItemButton onClick={showNewProjectDialog}>
+        <ListItemIcon>
+          <AddIcon />
+        </ListItemIcon>
+        <ListItemText primary="Create project" />
+      </ListItemButton>
+      <ListItemButton onClick={deleteAllProjects}>
+        <ListItemIcon>
+          <DeleteForeverIcon />
+        </ListItemIcon>
+        <ListItemText primary="Delete all" />
+      </ListItemButton>
+    </List>
   );
 }
 

@@ -122,6 +122,7 @@ export function convertUserDTO(dto: UserDTO): User {
     login: dto.login,
     email: dto.email,
     url: dto.url,
+    avatarURL: dto.avatar_url,
     dateCreated: dto.date_created,
   };
 }

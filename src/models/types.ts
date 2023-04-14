@@ -76,5 +76,6 @@ export type User = {
   login: string;
   email: string;
   url: string;
+  avatarURL: string;
   dateCreated: string;
 };

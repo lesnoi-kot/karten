@@ -99,7 +99,6 @@ function ProfileMenu(props: MenuProps) {
 
   const onLogOut = () => {
     dispatch(apiActions.logOut());
-    // props.onClose && props.onClose();
   };
 
   return (

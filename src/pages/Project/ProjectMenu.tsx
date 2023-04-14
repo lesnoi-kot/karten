@@ -1,16 +1,16 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import {
-  Box,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
-  Typography,
+  ListSubheader,
 } from "@mui/material";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import ClearAllIcon from "@mui/icons-material/ClearAll";
 import AddIcon from "@mui/icons-material/Add";
+import PhotoIcon from "@mui/icons-material/Photo";
 
 import { useAppSelector, useAppDispatch } from "app/hooks";
 import { selectProjectById } from "app/projects/selectors";
@@ -48,29 +48,32 @@ export function ProjectMenu() {
   };
 
   return (
-    <>
-      <Box px={2} py={2} textAlign="center">
-        <Typography variant="h5">{project.name}</Typography>
-      </Box>
-
-      <Divider />
-
-      <List>
-        <ListItem button onClick={onProjectAdd}>
-          <ListItemIcon>
-            <AddIcon />
-          </ListItemIcon>
-          <ListItemText primary="Add board" />
-        </ListItem>
-        <ListItem button onClick={onProjectClear}>
-          <ListItemIcon>
-            <DeleteForeverIcon />
-          </ListItemIcon>
-          <ListItemText primary="Delete all boards" />
-        </ListItem>
-      </List>
-      <Divider />
-    </>
+    <List dense subheader={<ListSubheader>{project.name}</ListSubheader>}>
+      <ListItemButton onClick={onProjectAdd}>
+        <ListItemIcon>
+          <PhotoIcon />
+        </ListItemIcon>
+        <ListItemText primary="Change logo" />
+      </ListItemButton>
+      <ListItemButton onClick={onProjectAdd}>
+        <ListItemIcon>
+          <AddIcon />
+        </ListItemIcon>
+        <ListItemText primary="Create board" />
+      </ListItemButton>
+      <ListItemButton onClick={onProjectClear}>
+        <ListItemIcon>
+          <ClearAllIcon />
+        </ListItemIcon>
+        <ListItemText primary="Delete all boards" />
+      </ListItemButton>
+      <ListItemButton onClick={onProjectClear}>
+        <ListItemIcon>
+          <DeleteForeverIcon />
+        </ListItemIcon>
+        <ListItemText primary="Delete project" />
+      </ListItemButton>
+    </List>
   );
 }
 

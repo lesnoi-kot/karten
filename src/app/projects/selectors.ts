@@ -3,10 +3,15 @@ import { createSelector } from "reselect";
 import { RootState } from "app/types";
 import { ID, Project } from "models/types";
 
-export const selectProjects = (state: RootState) =>
+import { ProjectsMap } from "./slice";
+
+const selectProjectsMap = (state: RootState): ProjectsMap =>
   state.entities.projects.items;
 
-export const selectProjectsIds = createSelector(selectProjects, Object.keys);
+export const selectProjects = (state: RootState) =>
+  Object.values(selectProjectsMap(state));
+
+export const selectProjectsIds = createSelector(selectProjectsMap, Object.keys);
 
 export const selectProjectById = (
   state: RootState,

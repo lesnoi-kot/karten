@@ -2,7 +2,13 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Helmet } from "react-helmet";
-import { Box, Container, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Container,
+  CircularProgress,
+  Avatar,
+  Typography,
+} from "@mui/material";
 
 import { useAppSelector } from "app/hooks";
 
@@ -39,11 +45,30 @@ function Project() {
         </Box>
       )}
 
-      {isLoaded && (
+      {project && isLoaded && (
         <Container maxWidth="lg">
-          <Box mt={2} mb={3} textAlign="center">
+          <Box mt={2} mb={3} textAlign="center" display="flex" gap={2}>
+            {project.avatarURL && (
+              <Avatar
+                src={project.avatarURL}
+                variant="rounded"
+                sx={{ width: 64, height: 64 }}
+                alt="Project logo"
+                title="Project logo"
+              />
+            )}
             <ProjectName projectId={projectId} />
           </Box>
+          <Typography
+            variant="h4"
+            component="h2"
+            mt={4}
+            mb={3}
+            display="flex"
+            alignItems="center"
+          >
+            Boards
+          </Typography>
           <BoardPreviewList ids={boards} showComposer projectId={projectId} />
         </Container>
       )}

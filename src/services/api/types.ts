@@ -84,6 +84,7 @@ export type UserDTO = {
   login: string;
   email: string;
   url: string;
+  avatar_url: string;
   date_created: string;
 };
 
