@@ -44,3 +44,14 @@ export const logInAsGuestEpic: Epic = (action$, store$, { api }) =>
       ),
     ),
   );
+
+export const deleteUserEpic: Epic = (action$, store$, { api }) =>
+  action$.pipe(
+    filter(actions.deleteUser.match),
+    mergeMap(({ meta: { requestKey } }) =>
+      from(api.deleteUser()).pipe(
+        mergeMap(() => of(userLoggedOut(), actions.requestLoaded(requestKey))),
+        catchError((error) => of(actions.requestFailed(error, requestKey))),
+      ),
+    ),
+  );

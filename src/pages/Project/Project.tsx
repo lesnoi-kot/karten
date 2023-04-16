@@ -47,7 +47,7 @@ function Project() {
 
       {project && isLoaded && (
         <Container maxWidth="lg">
-          <Box mt={2} mb={3} textAlign="center" display="flex" gap={2}>
+          <Box mt={2} mb={3} display="flex" gap={4}>
             {project.avatarURL && (
               <Avatar
                 src={project.avatarURL}

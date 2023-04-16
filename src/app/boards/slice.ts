@@ -32,15 +32,23 @@ export const {
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(
-      projectsActions.projectCleared,
-      (state, { payload: projectId }: PayloadAction<ID>) => {
-        for (const boardId in state.items) {
-          if (state.items[boardId].projectId === projectId) {
-            delete state.items[boardId];
-          }
-        }
-      },
-    );
+    builder
+      .addCase(projectsActions.projectCleared, (state, { payload }) => {
+        deleteBoardsByProjectId(state, payload);
+      })
+      .addCase(projectsActions.projectDeleted, (state, { payload }) => {
+        deleteBoardsByProjectId(state, payload);
+      })
+      .addCase(projectsActions.allProjectsDeleted, (state) => {
+        state.items = {};
+      });
   },
 });
+
+function deleteBoardsByProjectId(state: BoardsState, projectId: ID) {
+  for (const boardId in state.items) {
+    if (state.items[boardId].projectId === projectId) {
+      delete state.items[boardId];
+    }
+  }
+}

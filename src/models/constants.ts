@@ -8,4 +8,8 @@ export const ENTITY_COLOR = {
   lime: "#4bbf6b",
   sky: "#00aecc",
   black: "#000000",
-};
+} as const;
+
+export const ENTITY_COLOR_NAMES: Array<keyof typeof ENTITY_COLOR> = Object.keys(
+  ENTITY_COLOR,
+) as any;

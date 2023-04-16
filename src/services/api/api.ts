@@ -329,6 +329,11 @@ export class APIService implements DataStore {
     return null;
   }
 
+  async deleteUser(): Promise<void> {
+    const res = await this.fetchJSON("/users/self", "DELETE");
+    await this.checkResponseError(res);
+  }
+
   async logOut() {
     const res = await this.fetchJSON("/users/self/logout", "POST");
     await this.checkResponseError(res);

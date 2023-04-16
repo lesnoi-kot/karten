@@ -7,7 +7,7 @@ import {
   projectSet,
   projectDeleted,
   projectCleared,
-  projectsDeleted,
+  allProjectsDeleted,
 } from "app/projects";
 import { normalizeProjects, normalizeProject } from "app/projects/utils";
 import { showSnackbar } from "app/snackbars";
@@ -143,7 +143,7 @@ export const deleteProjectsEpic: Epic = (action$, store$, { api }) =>
         mergeMap(() =>
           of(
             actions.requestLoaded(requestKey),
-            projectsDeleted(),
+            allProjectsDeleted(),
             showSnackbar({
               message: `All projects have been deleted!`,
               type: "info",

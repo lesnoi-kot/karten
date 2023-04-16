@@ -169,6 +169,7 @@ export type UploadImage = {
 
 export interface DataStore {
   getCurrentUser(): Promise<User | null>;
+  deleteUser(): Promise<void>;
   logOut(): Promise<void>;
   logInAsGuest(): Promise<User>;
 

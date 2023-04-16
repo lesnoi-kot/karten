@@ -76,6 +76,7 @@ export const {
       Users
     */
     getCurrentUser: requestWithPayload<void>(),
+    deleteUser: requestWithPayload<void>(),
     logOut: requestWithPayload<void>(),
     logInAsGuest: requestWithPayload<void>(),
 

@@ -6,21 +6,26 @@ import {
   Divider,
   Avatar,
   Typography,
+  Link as MUILink,
   List,
   ListSubheader,
   ListItemButton,
+  ListItemAvatar,
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import LogoutIcon from "@mui/icons-material/Logout";
+import HomeIcon from "@mui/icons-material/Home";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { selectCurrentUser } from "app/users/selectors";
 import { selectProjects } from "app/projects/selectors";
 import { actions, selectIsOpen } from "app/widgets/drawerMenu";
 import ColorThemeSwitch from "components/ColorThemeSwitch";
+import ColoredAvatar from "components/ColoredAvatar";
+import Link from "components/Link";
 
 type Props = {
   children: React.ReactNode;
@@ -60,57 +65,76 @@ export default function DrawerMenu({ children }: Props) {
         <CloseIcon />
       </IconButton>
 
-      {!!user && (
-        <>
-          <Box p={3} pb={2}>
-            <Avatar
-              src={user.avatarURL}
-              variant="circular"
-              alt={user.name}
-              title="User avatar"
-              sx={{ width: 56, height: 56 }}
-            >
-              {user.name[0]}
-            </Avatar>
-            <Typography mt={1} fontWeight={500}>
-              {user.name}
-            </Typography>
-            {Boolean(user.url) && <Typography>{user.url}</Typography>}
-          </Box>
-          <Divider />
-        </>
-      )}
+      <Box p={3} pb={2}>
+        <Avatar
+          src={user?.avatarURL}
+          variant="circular"
+          alt={user?.name}
+          title="User avatar"
+          sx={{ width: 56, height: 56 }}
+        >
+          {user?.name[0]}
+        </Avatar>
+        <Typography mt={1} fontWeight={500}>
+          {user?.name}
+        </Typography>
+
+        {Boolean(user?.url) && (
+          <MUILink
+            target="_blank"
+            rel="noopener"
+            href={user?.url}
+            underline="always"
+            variant="subtitle2"
+          >
+            <OpenInNewIcon sx={{ fontSize: ".8rem" }} />
+            {user?.url}
+          </MUILink>
+        )}
+      </Box>
+      <Divider />
 
       <Box display="flex" gap={1} pt={2} flexDirection="column">
+        <List dense>
+          <ListItemButton component={Link} onClick={onClose} to="/projects">
+            <ListItemIcon>
+              <HomeIcon />
+            </ListItemIcon>
+            <ListItemText primary="Home" />
+          </ListItemButton>
+        </List>
+
         <Box>{children}</Box>
 
         {projects.length > 0 && (
           <List dense subheader={<ListSubheader>All projects</ListSubheader>}>
             {projects.map((project) => (
-              <ListItemButton key={project.id}>
-                <ListItemText inset primary={project.name} />
+              <ListItemButton
+                key={project.id}
+                component={Link}
+                onClick={onClose}
+                to={`/projects/${project.id}`}
+              >
+                <ListItemAvatar>
+                  <ColoredAvatar oneLetter src={project.avatarThumbnailURL}>
+                    {project.name}
+                  </ColoredAvatar>
+                </ListItemAvatar>
+                <ListItemText primary={project.name} />
               </ListItemButton>
             ))}
           </List>
         )}
 
         {!!user && (
-          <Box>
-            <List dense subheader={<ListSubheader>User</ListSubheader>}>
-              <ListItemButton>
-                <ListItemIcon>
-                  <AccountBoxIcon />
-                </ListItemIcon>
-                <ListItemText primary="Profile" />
-              </ListItemButton>
-              <ListItemButton>
-                <ListItemIcon>
-                  <LogoutIcon />
-                </ListItemIcon>
-                <ListItemText primary="Log out" />
-              </ListItemButton>
-            </List>
-          </Box>
+          <List dense subheader={<ListSubheader>User</ListSubheader>}>
+            <ListItemButton component={Link} onClick={onClose} to="/profile">
+              <ListItemIcon>
+                <AccountBoxIcon />
+              </ListItemIcon>
+              <ListItemText primary="Profile" />
+            </ListItemButton>
+          </List>
         )}
       </Box>
 

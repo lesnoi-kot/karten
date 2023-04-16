@@ -21,6 +21,10 @@ export default function ProjectsList() {
         Projects
       </Typography>
 
+      {projects.length === 0 && (
+        <Typography>You don't have any project yet.</Typography>
+      )}
+
       <Stack gap={4}>
         {projects.map((projectId) => (
           <ProjectInfo key={projectId} id={projectId} />

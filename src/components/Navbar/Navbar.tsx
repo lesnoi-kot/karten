@@ -13,7 +13,6 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Logout } from "@mui/icons-material";
-import { deepPurple } from "@mui/material/colors";
 
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
@@ -24,6 +23,7 @@ import Heading from "components/ui/Heading";
 import Link from "components/Link";
 import ColorThemeSwitch from "components/ColorThemeSwitch";
 import useToggle from "components/hooks/useToggle";
+import ColoredAvatar from "components/ColoredAvatar";
 
 function NavbarTitle() {
   return (
@@ -79,9 +79,9 @@ export default function Navbar({ renderMenuButton }: Props) {
           onClick={showProfileMenu}
           size="small"
         >
-          <Avatar sx={{ bgcolor: deepPurple[500] }}>
+          <ColoredAvatar src={user?.avatarURL}>
             {user?.name?.[0]?.toUpperCase() ?? "G"}
-          </Avatar>
+          </ColoredAvatar>
         </IconButton>
       </Toolbar>
 
@@ -94,7 +94,11 @@ export default function Navbar({ renderMenuButton }: Props) {
   );
 }
 
-function ProfileMenu(props: MenuProps) {
+type ProfileMenuProps = MenuProps & {
+  onClose: () => void;
+};
+
+function ProfileMenu({ onClose, ...props }: ProfileMenuProps) {
   const dispatch = useAppDispatch();
 
   const onLogOut = () => {
@@ -134,7 +138,13 @@ function ProfileMenu(props: MenuProps) {
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       {...props}
     >
-      <MenuItem>
+      <MenuItem
+        component={Link}
+        to="/profile"
+        onClick={() => {
+          onClose();
+        }}
+      >
         <Avatar /> Profile
       </MenuItem>
       <Divider />

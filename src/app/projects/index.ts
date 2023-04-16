@@ -8,6 +8,6 @@ export const {
   projectSet,
   projectDeleted,
   projectCleared,
-  projectsDeleted,
+  allProjectsDeleted,
 } = actions;
 export { selectors };
