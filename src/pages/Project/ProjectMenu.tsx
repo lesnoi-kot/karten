@@ -18,6 +18,7 @@ import { actions as apiActions } from "app/apiInteraction";
 import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice";
 import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
 import { actions as newBoardDialogActions } from "app/widgets/newBoardDialog";
+import { BaseMenu } from "components/Navbar/DrawerMenu";
 
 export function ProjectMenu() {
   const { id: projectId = "" } = useParams();
@@ -29,6 +30,10 @@ export function ProjectMenu() {
   if (!project) {
     return null;
   }
+
+  const onChangeLogo = () => {
+    dispatch(drawerMenuActions.close());
+  };
 
   const onProjectAdd = () => {
     dispatch(drawerMenuActions.close());
@@ -47,33 +52,47 @@ export function ProjectMenu() {
     );
   };
 
+  const onProjectDelete = () => {
+    dispatch(drawerMenuActions.close());
+    dispatch(
+      confirmDialogActions.showDialog({
+        okAction: apiActions.deleteProject(projectId),
+        okButtonText: "yes",
+        title: "Warning",
+        text: `Delete project "${project.name}"?`,
+      }),
+    );
+  };
+
   return (
-    <List dense subheader={<ListSubheader>{project.name}</ListSubheader>}>
-      <ListItemButton onClick={onProjectAdd}>
-        <ListItemIcon>
-          <PhotoIcon />
-        </ListItemIcon>
-        <ListItemText primary="Change logo" />
-      </ListItemButton>
-      <ListItemButton onClick={onProjectAdd}>
-        <ListItemIcon>
-          <AddIcon />
-        </ListItemIcon>
-        <ListItemText primary="Create board" />
-      </ListItemButton>
-      <ListItemButton onClick={onProjectClear}>
-        <ListItemIcon>
-          <ClearAllIcon />
-        </ListItemIcon>
-        <ListItemText primary="Delete all boards" />
-      </ListItemButton>
-      <ListItemButton onClick={onProjectClear}>
-        <ListItemIcon>
-          <DeleteForeverIcon />
-        </ListItemIcon>
-        <ListItemText primary="Delete project" />
-      </ListItemButton>
-    </List>
+    <BaseMenu>
+      <List dense subheader={<ListSubheader>{project.name}</ListSubheader>}>
+        <ListItemButton onClick={onChangeLogo}>
+          <ListItemIcon>
+            <PhotoIcon />
+          </ListItemIcon>
+          <ListItemText primary="Change logo" />
+        </ListItemButton>
+        <ListItemButton onClick={onProjectAdd}>
+          <ListItemIcon>
+            <AddIcon />
+          </ListItemIcon>
+          <ListItemText primary="Create board" />
+        </ListItemButton>
+        <ListItemButton onClick={onProjectClear}>
+          <ListItemIcon>
+            <ClearAllIcon />
+          </ListItemIcon>
+          <ListItemText primary="Delete all boards" />
+        </ListItemButton>
+        <ListItemButton onClick={onProjectDelete}>
+          <ListItemIcon>
+            <DeleteForeverIcon />
+          </ListItemIcon>
+          <ListItemText primary="Delete project" />
+        </ListItemButton>
+      </List>
+    </BaseMenu>
   );
 }
 

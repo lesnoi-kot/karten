@@ -14,8 +14,9 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useAppSelector } from "app/hooks";
 import { actions as apiActions } from "app/apiInteraction";
 import { actions as confirmDialogActions } from "app/widgets/confirmDialog";
-import makePage from "pages/makePageHOC";
 import { selectCurrentUser } from "app/users/selectors";
+import { GUEST_USER_ID } from "models/constants";
+import makePage from "pages/makePageHOC";
 
 function Profile() {
   const dispatch = useDispatch();
@@ -65,6 +66,7 @@ function Profile() {
                   variant="subtitle2"
                 >
                   <OpenInNewIcon sx={{ fontSize: ".8rem" }} />
+                  &nbsp;
                   {user.url}
                 </Link>
               )}
@@ -80,22 +82,25 @@ function Profile() {
             >
               Log Out
             </Button>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => {
-                dispatch(
-                  confirmDialogActions.showDialog({
-                    title: "Warning",
-                    text: "Do you want to delete your account?",
-                    okAction: apiActions.deleteUser(),
-                    okButtonText: "Delete",
-                  }),
-                );
-              }}
-            >
-              Delete Account
-            </Button>
+
+            {user.id !== GUEST_USER_ID && (
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => {
+                  dispatch(
+                    confirmDialogActions.showDialog({
+                      title: "Warning",
+                      text: "Do you want to delete your account?",
+                      okAction: apiActions.deleteUser(),
+                      okButtonText: "Delete",
+                    }),
+                  );
+                }}
+              >
+                Delete Account
+              </Button>
+            )}
           </Box>
         </Paper>
       </Container>

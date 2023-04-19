@@ -21,7 +21,13 @@ export function BoardName({ boardId }: { boardId: ID }) {
     }
   };
 
-  return <EditablePageTitle value={board.name} onChange={onNameChange} />;
+  return (
+    <EditablePageTitle
+      value={board.name}
+      onChange={onNameChange}
+      sx={{ color: "white" }}
+    />
+  );
 }
 
 export default React.memo(BoardName);

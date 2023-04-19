@@ -2,31 +2,37 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
-  Box,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
-  Typography,
+  ListSubheader,
 } from "@mui/material";
 import ArrowBack from "@mui/icons-material/ArrowBack";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import EditIcon from "@mui/icons-material/Edit";
+import PhotoIcon from "@mui/icons-material/Photo";
 
-import Link from "components/Link";
 import { actions as apiActions } from "app/apiInteraction";
+import { useAppSelector } from "app/hooks";
 import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice";
 import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
-import { useAppSelector } from "app/hooks";
 import { selectBoard } from "app/boards/selectors";
+import Link from "components/Link";
+import useToggle from "components/hooks/useToggle";
+import ChangeCoverDialog from "components/Board/ChangeCoverDialog";
+import { BaseMenu } from "components/Navbar/DrawerMenu";
+import { selectProjectById } from "app/projects";
 
 export function BoardMenu() {
   const { id: boardId = "" } = useParams();
   const dispatch = useDispatch();
+  const [dialogVisible, showDialog, hideDialog] = useToggle(false);
 
   const board = useAppSelector((state) => selectBoard(state, boardId));
+  const project = useAppSelector((state) =>
+    board ? selectProjectById(state, board.projectId) : null,
+  );
 
   if (!board) {
     return null;
@@ -36,8 +42,9 @@ export function BoardMenu() {
     dispatch(
       confirmDialogActions.showDialog({
         title: "Warning",
-        text: "You are about to delete this board",
+        text: "Delete this board?",
         okAction: apiActions.deleteBoardRequest(boardId),
+        okButtonText: "yes",
       }),
     );
     dispatch(drawerMenuActions.close());
@@ -47,8 +54,9 @@ export function BoardMenu() {
     dispatch(
       confirmDialogActions.showDialog({
         title: "Warning",
-        text: "You are about to delete all lists in this board",
+        text: "Delete all lists in this board?",
         okAction: apiActions.clearBoardRequest(boardId),
+        okButtonText: "yes",
       }),
     );
     dispatch(drawerMenuActions.close());
@@ -56,38 +64,13 @@ export function BoardMenu() {
 
   const onBackgroundChange = () => {
     dispatch(drawerMenuActions.close());
+    showDialog();
   };
 
   return (
-    <Box display="flex" flexDirection="column" height="100%">
-      <Box px={2} py={2} textAlign="center">
-        <Typography variant="h5">{board.name}</Typography>
-      </Box>
-      <Divider />
-
-      <List>
-        <ListItem button onClick={onBackgroundChange}>
-          <ListItemIcon>
-            <EditIcon />
-          </ListItemIcon>
-          <ListItemText primary="Edit" />
-        </ListItem>
-
-        <ListItem button onClick={onBoardClear}>
-          <ListItemIcon>
-            <ClearAllIcon />
-          </ListItemIcon>
-          <ListItemText primary="Clear" />
-        </ListItem>
-
-        <ListItem button onClick={onBoardDelete}>
-          <ListItemIcon>
-            <DeleteForeverIcon />
-          </ListItemIcon>
-          <ListItemText primary="Delete" />
-        </ListItem>
-
-        <ListItem
+    <BaseMenu
+      mainSectionChildren={
+        <ListItemButton
           component={Link}
           to={`/projects/${board.projectId}`}
           onClick={() => {
@@ -97,11 +80,38 @@ export function BoardMenu() {
           <ListItemIcon>
             <ArrowBack />
           </ListItemIcon>
-          <ListItemText primary="Back to the project" />
-        </ListItem>
+          <ListItemText primary={`Back to "${project?.name ?? ""}"`} />
+        </ListItemButton>
+      }
+    >
+      <List dense subheader={<ListSubheader>{board.name}</ListSubheader>}>
+        <ListItemButton onClick={onBackgroundChange}>
+          <ListItemIcon>
+            <PhotoIcon />
+          </ListItemIcon>
+          <ListItemText primary="Change cover image" />
+        </ListItemButton>
+
+        <ListItemButton onClick={onBoardClear}>
+          <ListItemIcon>
+            <ClearAllIcon />
+          </ListItemIcon>
+          <ListItemText primary="Clear" />
+        </ListItemButton>
+
+        <ListItemButton onClick={onBoardDelete}>
+          <ListItemIcon>
+            <DeleteForeverIcon />
+          </ListItemIcon>
+          <ListItemText primary="Delete" />
+        </ListItemButton>
       </List>
-      <Divider />
-    </Box>
+      <ChangeCoverDialog
+        board={board}
+        open={dialogVisible}
+        onClose={hideDialog}
+      />
+    </BaseMenu>
   );
 }
 

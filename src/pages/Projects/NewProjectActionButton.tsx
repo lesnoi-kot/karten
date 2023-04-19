@@ -29,7 +29,7 @@ function NewProjectActionButton() {
     <>
       <Fab color="secondary" variant="extended" sx={sxFab} onClick={openDialog}>
         <AddIcon />
-        Add new project
+        Create project
       </Fab>
 
       <NewProjectDialog isOpen={isOpen} onClose={closeDialog} />

@@ -13,6 +13,7 @@ import { actions as apiActions } from "app/apiInteraction";
 import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
 import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice";
 import { useAppDispatch } from "app/hooks";
+import { BaseMenu } from "components/Navbar/DrawerMenu";
 
 import { actions } from "./slice";
 
@@ -29,27 +30,30 @@ export function ProjectsMenu() {
     dispatch(
       confirmDialogActions.showDialog({
         title: "Warning",
-        text: "You are about to delete all projects",
+        text: "Delete all your projects?",
         okAction: apiActions.deleteAllProjects(),
+        okButtonText: "yes",
       }),
     );
   };
 
   return (
-    <List dense subheader={<ListSubheader>Projects</ListSubheader>}>
-      <ListItemButton onClick={showNewProjectDialog}>
-        <ListItemIcon>
-          <AddIcon />
-        </ListItemIcon>
-        <ListItemText primary="Create project" />
-      </ListItemButton>
-      <ListItemButton onClick={deleteAllProjects}>
-        <ListItemIcon>
-          <DeleteForeverIcon />
-        </ListItemIcon>
-        <ListItemText primary="Delete all" />
-      </ListItemButton>
-    </List>
+    <BaseMenu>
+      <List dense subheader={<ListSubheader>Projects</ListSubheader>}>
+        <ListItemButton onClick={showNewProjectDialog}>
+          <ListItemIcon>
+            <AddIcon />
+          </ListItemIcon>
+          <ListItemText primary="Create project" />
+        </ListItemButton>
+        <ListItemButton onClick={deleteAllProjects}>
+          <ListItemIcon>
+            <DeleteForeverIcon />
+          </ListItemIcon>
+          <ListItemText primary="Delete all" />
+        </ListItemButton>
+      </List>
+    </BaseMenu>
   );
 }
 

@@ -46,7 +46,6 @@ const sxCloseIcon = {
 export default function DrawerMenu({ children }: Props) {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(selectIsOpen);
-  const projects = useAppSelector(selectProjects);
   const user = useAppSelector(selectCurrentUser);
 
   const onClose = () => {
@@ -60,6 +59,7 @@ export default function DrawerMenu({ children }: Props) {
       onClose={onClose}
       anchor="left"
       variant="temporary"
+      keepMounted
     >
       <IconButton sx={sxCloseIcon} onClick={onClose}>
         <CloseIcon />
@@ -88,6 +88,7 @@ export default function DrawerMenu({ children }: Props) {
             variant="subtitle2"
           >
             <OpenInNewIcon sx={{ fontSize: ".8rem" }} />
+            &nbsp;
             {user?.url}
           </MUILink>
         )}
@@ -95,47 +96,7 @@ export default function DrawerMenu({ children }: Props) {
       <Divider />
 
       <Box display="flex" gap={1} pt={2} flexDirection="column">
-        <List dense>
-          <ListItemButton component={Link} onClick={onClose} to="/projects">
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary="Home" />
-          </ListItemButton>
-        </List>
-
-        <Box>{children}</Box>
-
-        {projects.length > 0 && (
-          <List dense subheader={<ListSubheader>All projects</ListSubheader>}>
-            {projects.map((project) => (
-              <ListItemButton
-                key={project.id}
-                component={Link}
-                onClick={onClose}
-                to={`/projects/${project.id}`}
-              >
-                <ListItemAvatar>
-                  <ColoredAvatar oneLetter src={project.avatarThumbnailURL}>
-                    {project.name}
-                  </ColoredAvatar>
-                </ListItemAvatar>
-                <ListItemText primary={project.name} />
-              </ListItemButton>
-            ))}
-          </List>
-        )}
-
-        {!!user && (
-          <List dense subheader={<ListSubheader>User</ListSubheader>}>
-            <ListItemButton component={Link} onClick={onClose} to="/profile">
-              <ListItemIcon>
-                <AccountBoxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Profile" />
-            </ListItemButton>
-          </List>
-        )}
+        {children}
       </Box>
 
       <Box sx={{ flexGrow: "1" }} />
@@ -145,5 +106,104 @@ export default function DrawerMenu({ children }: Props) {
         <ColorThemeSwitch sx={{ display: "flex", justifyContent: "center" }} />
       </Box>
     </Drawer>
+  );
+}
+
+type SectionProps = {
+  children?: React.ReactNode;
+};
+
+function DrawerMainSection({ children }: SectionProps) {
+  const dispatch = useAppDispatch();
+
+  return (
+    <List dense>
+      <ListItemButton
+        component={Link}
+        onClick={() => {
+          dispatch(actions.close());
+        }}
+        to="/projects"
+      >
+        <ListItemIcon>
+          <HomeIcon />
+        </ListItemIcon>
+        <ListItemText primary="Home" />
+      </ListItemButton>
+
+      {children}
+    </List>
+  );
+}
+
+function DrawerProjectsSection({ children }: SectionProps) {
+  const dispatch = useAppDispatch();
+  const projects = useAppSelector(selectProjects);
+
+  if (projects.length === 0) {
+    return null;
+  }
+
+  return (
+    <List dense subheader={<ListSubheader>All projects</ListSubheader>}>
+      {projects.map((project) => (
+        <ListItemButton
+          key={project.id}
+          component={Link}
+          onClick={() => {
+            dispatch(actions.close());
+          }}
+          to={`/projects/${project.id}`}
+        >
+          <ListItemAvatar>
+            <ColoredAvatar oneLetter src={project.avatarThumbnailURL}>
+              {project.name}
+            </ColoredAvatar>
+          </ListItemAvatar>
+          <ListItemText primary={project.name} />
+        </ListItemButton>
+      ))}
+
+      {children}
+    </List>
+  );
+}
+
+function DrawerUserSection({ children }: SectionProps) {
+  const dispatch = useAppDispatch();
+
+  return (
+    <List subheader={<ListSubheader>User</ListSubheader>}>
+      <ListItemButton
+        component={Link}
+        onClick={() => {
+          dispatch(actions.close());
+        }}
+        to="/profile"
+      >
+        <ListItemIcon>
+          <AccountBoxIcon />
+        </ListItemIcon>
+        <ListItemText primary="Profile" />
+      </ListItemButton>
+
+      {children}
+    </List>
+  );
+}
+
+type BaseMenuProps = {
+  mainSectionChildren?: React.ReactNode;
+  children?: React.ReactNode;
+};
+
+export function BaseMenu(props: BaseMenuProps) {
+  return (
+    <>
+      <DrawerMainSection>{props.mainSectionChildren}</DrawerMainSection>
+      {props.children}
+      <DrawerProjectsSection />
+      <DrawerUserSection />
+    </>
   );
 }

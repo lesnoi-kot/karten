@@ -13,3 +13,5 @@ export const ENTITY_COLOR = {
 export const ENTITY_COLOR_NAMES: Array<keyof typeof ENTITY_COLOR> = Object.keys(
   ENTITY_COLOR,
 ) as any;
+
+export const GUEST_USER_ID = 1;

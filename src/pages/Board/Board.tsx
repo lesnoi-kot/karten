@@ -2,9 +2,8 @@ import { useEffect } from "react";
 import { useParams, Navigate, useSearchParams } from "react-router-dom";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Box, CircularProgress } from "@mui/material";
+import { useColorScheme, Box, CircularProgress } from "@mui/material";
 
-import logger from "services/logger";
 import { actions as apiActions } from "app/apiInteraction";
 import { useRequest } from "app/apiInteraction/hooks";
 import { useAppSelector } from "app/hooks";
@@ -23,6 +22,7 @@ import PageTitle from "./PageTitle";
 function BoardPage() {
   const { id: boardId = "" } = useParams();
   const [searchParams] = useSearchParams();
+  const { colorScheme } = useColorScheme();
   const board = useAppSelector((state) => selectBoard(state, boardId));
   const { load, reload, isLoading, isLoaded, isFailed, error } = useRequest(
     apiActions.boardRequest,
@@ -41,18 +41,29 @@ function BoardPage() {
     return null;
   }
 
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <Box
-        sx={{
+  const sxBackground =
+    colorScheme === "dark"
+      ? {
+          backgroundColor: "black",
+        }
+      : {
           backgroundImage: board.coverURL
             ? `url("${board.coverURL}")`
             : undefined,
+          boxShadow: board.coverURL
+            ? "0px 50px 40px 0px rgba(0,0,0,0.75) inset"
+            : undefined,
           backgroundSize: "cover",
-          height: "calc(100vh - 64px)",
-          display: "flex",
-          flexDirection: "column",
-        }}
+          backgroundColor: board.color,
+        };
+
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        height="calc(100vh - 64px)"
+        sx={sxBackground}
       >
         <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />
 
@@ -66,7 +77,7 @@ function BoardPage() {
 
         {isLoaded && (
           <>
-            <Box pt={2} pb={3} textAlign="center">
+            <Box pl={4} pt={1} pb={3}>
               <BoardName boardId={boardId} />
             </Box>
 
