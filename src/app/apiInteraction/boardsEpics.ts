@@ -50,18 +50,10 @@ export const addBoardEpic: Epic = (action$, store$, { api }) =>
 export const updateBoardEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.updateBoardRequest.match),
-    switchMap(({ payload: { id, name }, meta }) =>
-      from(api.editBoard({ id, name })).pipe(
+    switchMap(({ payload, meta }) =>
+      from(api.editBoard(payload)).pipe(
         mergeMap((board) => {
-          const { boards, taskLists, tasks, comments } = normalizeBoard(board);
-
-          return of(
-            tasksSet(tasks),
-            taskListsSet(taskLists),
-            boardsSet(boards),
-            commentsSet(comments),
-            actions.requestLoaded(meta.requestKey),
-          );
+          return of(boardSet(board), actions.requestLoaded(meta.requestKey));
         }),
         catchError((error) =>
           of(actions.requestFailed(String(error), meta.requestKey)),

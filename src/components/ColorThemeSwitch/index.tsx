@@ -6,7 +6,6 @@ import {
 } from "@mui/material";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
 
 type Props = ToggleButtonGroupProps & {
   iconColor?: string;
@@ -33,10 +32,6 @@ export default function ColorThemeSwitch({ iconColor, ...props }: Props) {
       >
         <DarkModeIcon color="inherit" htmlColor={iconColor} />
       </ToggleButton>
-
-      {/* <ToggleButton value="system" key="system">
-        <SettingsBrightnessIcon />
-      </ToggleButton> */}
 
       <ToggleButton
         value="light"

@@ -86,13 +86,6 @@ function ProjectInfo({ id }: { id: ID }) {
         open={menuIsVisible}
         onClose={hideMenu}
       >
-        <MenuItem
-          onClick={() => {
-            hideMenu();
-          }}
-        >
-          Change logo
-        </MenuItem>
         {boards.length > 0 && (
           <MenuItem
             onClick={() => {

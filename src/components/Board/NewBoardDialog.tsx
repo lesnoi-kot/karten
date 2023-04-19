@@ -1,6 +1,4 @@
-import { keys } from "ramda";
 import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "react-query";
 
 import {
   RadioGroup,
@@ -14,26 +12,21 @@ import {
   DialogContentText,
   DialogTitle,
   Typography,
-  Stack,
   SxProps,
   Theme,
   TextField,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
 
-import { UploadImage } from "services/api";
 import { actions } from "app/apiInteraction";
-import { colorToNumber } from "models";
-import { ENTITY_COLOR } from "models/constants";
-import { ID, ColorName } from "models/types";
+import { ID } from "models/types";
 import { selectProjectById } from "app/projects/selectors";
-import { useAPI } from "context/APIProvider";
 import { useAppSelector } from "app/hooks";
-import { useFilePicker } from "components/ui/FileInput/FileInput";
 import { useRequest } from "app/apiInteraction/hooks";
 
-import boardPreviewSVG from "./board_preview.svg";
+import BoardCoverSelect, { OnChangeArg } from "./BoardCoverSelect";
+import { hexColorToNumber } from "utils/color";
+import { ENTITY_COLOR } from "models/constants";
 
 type Props = {
   projectId: ID;
@@ -47,17 +40,7 @@ const sxDialogContent: SxProps<Theme> = {
   gap: 1,
 };
 
-const sxColorTile: SxProps<Theme> = {
-  width: "40px",
-  height: "32px",
-  cursor: "pointer",
-};
-
 export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
-  const api = useAPI();
-  const { data: covers } = useQuery("boards.covers", () =>
-    api.getBoardCovers(),
-  );
   const { load, isLoading } = useRequest(actions.addBoardRequest, {
     onSuccess: onClose,
   });
@@ -65,28 +48,45 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
     selectProjectById(state, projectId),
   );
   const [boardName, setBoardName] = useState("");
-  const [color, setColor] = useState<ColorName>("blue");
+  const [color, setColor] = useState<string>(ENTITY_COLOR.blue);
   const [coverId, setCoverId] = useState<string | null>(null);
   const [coverURL, setCoverURL] = useState<string | null>(null);
-  const { FileInput, clearFile } = useFilePicker();
-
-  const { mutate: uploadImage, isLoading: isUploadingImage } = useMutation({
-    mutationFn: (arg: UploadImage) => api.uploadImage(arg),
-    onSuccess: (uploadedImage) => {
-      setCoverId(uploadedImage.id);
-      setCoverURL(uploadedImage.url);
-    },
-  });
 
   useEffect(() => {
     if (!isOpen) {
       setBoardName("");
       setColor("blue");
       setCoverURL(null);
-      clearFile();
       setCoverId(null);
     }
   }, [isOpen]);
+
+  const onCoverChange = (data: OnChangeArg) => {
+    if ("color" in data) {
+      setColor(data.color);
+      setCoverURL(null);
+      setCoverId(null);
+    } else {
+      setCoverURL(data.coverURL);
+      setCoverId(data.coverId);
+    }
+  };
+
+  const onSubmit = () => {
+    if (coverId) {
+      load({
+        projectId,
+        name: boardName,
+        coverId,
+      });
+    } else {
+      load({
+        projectId,
+        name: boardName,
+        color: hexColorToNumber(color),
+      });
+    }
+  };
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
@@ -117,58 +117,11 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
             Background
           </Typography>
 
-          <Box display="flex" flexDirection="row">
-            <Box display="flex" flexDirection="column" gap={1}>
-              <Stack direction="row" gap={1} flexWrap="wrap">
-                {keys(ENTITY_COLOR).map((color: ColorName) => (
-                  <Box
-                    key={color}
-                    title={color}
-                    onClick={() => {
-                      setColor(color);
-                      setCoverId(null);
-                      setCoverURL(null);
-                    }}
-                    bgcolor={ENTITY_COLOR[color]}
-                    sx={sxColorTile}
-                  />
-                ))}
-              </Stack>
-              <Stack direction="row" gap={1}>
-                {(covers ?? []).map((cover) => (
-                  <Box
-                    key={cover.id}
-                    width="64px"
-                    height="40px"
-                    onClick={() => {
-                      setCoverId(cover.id);
-                      setCoverURL(cover.url);
-                    }}
-                  >
-                    <img width="100%" src={cover.url} alt="Preview" />
-                  </Box>
-                ))}
-
-                <FileInput
-                  label="Select file"
-                  buttonProps={{
-                    startIcon: <FileUploadIcon />,
-                    loading: isUploadingImage,
-                    variant: "outlined",
-                    size: "small",
-                  }}
-                  accept="image/png, image/jpeg, image/webp"
-                  onChange={(files) => {
-                    if (files[0]) {
-                      uploadImage({ file: files[0], makeThumbnail: false });
-                    }
-                  }}
-                />
-              </Stack>
-            </Box>
-
-            <Preview color={color} coverURL={coverURL} />
-          </Box>
+          <BoardCoverSelect
+            color={color}
+            coverURL={coverURL}
+            onChange={onCoverChange}
+          />
         </Box>
 
         <Box display="flex" flexDirection="column" mt={2}>
@@ -187,14 +140,7 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
           Cancel
         </Button>
         <LoadingButton
-          onClick={() => {
-            load({
-              projectId,
-              name: boardName,
-              coverId,
-              color: colorToNumber(color),
-            });
-          }}
+          onClick={onSubmit}
           loading={isLoading}
           disabled={boardName.trim() === ""}
         >
@@ -202,48 +148,5 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
         </LoadingButton>
       </DialogActions>
     </Dialog>
-  );
-}
-
-function Preview({
-  color,
-  coverURL,
-}: {
-  color: ColorName;
-  coverURL: string | null;
-}) {
-  return (
-    <Box
-      display="flex"
-      position="relative"
-      width="200px"
-      height="120px"
-      paddingX={1}
-      alignItems="center"
-      justifyContent="center"
-      margin="0 auto"
-      bgcolor={ENTITY_COLOR[color]}
-      title="New board preview"
-    >
-      {coverURL && (
-        <Box
-          component="img"
-          position="absolute"
-          width="100%"
-          height="100%"
-          top="0"
-          left="0"
-          src={coverURL}
-          alt="Preview"
-        />
-      )}
-      <Box
-        component="img"
-        zIndex="1"
-        width="100%"
-        src={boardPreviewSVG}
-        alt="Preview"
-      />
-    </Box>
   );
 }

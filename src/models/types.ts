@@ -70,7 +70,7 @@ export type KartenImageFile = KartenFile & {
 };
 
 export type User = {
-  id: string;
+  id: number;
   socialId: string;
   name: string;
   login: string;

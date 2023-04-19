@@ -5,11 +5,11 @@ export default function useToggle(initialValue = false) {
 
   const on = useCallback(() => {
     setValue(true);
-  }, [setValue]);
+  }, []);
 
   const off = useCallback(() => {
     setValue(false);
-  }, [setValue]);
+  }, []);
 
   return [value, on, off, setValue] as const;
 }

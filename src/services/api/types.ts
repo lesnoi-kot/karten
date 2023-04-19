@@ -78,7 +78,7 @@ export type ProjectDTO = {
 };
 
 export type UserDTO = {
-  id: string;
+  id: number;
   social_id: string;
   name: string;
   login: string;
@@ -134,12 +134,14 @@ export type AddCommentArgs = {
 export type EditProjectArgs = {
   id: ID;
   name: string;
+  avatarId?: ID;
 };
 
 export type EditBoardArgs = {
   id: ID;
   name?: string;
   color?: number;
+  coverId?: ID | null;
 };
 
 export type EditTaskListArgs = {

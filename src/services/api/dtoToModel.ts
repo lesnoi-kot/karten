@@ -82,11 +82,7 @@ export function convertCommentDTO(dto: CommentDTO): Comment {
 }
 
 function convertNumberToColor(color: number): string {
-  if (!color) {
-    return ENTITY_COLOR.blue;
-  }
-
-  return "#" + color.toString(16).padEnd(6, "0");
+  return "#" + color.toString(16).padStart(6, "0");
 }
 
 export function convertFileDTO(dto: FileDTO): KartenFile {

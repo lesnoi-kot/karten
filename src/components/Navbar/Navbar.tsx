@@ -4,7 +4,6 @@ import {
   Toolbar,
   Box,
   IconButton,
-  Avatar,
   Menu,
   MenuItem,
   Divider,
@@ -13,6 +12,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Logout } from "@mui/icons-material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
@@ -109,48 +109,24 @@ function ProfileMenu({ onClose, ...props }: ProfileMenuProps) {
     <Menu
       id="account-menu"
       PaperProps={{
-        elevation: 0,
-        sx: {
-          overflow: "visible",
-          filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-          mt: 1.5,
-          "& .MuiAvatar-root": {
-            width: 32,
-            height: 32,
-            ml: -0.5,
-            mr: 1,
-          },
-          "&:before": {
-            content: '""',
-            display: "block",
-            position: "absolute",
-            top: 0,
-            right: 14,
-            width: 10,
-            height: 10,
-            bgcolor: "background.paper",
-            transform: "translateY(-50%) rotate(45deg)",
-            zIndex: 0,
-          },
-        },
+        elevation: 1,
+        sx: { mt: 1.5 },
       }}
       transformOrigin={{ horizontal: "right", vertical: "top" }}
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+      onClose={onClose}
       {...props}
     >
-      <MenuItem
-        component={Link}
-        to="/profile"
-        onClick={() => {
-          onClose();
-        }}
-      >
-        <Avatar /> Profile
+      <MenuItem component={Link} to="/profile" onClick={onClose} dense>
+        <ListItemIcon>
+          <AccountCircleIcon />
+        </ListItemIcon>
+        Profile
       </MenuItem>
       <Divider />
-      <MenuItem onClick={onLogOut}>
+      <MenuItem onClick={onLogOut} dense>
         <ListItemIcon>
-          <Logout fontSize="small" />
+          <Logout />
         </ListItemIcon>
         Log Out
       </MenuItem>

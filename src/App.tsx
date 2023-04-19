@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 
 import { settings } from "settings";
 import { actions as apiActions } from "app/apiInteraction";
+import { useRequest } from "app/apiInteraction/hooks";
 import ProjectsPage from "pages/Projects";
 import ProjectPage from "pages/Project";
 import BoardPage from "pages/Board";
@@ -13,7 +14,7 @@ import { ProjectsMenu } from "pages/Projects/ProjectsMenu";
 import { ProjectMenu } from "pages/Project/ProjectMenu";
 import LayoutWithNavbar from "components/layouts/LayoutWithNavbar";
 import RequireAuth from "components/RequireAuth";
-import { useRequest } from "app/apiInteraction/hooks";
+import { BaseMenu } from "components/Navbar/DrawerMenu";
 
 function App() {
   const { load, isLoaded } = useRequest(apiActions.getCurrentUser);
@@ -36,6 +37,7 @@ function App() {
                   <Route index path="/projects" element={<ProjectsMenu />} />
                   <Route path="/projects/:id" element={<ProjectMenu />} />
                   <Route path="/boards/:id" element={<BoardMenu />} />
+                  <Route path="*" element={<BaseMenu />} />
                 </Routes>
               </LayoutWithNavbar>
             </RequireAuth>

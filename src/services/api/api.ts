@@ -11,6 +11,7 @@ import {
   TaskList,
   User,
 } from "models/types";
+import { filter } from "ramda";
 
 import {
   convertBoardDTO,
@@ -105,7 +106,7 @@ export class APIService implements DataStore {
     }
 
     if (body) {
-      fetchOptions.body = JSON.stringify(body);
+      fetchOptions.body = JSON.stringify(filter((v) => v !== undefined, body));
       headers.append("Content-Type", "application/json; charset=UTF-8");
     }
 
@@ -181,8 +182,10 @@ export class APIService implements DataStore {
   }
 
   async editBoard(args: EditBoardArgs): Promise<Board> {
-    const res = await this.fetchJSON(`/projects/${args.id}`, "PATCH", {
+    const res = await this.fetchJSON(`/boards/${args.id}`, "PATCH", {
       name: args.name,
+      color: args.color,
+      cover_id: args.coverId,
     });
     return convertBoardDTO(await this.unwrapResponse<BoardDTO>(res));
   }
