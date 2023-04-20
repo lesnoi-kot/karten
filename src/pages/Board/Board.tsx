@@ -2,16 +2,25 @@ import { useEffect } from "react";
 import { useParams, Navigate, useSearchParams } from "react-router-dom";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { useColorScheme, Box, CircularProgress } from "@mui/material";
+import {
+  useColorScheme,
+  Box,
+  CircularProgress,
+  Breadcrumbs,
+  Typography,
+  Container,
+} from "@mui/material";
 
 import { actions as apiActions } from "app/apiInteraction";
 import { useRequest } from "app/apiInteraction/hooks";
 import { useAppSelector } from "app/hooks";
 import { selectBoard } from "app/boards/selectors";
+import { selectProjectById } from "app/projects/selectors";
 
 import makePage from "pages/makePageHOC";
 import { TaskModal } from "components/Task";
 import ErrorSplash from "components/ui/ErrorSplash";
+import Link from "components/Link";
 
 import { useDashboardMethods, selectShouldRedirectToProject } from "./slice";
 import ScrollableSpace from "./ScrollableSpace";
@@ -77,7 +86,8 @@ function BoardPage() {
 
         {isLoaded && (
           <>
-            <Box pl={4} pt={1} pb={3}>
+            <Box pl={3} pt={1} pb={3}>
+              <PageBreadcrumbs />
               <BoardName boardId={boardId} />
             </Box>
 
@@ -98,6 +108,30 @@ function BoardPage() {
         )}
       </Box>
     </DndProvider>
+  );
+}
+
+function PageBreadcrumbs() {
+  const { id: boardId = "" } = useParams();
+  const board = useAppSelector((state) => selectBoard(state, boardId));
+  const project = useAppSelector((state) =>
+    board ? selectProjectById(state, board?.projectId) : null,
+  );
+
+  if (!board || !project) {
+    return null;
+  }
+
+  return (
+    <Breadcrumbs aria-label="breadcrumb" separator="⧽" sx={{ color: "white" }}>
+      <Link underline="hover" color="inherit" to="/projects">
+        Projects
+      </Link>
+      <Link underline="hover" color="inherit" to={`/projects/${project?.id}`}>
+        {project?.name}
+      </Link>
+      <Typography>{board.name}</Typography>
+    </Breadcrumbs>
   );
 }
 

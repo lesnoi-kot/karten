@@ -1,8 +1,9 @@
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
+import { Box, InputAdornment } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ListAltIcon from "@mui/icons-material/ListAlt";
-import { Box } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 
 import { actions as apiActions } from "app/apiInteraction";
 import { Task } from "models/types";
@@ -36,7 +37,15 @@ function NameEditor({ task }: Props) {
   return (
     <Box display="flex" alignItems="center" columnGap={1}>
       <ListAltIcon />
-      <StyledEditableText value={name} onChange={onNameChange} />
+      <StyledEditableText
+        value={name}
+        onChange={onNameChange}
+        endAdornment={
+          <InputAdornment position="end" disablePointerEvents variant="filled">
+            <EditIcon fontSize="small" />
+          </InputAdornment>
+        }
+      />
     </Box>
   );
 }

@@ -5,11 +5,11 @@ import {
   KeyboardEventHandler,
   ChangeEventHandler,
 } from "react";
-import { mergeDeepLeft } from "ramda";
 import Input, { InputProps } from "@mui/material/Input";
-import clsx from "clsx";
+import { InputAdornment } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 
-import styles from "./styles.module.css";
+import { placeCaretToTheEnd } from "utils/events";
 
 export type Props = Omit<InputProps, "onChange"> & {
   value: string;
@@ -17,12 +17,23 @@ export type Props = Omit<InputProps, "onChange"> & {
   onChange(newValue: string): void;
 };
 
-export function EditableText({
+const sxHoverAdornment = {
+  "&:hover .MuiInputAdornment-root": {
+    visibility: "visible",
+  },
+  "& input:focus + .MuiInputAdornment-root": {
+    visibility: "visible",
+  },
+  "& .MuiInputAdornment-root": {
+    visibility: "hidden",
+  },
+};
+
+export default function EditableText({
   value,
   onChange,
-  className,
   disableSubmitOnEnter = false,
-  inputProps = {},
+  sx = {},
   ...props
 }: Props) {
   const [draftValue, setDraftValue] = useState(value);
@@ -59,24 +70,34 @@ export function EditableText({
 
   return (
     <Input
+      type="text"
+      margin="dense"
+      title="Click to change value"
+      readOnly={!isEditMode}
+      disableUnderline={!isEditMode}
+      endAdornment={
+        <InputAdornment position="end" disablePointerEvents variant="filled">
+          <EditIcon />
+        </InputAdornment>
+      }
+      {...props}
+      inputRef={textFieldRef}
       value={draftValue}
+      onClick={onClick}
       onBlur={onBlur}
+      onFocus={placeCaretToTheEnd}
       onChange={onDraftChange}
       onKeyDown={onKeyDown}
-      readOnly={!isEditMode}
-      disableUnderline={isEditMode ? false : true}
-      className={clsx(styles.editableTextField, className)}
-      inputProps={mergeDeepLeft(inputProps, {
-        style: {
+      sx={[
+        ...(Array.isArray(sx) ? sx : [sx]),
+        {
           cursor: isEditMode ? "initial" : "pointer",
+          "& input": {
+            cursor: "inherit",
+          },
         },
-      })}
-      inputRef={textFieldRef}
-      onClick={onClick}
-      margin="dense"
-      {...props}
+        sxHoverAdornment,
+      ]}
     />
   );
 }
-
-export default EditableText;

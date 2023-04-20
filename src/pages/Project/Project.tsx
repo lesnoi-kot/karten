@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Avatar,
   Typography,
+  Breadcrumbs,
 } from "@mui/material";
 
 import { useAppSelector } from "app/hooks";
@@ -18,6 +19,8 @@ import { selectProjectById } from "app/projects/selectors";
 import { useRequestInfo } from "app/apiInteraction/hooks";
 import makePage from "pages/makePageHOC";
 import BoardPreviewList from "components/Board/BoardPreviewList";
+import Link from "components/Link";
+
 import ProjectName from "./ProjectName";
 
 function Project() {
@@ -46,7 +49,8 @@ function Project() {
       )}
 
       {project && isLoaded && (
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" sx={{ pt: 1 }}>
+          <PageBreadcrumbs />
           <Box mt={2} mb={3} display="flex" gap={4}>
             {project.avatarURL && (
               <Avatar
@@ -73,6 +77,26 @@ function Project() {
         </Container>
       )}
     </>
+  );
+}
+
+function PageBreadcrumbs() {
+  const { id: projectId = "" } = useParams();
+  const project = useAppSelector((state) =>
+    selectProjectById(state, projectId),
+  );
+
+  if (!project) {
+    return null;
+  }
+
+  return (
+    <Breadcrumbs aria-label="breadcrumb" separator="⧽">
+      <Link underline="hover" color="inherit" to="/projects">
+        Projects
+      </Link>
+      <Typography>{project.name}</Typography>
+    </Breadcrumbs>
   );
 }
 

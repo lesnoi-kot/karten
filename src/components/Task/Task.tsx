@@ -5,7 +5,6 @@ import { ID } from "models/types";
 import Stub from "components/Stub";
 
 import { useTask } from "./hooks";
-import styles from "./styles.module.css";
 import Comments from "./Comments";
 import DescriptionEditor from "./DescriptionEditor";
 import NameEditor from "./NameEditor";
@@ -22,7 +21,7 @@ function Task({ taskId }: Props) {
   }
 
   return (
-    <Paper className={styles.taskCard} sx={{ paddingX: 2, paddingY: 2 }}>
+    <Paper sx={{ paddingX: 2, paddingY: 2 }}>
       <Box>
         <NameEditor task={task} />
       </Box>

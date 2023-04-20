@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useMemo } from "react";
 import { Box, Paper, Typography, Avatar, Button } from "@mui/material";
 
 import { ID } from "models/types";
 import Stub from "components/Stub";
 import { actions as apiActions } from "app/apiInteraction";
 import { selectCommentById } from "app/comments/selectors";
-import { useRequestInfo } from "app/apiInteraction/hooks";
+import { useRequest } from "app/apiInteraction/hooks";
+import { useAppDispatch, useAppSelector } from "app/hooks";
 
-import styles from "./styles.module.css";
 import CommentEditor from "./CommentEditor";
-import { RootState } from "app";
+import { Markdown } from "components/Markdown";
 
 type Props = {
   commentId: ID;
@@ -18,17 +17,19 @@ type Props = {
 
 export function Comment({ commentId }: Props) {
   const [editMode, setEditMode] = useState(false);
-  const dispatch = useDispatch();
-  const comment = useSelector((state: RootState) =>
+  const dispatch = useAppDispatch();
+  const comment = useAppSelector((state) =>
     selectCommentById(state, commentId),
   );
-  const { isLoading } = useRequestInfo(`CommentEditor:${commentId}`);
 
-  useEffect(() => {
-    if (!isLoading) {
-      setEditMode(false);
-    }
-  }, [isLoading]);
+  const { load: updateComment, isLoading } = useRequest(
+    apiActions.updateCommentRequest,
+    {
+      onSuccess() {
+        setEditMode(false);
+      },
+    },
+  );
 
   if (!comment) {
     return <Stub />;
@@ -38,36 +39,27 @@ export function Comment({ commentId }: Props) {
     dispatch(apiActions.deleteCommentRequest(commentId));
   };
 
-  const onEdit = (text: string) => {
-    dispatch(
-      apiActions.updateCommentRequest(
-        {
-          id: commentId,
-          text,
-        },
-        `CommentEditor:${commentId}`,
-      ),
-    );
-  };
-
   return (
-    <Box className={styles.comment}>
-      <Box className={styles.commentAvatar}>
+    <Box position="relative" pl="50px">
+      <Box position="absolute" width="40px" height="40px" sx={{ inset: 0 }}>
         <Avatar>Y</Avatar>
       </Box>
       <Typography gutterBottom>
         <b>Yuko</b>
       </Typography>
+
       {editMode ? (
         <CommentEditor
           text={comment.text}
           onClose={() => setEditMode(false)}
-          onSubmit={onEdit}
+          onSubmit={(text: string) => {
+            updateComment({ id: commentId, text });
+          }}
           isLoading={isLoading}
         />
       ) : (
-        <Paper className={styles.commentText} variant="outlined">
-          {comment.text}
+        <Paper variant="outlined" sx={{ padding: 1 }}>
+          <Markdown md={comment.text} />
         </Paper>
       )}
 

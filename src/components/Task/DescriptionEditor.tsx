@@ -76,57 +76,59 @@ function DescriptionEditor({ task }: Props) {
           </Button>
         )}
       </Box>
-      {readonly &&
-        (description ? (
-          <Typography>
-            <div dangerouslySetInnerHTML={{ __html: markdown }} />
-          </Typography>
-        ) : (
-          <EmptyDescriptionCard
-            component="button"
-            onClick={() => setReadonly(false)}
-            elevation={0}
-          >
-            <Typography variant="body2">
-              Add a more detailed description
+      <Box pl={4}>
+        {readonly &&
+          (description ? (
+            <Typography>
+              <div dangerouslySetInnerHTML={{ __html: markdown }} />
             </Typography>
-          </EmptyDescriptionCard>
-        ))}
-
-      {!readonly && (
-        <>
-          <TextField
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            fullWidth
-            multiline
-            margin="dense"
-            size="small"
-            autoFocus
-            onFocus={(e) =>
-              e.target.setSelectionRange(
-                e.target.value.length,
-                e.target.value.length,
-              )
-            }
-            minRows={3}
-            variant="outlined"
-            className={styles.textfield}
-          />
-          <Box mt={1} display="flex" gap={0.5}>
-            <Button
-              onClick={onDescriptionChange}
-              variant="contained"
-              size="small"
+          ) : (
+            <EmptyDescriptionCard
+              component="button"
+              onClick={() => setReadonly(false)}
+              elevation={0}
             >
-              Save
-            </Button>
-            <Button onClick={onCloseEditor} variant="text" size="small">
-              Close
-            </Button>
-          </Box>
-        </>
-      )}
+              <Typography variant="body2">
+                Add a more detailed description
+              </Typography>
+            </EmptyDescriptionCard>
+          ))}
+
+        {!readonly && (
+          <>
+            <TextField
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              fullWidth
+              multiline
+              margin="dense"
+              size="small"
+              autoFocus
+              onFocus={(e) =>
+                e.target.setSelectionRange(
+                  e.target.value.length,
+                  e.target.value.length,
+                )
+              }
+              minRows={3}
+              variant="outlined"
+              className={styles.textfield}
+            />
+            <Box mt={1} display="flex" gap={0.5}>
+              <Button
+                onClick={onDescriptionChange}
+                variant="contained"
+                size="small"
+              >
+                Save
+              </Button>
+              <Button onClick={onCloseEditor} variant="text" size="small">
+                Close
+              </Button>
+            </Box>
+          </>
+        )}
+      </Box>
     </>
   );
 }

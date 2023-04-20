@@ -10,14 +10,14 @@ type TaskModalProps = Props & {
 
 const StyledModal = styled(Modal)<ModalProps>(({ theme }) => ({
   marginTop: theme.spacing(5),
-  marginBottom: theme.spacing(5),
   marginLeft: "auto",
   marginRight: "auto",
-  height: "auto",
-  maxWidth: "768px",
   width: "100%",
+  maxWidth: "768px",
+  height: "auto",
   minHeight: "500px",
   maxHeight: "100%",
+  overflow: "scroll",
 }));
 
 export function TaskModal({ onClose, ...taskProps }: TaskModalProps) {

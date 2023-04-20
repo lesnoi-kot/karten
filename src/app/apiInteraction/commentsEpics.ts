@@ -2,6 +2,7 @@ import { of, from } from "rxjs";
 import { filter, mergeMap, catchError, map } from "rxjs/operators";
 
 import { commentSet, commentDeleted, commentUpdated } from "app/comments";
+import { showSnackbar } from "app/snackbars";
 
 import { Epic } from "../types";
 import { actions } from "./slice";
@@ -26,7 +27,10 @@ export const deleteCommentEpic: Epic = (action$, _, { api }) =>
       from(api.deleteComment(commentId)).pipe(
         mergeMap(() => of(actions.requestLoaded(requestKey))),
         catchError((error) =>
-          of(actions.requestFailed(String(error), requestKey)),
+          of(
+            actions.requestFailed(String(error), requestKey),
+            showSnackbar({ message: String(error), type: "error" }),
+          ),
         ),
       ),
     ),
@@ -46,7 +50,12 @@ export const updateCommentEpic: Epic = (action$, store$, { api }) =>
         mergeMap((comment) =>
           of(commentUpdated(comment), actions.requestLoaded(requestKey)),
         ),
-        catchError((error) => of(actions.requestFailed(error, requestKey))),
+        catchError((error) =>
+          of(
+            actions.requestFailed(error, requestKey),
+            showSnackbar({ message: String(error), type: "error" }),
+          ),
+        ),
       ),
     ),
   );

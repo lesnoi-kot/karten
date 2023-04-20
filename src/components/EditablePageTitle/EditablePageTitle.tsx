@@ -1,15 +1,11 @@
 import { InputAdornment } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 
-import EditableTextField from "components/EditableTextField";
-
-type Props = {
-  value: string;
-  onChange: (name: string) => void;
-};
+import EditableTextField, {
+  Props as EditableTextFieldProps,
+} from "components/EditableTextField";
 
 const sxTextField = {
-  textAlign: "center",
   "&:hover .MuiInputAdornment-root": {
     visibility: "visible",
   },
@@ -20,24 +16,23 @@ const sxTextField = {
     visibility: "hidden",
   },
   "& input": {
-    textAlign: "center",
     fontSize: "2.5rem",
   },
 };
 
-export function EditablePageTitle({ value, onChange }: Props) {
+export function EditablePageTitle({ sx, ...props }: EditableTextFieldProps) {
   return (
     <EditableTextField
-      title="Click to change name"
-      value={value}
-      onChange={onChange}
-      onFocus={(e) => e.target.setSelectionRange(value.length, value.length)}
+      sx={[sxTextField, ...(Array.isArray(sx) ? sx : [sx])]}
       endAdornment={
-        <InputAdornment position="end">
-          <EditIcon />
+        <InputAdornment position="end" disablePointerEvents variant="filled">
+          <EditIcon htmlColor="white" />
         </InputAdornment>
       }
-      sx={sxTextField}
+      inputProps={{
+        maxLength: 32,
+      }}
+      {...props}
     />
   );
 }
