@@ -2,9 +2,12 @@ import { Box, IconButton, Modal, ModalProps } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ClearIcon from "@mui/icons-material/Clear";
 
-import Task, { Props } from "./Task";
+import { ID } from "models/types";
 
-type TaskModalProps = Props & {
+import Task from "./Task";
+
+type TaskModalProps = {
+  taskId: ID | null;
   onClose(): void;
 };
 
@@ -20,17 +23,17 @@ const StyledModal = styled(Modal)<ModalProps>(({ theme }) => ({
   overflow: "scroll",
 }));
 
-export function TaskModal({ onClose, ...taskProps }: TaskModalProps) {
+export function TaskModal({ onClose, taskId }: TaskModalProps) {
   return (
-    <StyledModal open onClose={onClose}>
-      <>
+    <StyledModal open={!!taskId} disableScrollLock onClose={onClose}>
+      <Box>
         <Box position="absolute" mt={1} mr={1} right={0}>
           <IconButton size="small" onClick={onClose}>
             <ClearIcon />
           </IconButton>
         </Box>
-        <Task {...taskProps} />
-      </>
+        {taskId && <Task taskId={taskId} />}
+      </Box>
     </StyledModal>
   );
 }

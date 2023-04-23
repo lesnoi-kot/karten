@@ -65,6 +65,7 @@ export function convertTaskDTO(dto: TaskDTO): Task {
     position: dto.position,
     name: dto.name,
     text: dto.text,
+    html: dto.html,
     dateCreated: dto.date_created,
     dueDate: dto.due_date,
     comments: dto.comments ? dto.comments.map(convertCommentDTO) : [],

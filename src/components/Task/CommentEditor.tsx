@@ -3,7 +3,7 @@ import { Box, TextField, Typography, IconButton } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import ClearIcon from "@mui/icons-material/Clear";
 
-import styles from "./styles.module.css";
+import { placeCaretToTheEnd, blurOnEscape } from "utils/events";
 
 type Props = {
   text: string;
@@ -30,16 +30,11 @@ function CommentEditor({
         multiline
         fullWidth
         autoFocus
-        onFocus={(e) =>
-          e.target.setSelectionRange(
-            e.target.value.length,
-            e.target.value.length,
-          )
-        }
+        onFocus={placeCaretToTheEnd}
+        onKeyDown={blurOnEscape}
         margin="dense"
         size="small"
         placeholder="Write a comment"
-        className={styles.textfield}
         variant="outlined"
       />
 

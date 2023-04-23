@@ -1,16 +1,27 @@
-import { useMemo, memo } from "react";
+import { memo } from "react";
 import { Box, BoxProps } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { micromark } from "micromark";
 
-type Props = {
-  md: string;
+type Props = BoxProps & {
+  html: string;
 };
 
 const Content = styled(Box)<BoxProps>(({ theme }) => ({
-  "& p": {
+  maxWidth: "100%",
+
+  "& p, pre": {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
+  },
+  "& code": {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+  "& pre": {
+    overflow: "scroll",
+  },
+  "& img": {
+    maxWidth: "100%",
   },
 
   "& h1": {
@@ -45,10 +56,8 @@ const Content = styled(Box)<BoxProps>(({ theme }) => ({
   },
 }));
 
-export function Markdown({ md }: Props) {
-  const html = useMemo(() => micromark(md), [md]);
-
-  return <Content dangerouslySetInnerHTML={{ __html: html }} />;
+export function Markdown({ html, ...boxProps }: Props) {
+  return <Content {...boxProps} dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 export default memo(Markdown);

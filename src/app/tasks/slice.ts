@@ -28,10 +28,10 @@ export const {
   initialState,
   reducers: {
     tasksSet: (state, { payload }: PayloadAction<TasksMap>) => {
-      state.items = payload;
+      Object.assign(state.items, payload);
     },
     taskSet: (state, { payload: task }: PayloadAction<Task>) => {
-      state.items[task.id] = task;
+      Object.assign(state.items[task.id], task);
     },
     taskUpdated: (state, { payload: task }: PayloadAction<Partial<Task>>) => {
       if (task.id) {

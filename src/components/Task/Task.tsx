@@ -1,8 +1,24 @@
-import React from "react";
-import { Box, Paper, Stack, Button, Typography } from "@mui/material";
+import React, { useEffect } from "react";
+import {
+  Box,
+  CircularProgress,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Paper,
+  Stack,
+} from "@mui/material";
+import LabelIcon from "@mui/icons-material/Label";
+import AttachmentIcon from "@mui/icons-material/Attachment";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import { ID } from "models/types";
 import Stub from "components/Stub";
+import { useRequest } from "app/apiInteraction/hooks";
+import { actions as apiActions } from "app/apiInteraction";
 
 import { useTask } from "./hooks";
 import Comments from "./Comments";
@@ -15,6 +31,19 @@ export type Props = {
 
 function Task({ taskId }: Props) {
   const { task } = useTask(taskId);
+  const { load: loadTask, isLoading } = useRequest(apiActions.getTask);
+
+  useEffect(() => {
+    loadTask(taskId);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Box textAlign="center" mt={3}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (!task) {
     return <Stub />;
@@ -26,7 +55,7 @@ function Task({ taskId }: Props) {
         <NameEditor task={task} />
       </Box>
       <Stack direction="row" gap={2} mt={2}>
-        <Box flexGrow={1}>
+        <Box flexGrow="1" maxWidth="70%">
           <Box>
             <DescriptionEditor task={task} />
           </Box>
@@ -34,7 +63,7 @@ function Task({ taskId }: Props) {
             <Comments taskId={taskId} />
           </Box>
         </Box>
-        <Box flexBasis="20%">
+        <Box flexShrink="0" flexBasis="20%">
           <SidePanel taskId={taskId} />
         </Box>
       </Stack>
@@ -47,34 +76,36 @@ function SidePanel({ taskId }: Props) {
   const onCopy = () => {};
 
   return (
-    <Stack gap={2}>
-      <Box>
-        <Typography variant="subtitle1" fontWeight={500} gutterBottom>
-          Add to card
-        </Typography>
-        <Stack paddingX={1} gap={1}>
-          <Button size="small" variant="outlined" onClick={onDelete}>
-            Labels
-          </Button>
-          <Button size="small" variant="outlined" onClick={onCopy}>
-            Attachment
-          </Button>
-        </Stack>
-      </Box>
+    <Stack gap={2} sx={{ position: "sticky", top: "32px" }}>
+      <List dense subheader={<ListSubheader>Add to card</ListSubheader>}>
+        <ListItemButton onClick={() => {}}>
+          <ListItemIcon>
+            <LabelIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Labels" />
+        </ListItemButton>
+        <ListItemButton onClick={() => {}}>
+          <ListItemIcon>
+            <AttachmentIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Attachment" />
+        </ListItemButton>
+      </List>
 
-      <Box>
-        <Typography variant="subtitle1" fontWeight={500} gutterBottom>
-          Actions
-        </Typography>
-        <Stack paddingX={1} gap={1}>
-          <Button size="small" variant="outlined" onClick={onDelete}>
-            Delete
-          </Button>
-          <Button size="small" variant="outlined" onClick={onCopy}>
-            Copy
-          </Button>
-        </Stack>
-      </Box>
+      <List dense subheader={<ListSubheader>Actions</ListSubheader>}>
+        <ListItemButton onClick={() => {}}>
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Copy" />
+        </ListItemButton>
+        <ListItemButton onClick={() => {}}>
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Delete" />
+        </ListItemButton>
+      </List>
     </Stack>
   );
 }

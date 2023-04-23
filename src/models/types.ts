@@ -19,6 +19,7 @@ export type Task = {
   taskListId: UUID;
   name: string;
   text: string;
+  html: string;
   position: number;
   dateCreated: DateString;
   dueDate: DateString;

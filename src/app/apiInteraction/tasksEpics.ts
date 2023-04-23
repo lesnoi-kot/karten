@@ -8,6 +8,24 @@ import { showSnackbar } from "app/snackbars";
 import { Epic } from "../types";
 import { actions } from "./slice";
 
+export const getTaskEpic: Epic = (action$, store$, { api }) =>
+  action$.pipe(
+    filter(actions.getTask.match),
+    mergeMap(({ payload: taskId, meta: { requestKey } }) =>
+      from(api.getTask(taskId)).pipe(
+        mergeMap((task) =>
+          of(taskSet(task), actions.requestLoaded(requestKey)),
+        ),
+        catchError((error) =>
+          of(
+            actions.requestFailed(error, requestKey),
+            showSnackbar({ message: String(error), type: "error" }),
+          ),
+        ),
+      ),
+    ),
+  );
+
 export const addTaskEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.addTaskRequest.match),

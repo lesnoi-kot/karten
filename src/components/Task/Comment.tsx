@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { Box, Paper, Typography, Avatar, Button } from "@mui/material";
+import { useState, useMemo } from "react";
+import { Box, Paper, Typography, Avatar, Button, Stack } from "@mui/material";
 
 import { ID } from "models/types";
 import Stub from "components/Stub";
@@ -15,7 +15,7 @@ type Props = {
   commentId: ID;
 };
 
-export function Comment({ commentId }: Props) {
+export default function Comment({ commentId }: Props) {
   const [editMode, setEditMode] = useState(false);
   const dispatch = useAppDispatch();
   const comment = useAppSelector((state) =>
@@ -40,41 +40,53 @@ export function Comment({ commentId }: Props) {
   };
 
   return (
-    <Box position="relative" pl="50px">
-      <Box position="absolute" width="40px" height="40px" sx={{ inset: 0 }}>
-        <Avatar>Y</Avatar>
+    <Stack
+      position="relative"
+      direction="row"
+      gap={1}
+      alignItems="stretch"
+      fontSize="1rem"
+    >
+      <Box width="40px" flexShrink="0">
+        <Avatar sx={{ position: "sticky", top: (theme) => theme.spacing(2) }}>
+          Y
+        </Avatar>
       </Box>
-      <Typography gutterBottom>
-        <b>Yuko</b>
-      </Typography>
 
-      {editMode ? (
-        <CommentEditor
-          text={comment.text}
-          onClose={() => setEditMode(false)}
-          onSubmit={(text: string) => {
-            updateComment({ id: commentId, text });
-          }}
-          isLoading={isLoading}
-        />
-      ) : (
-        <Paper variant="outlined" sx={{ padding: 1 }}>
-          <Markdown md={comment.text} />
-        </Paper>
-      )}
+      <Box flexGrow="1">
+        <Stack gap={2} direction="row" alignItems="center">
+          <Typography fontWeight="bold">Yuko</Typography>
+          <Typography variant="body2">
+            {new Date(comment.dateCreated).toLocaleString()}
+          </Typography>
+        </Stack>
 
-      {!editMode && (
-        <Box mt={1} display="flex" gap={1}>
-          <Button size="small" onClick={() => setEditMode(true)}>
-            Edit
-          </Button>
-          <Button size="small" onClick={onDelete}>
-            Delete
-          </Button>
-        </Box>
-      )}
-    </Box>
+        {editMode ? (
+          <CommentEditor
+            text={comment.text}
+            onClose={() => setEditMode(false)}
+            onSubmit={(text: string) => {
+              updateComment({ id: commentId, text });
+            }}
+            isLoading={isLoading}
+          />
+        ) : (
+          <Paper variant="outlined" sx={{ paddingX: 1 }}>
+            <Markdown html={comment.text} />
+          </Paper>
+        )}
+
+        {!editMode && (
+          <Box mt={1} display="flex" gap={1}>
+            <Button size="small" onClick={() => setEditMode(true)}>
+              Edit
+            </Button>
+            <Button size="small" onClick={onDelete}>
+              Delete
+            </Button>
+          </Box>
+        )}
+      </Box>
+    </Stack>
   );
 }
-
-export default React.memo(Comment);
