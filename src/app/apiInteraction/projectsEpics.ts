@@ -19,8 +19,8 @@ import { selectProjectById } from "app/projects/selectors";
 export const getProjectsEpic: Epic = (action$, store$, { api }) =>
   action$.pipe(
     filter(actions.getProjects.match),
-    switchMap(({ meta: { requestKey, signal } }) =>
-      from(api.getProjects()).pipe(
+    switchMap(({ payload, meta: { requestKey } }) =>
+      from(api.getProjects(payload)).pipe(
         mergeMap((projectsArr) => {
           const { projects, boards } = normalizeProjects(projectsArr);
 

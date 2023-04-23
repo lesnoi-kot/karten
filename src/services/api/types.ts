@@ -36,6 +36,7 @@ export type TaskDTO = {
   task_list_id: ID;
   name: string;
   text: string;
+  html: string;
   position: number;
   date_created: string;
   due_date: string;
@@ -98,6 +99,10 @@ export type FileDTO = {
 
 export type ImageFileDTO = FileDTO & {
   thumbnails: FileDTO[];
+};
+
+export type GetProjectsArgs = {
+  includeBoards: boolean;
 };
 
 export type AddProjectArgs = {
@@ -175,7 +180,7 @@ export interface DataStore {
   logOut(): Promise<void>;
   logInAsGuest(): Promise<User>;
 
-  getProjects(): Promise<Project[]>;
+  getProjects(args: GetProjectsArgs): Promise<Project[]>;
   getProject(id: ID): Promise<Project>;
   addProject(args: AddProjectArgs): Promise<Project>;
   editProject(args: EditProjectArgs): Promise<Project>;

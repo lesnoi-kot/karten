@@ -2,6 +2,9 @@ import { of, from } from "rxjs";
 import { filter, mergeMap, catchError } from "rxjs/operators";
 
 import { userLoggedIn, userLoggedOut } from "app/users";
+import { projectsSet } from "app/projects";
+import { normalizeProjects } from "app/projects/utils";
+import { showSnackbar } from "app/snackbars";
 
 import { Epic } from "../types";
 import { actions } from "./slice";
@@ -52,6 +55,22 @@ export const deleteUserEpic: Epic = (action$, store$, { api }) =>
       from(api.deleteUser()).pipe(
         mergeMap(() => of(userLoggedOut(), actions.requestLoaded(requestKey))),
         catchError((error) => of(actions.requestFailed(error, requestKey))),
+      ),
+    ),
+  );
+
+export const userLoggedInEpic: Epic = (action$, store$, { api }) =>
+  action$.pipe(
+    filter(userLoggedIn.match),
+    mergeMap(() =>
+      from(api.getProjects({ includeBoards: false })).pipe(
+        mergeMap((projectsArr) => {
+          const { projects } = normalizeProjects(projectsArr);
+          return of(projectsSet(projects));
+        }),
+        catchError((error) =>
+          of(showSnackbar({ message: String(error), type: "error" })),
+        ),
       ),
     ),
   );

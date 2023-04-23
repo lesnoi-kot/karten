@@ -4,6 +4,7 @@ import { ID } from "models/types";
 import { FetchState } from "utils/types";
 
 import {
+  GetProjectsArgs,
   AddProjectArgs,
   AddBoardArgs,
   AddTaskArgs,
@@ -83,7 +84,7 @@ export const {
     /*
       Projects
     */
-    getProjects: requestWithPayload<void>(),
+    getProjects: requestWithPayload<GetProjectsArgs>(),
     getProject: requestWithPayload<ID>(),
     addProject: requestWithPayload<AddProjectArgs>(),
     updateProject: requestWithPayload<EditProjectArgs>(),
@@ -94,6 +95,7 @@ export const {
     /*
       Tasks
     */
+    getTask: requestWithPayload<ID>(),
     addTaskRequest: requestWithPayload<AddTaskArgs>(),
     deleteTaskRequest: requestWithPayload<ID>(),
     deleteTasksRequest: requestWithPayload<ID[]>(),

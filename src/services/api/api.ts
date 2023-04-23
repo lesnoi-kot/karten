@@ -25,6 +25,7 @@ import {
 } from "./dtoToModel";
 
 import {
+  GetProjectsArgs,
   AddBoardArgs,
   AddCommentArgs,
   AddProjectArgs,
@@ -133,8 +134,9 @@ export class APIService implements DataStore {
     return fetch(this.endpointURL(path), fetchOptions);
   }
 
-  async getProjects(): Promise<Project[]> {
-    const res = await this.fetchJSON("/projects");
+  async getProjects({ includeBoards }: GetProjectsArgs): Promise<Project[]> {
+    const queryParams = includeBoards ? "?include=boards" : "";
+    const res = await this.fetchJSON(`/projects${queryParams}`);
     const dtos = await this.unwrapResponse<ProjectDTO[]>(res);
     return dtos.map(convertProjectDTO);
   }

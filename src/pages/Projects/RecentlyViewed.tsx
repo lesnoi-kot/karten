@@ -1,5 +1,4 @@
 import { Box, Typography } from "@mui/material";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 import { selectLastViewedBoards } from "app/boards/selectors";
 import { useAppSelector } from "app/hooks";

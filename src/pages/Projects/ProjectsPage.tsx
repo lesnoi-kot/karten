@@ -18,7 +18,7 @@ function ProjectsPage() {
     apiActions.getProjects,
   );
 
-  useEffect(() => load(undefined), [load]);
+  useEffect(() => load({ includeBoards: true }), [load]);
 
   return (
     <>
