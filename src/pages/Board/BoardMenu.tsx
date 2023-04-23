@@ -12,6 +12,7 @@ import ArrowBack from "@mui/icons-material/ArrowBack";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import PhotoIcon from "@mui/icons-material/Photo";
+import AddIcon from "@mui/icons-material/Add";
 
 import { actions as apiActions } from "app/apiInteraction";
 import { useAppSelector } from "app/hooks";
@@ -85,6 +86,17 @@ export function BoardMenu() {
       }
     >
       <List dense subheader={<ListSubheader>{board.name}</ListSubheader>}>
+        <ListItemButton
+          onClick={() => {
+            dispatch(drawerMenuActions.close());
+          }}
+        >
+          <ListItemIcon>
+            <AddIcon />
+          </ListItemIcon>
+          <ListItemText primary="Create list" />
+        </ListItemButton>
+
         <ListItemButton onClick={onBackgroundChange}>
           <ListItemIcon>
             <PhotoIcon />

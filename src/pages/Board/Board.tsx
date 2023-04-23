@@ -8,7 +8,6 @@ import {
   CircularProgress,
   Breadcrumbs,
   Typography,
-  Container,
 } from "@mui/material";
 
 import { actions as apiActions } from "app/apiInteraction";
@@ -103,9 +102,7 @@ function BoardPage() {
           </>
         )}
 
-        {selectedTaskId && (
-          <TaskModal onClose={onTaskModalClose} taskId={selectedTaskId} />
-        )}
+        <TaskModal onClose={onTaskModalClose} taskId={selectedTaskId} />
       </Box>
     </DndProvider>
   );
@@ -123,14 +120,25 @@ function PageBreadcrumbs() {
   }
 
   return (
-    <Breadcrumbs aria-label="breadcrumb" separator="⧽" sx={{ color: "white" }}>
-      <Link underline="hover" color="inherit" to="/projects">
+    <Breadcrumbs
+      aria-label="breadcrumb"
+      separator="⧽"
+      sx={{ color: "white", fontSize: "1rem" }}
+    >
+      <Link underline="hover" color="inherit" fontSize="inherit" to="/projects">
         Projects
       </Link>
-      <Link underline="hover" color="inherit" to={`/projects/${project?.id}`}>
+      <Link
+        underline="hover"
+        color="inherit"
+        fontSize="inherit"
+        to={`/projects/${project?.id}`}
+      >
         {project?.name}
       </Link>
-      <Typography>{board.name}</Typography>
+      <Typography fontSize="inherit" color="inherit">
+        {board.name}
+      </Typography>
     </Breadcrumbs>
   );
 }

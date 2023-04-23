@@ -27,7 +27,6 @@ export const {
     },
     closeDialog: (state) => {
       state.isOpen = false;
-      state.projectId = null;
     },
   },
 });

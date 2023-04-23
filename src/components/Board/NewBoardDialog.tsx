@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import {
   RadioGroup,
@@ -34,13 +34,26 @@ type Props = {
   onClose(): void;
 };
 
+export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
+  return (
+    <Dialog open={isOpen} onClose={onClose} maxWidth="sm">
+      <Content projectId={projectId} onClose={onClose} />
+    </Dialog>
+  );
+}
+
 const sxDialogContent: SxProps<Theme> = {
   display: "flex",
   flexDirection: "column",
   gap: 1,
 };
 
-export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
+type ContentProps = {
+  projectId: ID;
+  onClose(): void;
+};
+
+function Content({ projectId, onClose }: ContentProps) {
   const { load, isLoading } = useRequest(actions.addBoardRequest, {
     onSuccess: onClose,
   });
@@ -51,15 +64,6 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
   const [color, setColor] = useState<string>(ENTITY_COLOR.blue);
   const [coverId, setCoverId] = useState<string | null>(null);
   const [coverURL, setCoverURL] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setBoardName("");
-      setColor("blue");
-      setCoverURL(null);
-      setCoverId(null);
-    }
-  }, [isOpen]);
 
   const onCoverChange = (data: OnChangeArg) => {
     if ("color" in data) {
@@ -89,7 +93,7 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
   };
 
   return (
-    <Dialog open={isOpen} onClose={onClose}>
+    <>
       <DialogTitle>New board in project "{project?.name}"</DialogTitle>
       <DialogContent dividers sx={sxDialogContent}>
         <DialogContentText>
@@ -147,6 +151,6 @@ export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
           Create board
         </LoadingButton>
       </DialogActions>
-    </Dialog>
+    </>
   );
 }
