@@ -1,48 +1,56 @@
-import { useMemo, useRef, memo } from "react";
-import { generatePath } from "react-router-dom";
+import { useRef, memo } from "react";
 import {
   Card,
   CardContent,
   CardHeader,
-  Avatar,
   IconButton,
   Menu,
   MenuItem,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-import { selectProjectById } from "app/projects/index";
-import { selectBoardsIdsByProjectId } from "app/boards/selectors";
-import { actions as apiActions } from "app/apiInteraction";
-import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice";
-import { useAppDispatch, useAppSelector } from "app/hooks";
-import { ID } from "models/types";
-import { ENTITY_COLOR } from "models/constants";
+import { actions as confirmDialogActions } from "app/widgets/confirmDialog";
+import { useAppDispatch } from "app/hooks";
+import { Project } from "models/types";
+import { showSnackbar } from "app/snackbars";
 
 import BoardPreviewList from "components/Board/BoardPreviewList";
 import useToggle from "components/hooks/useToggle";
 import Link from "components/Link";
+import ColoredAvatar from "components/ColoredAvatar";
+import { useClearProject, useDeleteProject } from "app/hooks/projects";
 
-function ProjectInfo({ id }: { id: ID }) {
+function ProjectInfo({ project }: { project: Project }) {
+  const { id, boards = [] } = project;
   const dispatch = useAppDispatch();
   const menuRef = useRef(null);
-  const project = useAppSelector((state) => selectProjectById(state, id));
-  const boards = useAppSelector((state) =>
-    selectBoardsIdsByProjectId(state, id),
-  );
   const [menuIsVisible, showMenu, hideMenu] = useToggle(false);
 
-  const avatarBgColor = useMemo(() => {
-    if (project) {
-      return Object.values(ENTITY_COLOR)[
-        project.name[0].charCodeAt(0) % Object.keys(ENTITY_COLOR).length
-      ];
-    }
-  }, [project]);
+  const { mutate: clearProject } = useClearProject({
+    projectId: project.id,
+    onSuccess() {
+      dispatch(
+        showSnackbar({
+          message: `Project "${project.name}" has been cleared`,
+          type: "info",
+        }),
+      );
+      dispatch(confirmDialogActions.closeDialog());
+    },
+  });
 
-  if (!project) {
-    return null;
-  }
+  const { mutate: deleteProject } = useDeleteProject({
+    projectId: project.id,
+    onSuccess() {
+      dispatch(
+        showSnackbar({
+          message: `Project "${project.name}" has been deleted`,
+          type: "info",
+        }),
+      );
+      dispatch(confirmDialogActions.closeDialog());
+    },
+  });
 
   return (
     <Card
@@ -52,13 +60,9 @@ function ProjectInfo({ id }: { id: ID }) {
     >
       <CardHeader
         avatar={
-          <Avatar
-            src={project.avatarThumbnailURL}
-            variant="rounded"
-            sx={{ bgcolor: avatarBgColor }}
-          >
-            {project.name[0]}
-          </Avatar>
+          <ColoredAvatar src={project.avatarThumbnailURL} variant="rounded">
+            {project.name}
+          </ColoredAvatar>
         }
         action={
           <IconButton aria-label="settings" ref={menuRef} onClick={showMenu}>
@@ -66,7 +70,7 @@ function ProjectInfo({ id }: { id: ID }) {
           </IconButton>
         }
         title={
-          <Link to={generatePath("/projects/:id", { id })} color="text.primary">
+          <Link to={`/projects/${id}`} color="text.primary">
             {project.name}
           </Link>
         }
@@ -76,7 +80,7 @@ function ProjectInfo({ id }: { id: ID }) {
         }}
       />
       <CardContent>
-        <BoardPreviewList ids={boards} showComposer projectId={id} />
+        <BoardPreviewList boards={boards} showComposer projectId={id} />
       </CardContent>
 
       <Menu
@@ -91,7 +95,7 @@ function ProjectInfo({ id }: { id: ID }) {
             onClick={() => {
               dispatch(
                 confirmDialogActions.showDialog({
-                  okAction: apiActions.clearProject(id),
+                  okCallback: clearProject,
                   okButtonText: "yes",
                   title: "Warning",
                   text: `Clear project "${project.name}"?`,
@@ -107,7 +111,7 @@ function ProjectInfo({ id }: { id: ID }) {
           onClick={() => {
             dispatch(
               confirmDialogActions.showDialog({
-                okAction: apiActions.deleteProject(id),
+                okCallback: deleteProject,
                 okButtonText: "yes",
                 title: "Warning",
                 text: `Delete project "${project.name}"?`,

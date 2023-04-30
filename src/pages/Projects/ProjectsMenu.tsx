@@ -1,4 +1,5 @@
 import React from "react";
+import { useMutation } from "@tanstack/react-query";
 import {
   List,
   ListSubheader,
@@ -9,16 +10,32 @@ import {
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AddIcon from "@mui/icons-material/Add";
 
-import { actions as apiActions } from "app/apiInteraction";
+import { useAPI } from "context/APIProvider";
 import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
-import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice";
 import { useAppDispatch } from "app/hooks";
+import { showSnackbar } from "app/snackbars";
+import { actions as confirmDialogActions } from "app/widgets/confirmDialog";
+
 import { BaseMenu } from "components/Navbar/DrawerMenu";
 
 import { actions } from "./slice";
 
 export function ProjectsMenu() {
+  const api = useAPI();
   const dispatch = useAppDispatch();
+
+  const { mutate: deleteAll } = useMutation({
+    mutationFn: () => api.deleteAllProjects(),
+    onSuccess: () => {
+      dispatch(
+        showSnackbar({
+          message: `All projects have been deleted!`,
+          type: "info",
+        }),
+      );
+      dispatch(confirmDialogActions.closeDialog());
+    },
+  });
 
   const showNewProjectDialog = () => {
     dispatch(drawerMenuActions.close());
@@ -27,12 +44,16 @@ export function ProjectsMenu() {
 
   const deleteAllProjects = () => {
     dispatch(drawerMenuActions.close());
+
     dispatch(
       confirmDialogActions.showDialog({
         title: "Warning",
-        text: "Delete all your projects?",
-        okAction: apiActions.deleteAllProjects(),
         okButtonText: "yes",
+        text: "Delete all your projects?",
+        okCallback: () => {
+          deleteAll();
+          dispatch(confirmDialogActions.setDialogLoading());
+        },
       }),
     );
   };

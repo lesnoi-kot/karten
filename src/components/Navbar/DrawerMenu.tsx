@@ -18,14 +18,16 @@ import CloseIcon from "@mui/icons-material/Close";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import HomeIcon from "@mui/icons-material/Home";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { useQuery } from "@tanstack/react-query";
 
+import { useAPI } from "context/APIProvider";
 import { useAppDispatch, useAppSelector } from "app/hooks";
 import { selectCurrentUser } from "app/users/selectors";
-import { selectProjects } from "app/projects/selectors";
 import { actions, selectIsOpen } from "app/widgets/drawerMenu";
 import ColorThemeSwitch from "components/ColorThemeSwitch";
 import ColoredAvatar from "components/ColoredAvatar";
 import Link from "components/Link";
+import { useEffect } from "react";
 
 type Props = {
   children: React.ReactNode;
@@ -137,8 +139,13 @@ function DrawerMainSection({ children }: SectionProps) {
 }
 
 function DrawerProjectsSection({ children }: SectionProps) {
+  const api = useAPI();
   const dispatch = useAppDispatch();
-  const projects = useAppSelector(selectProjects);
+
+  const { data: projects = [] } = useQuery({
+    queryKey: ["projects"],
+    queryFn: () => api.getProjects({ includeBoards: false }),
+  });
 
   if (projects.length === 0) {
     return null;
@@ -156,7 +163,7 @@ function DrawerProjectsSection({ children }: SectionProps) {
           to={`/projects/${project.id}`}
         >
           <ListItemAvatar>
-            <ColoredAvatar oneLetter src={project.avatarThumbnailURL}>
+            <ColoredAvatar src={project.avatarThumbnailURL}>
               {project.name}
             </ColoredAvatar>
           </ListItemAvatar>

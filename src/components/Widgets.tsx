@@ -1,11 +1,11 @@
-import ConfirmDialog from "components/ConfirmDialog";
+import ConfirmDialogWidget from "widgets/ConfirmDialogWidget";
 import Snackbars from "components/Snackbars";
 import NewBoardDialogWidget from "widgets/NewBoardDialogWidget";
 
 export function Widgets() {
   return (
     <>
-      <ConfirmDialog />
+      <ConfirmDialogWidget />
       <Snackbars />
       <NewBoardDialogWidget />
     </>

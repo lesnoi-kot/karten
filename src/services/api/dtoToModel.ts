@@ -41,6 +41,7 @@ export function convertBoardDTO(dto: BoardDTO): Board {
     dateLastViewed: dto.date_last_viewed,
     color: convertNumberToColor(dto.color),
     coverURL: dto.cover_url ?? "",
+    projectName: "TODO",
     taskLists: dto.task_lists ? dto.task_lists.map(convertTaskListDTO) : [],
   };
 }

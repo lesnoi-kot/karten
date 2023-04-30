@@ -31,11 +31,6 @@ import {
 } from "app/widgets/newBoardDialog";
 
 import {
-  reducer as projectsReducer,
-  sliceName as projectsSliceName,
-} from "./projects";
-
-import {
   reducer as taskListsReducer,
   sliceName as taskListsSliceName,
 } from "./taskLists";
@@ -46,11 +41,6 @@ import {
   reducer as commentsReducer,
   sliceName as commentsSliceName,
 } from "./comments";
-
-import {
-  reducer as boardsReducer,
-  sliceName as boardsSliceName,
-} from "./boards";
 
 import { reducer as usersReducer, sliceName as usersSliceName } from "./users";
 
@@ -63,8 +53,6 @@ export const rootReducer = combineReducers({
   [apiInteractionSliceName]: apiInteractionReducer,
 
   entities: combineReducers({
-    [projectsSliceName]: projectsReducer,
-    [boardsSliceName]: boardsReducer,
     [taskListsSliceName]: taskListsReducer,
     [tasksSliceName]: tasksReducer,
     [commentsSliceName]: commentsReducer,

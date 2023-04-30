@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
   DialogTitle,
@@ -8,12 +9,11 @@ import {
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
-import { actions as apiActions } from "app/apiInteraction";
+import { useAPI } from "context/APIProvider";
 import { ID, Board } from "models/types";
 import BoardCoverSelect, {
   OnChangeArg,
 } from "components/Board/BoardCoverSelect";
-import { useRequest } from "app/apiInteraction/hooks";
 import { hexColorToNumber } from "utils/color";
 
 type Props = {
@@ -23,12 +23,19 @@ type Props = {
 };
 
 export default function ChangeCoverDialog({ open, onClose, board }: Props) {
+  const api = useAPI();
+  const queryClient = useQueryClient();
   const [color, setColor] = useState<string>(board.color);
   const [coverURL, setCoverURL] = useState<string | null>(board.coverURL);
   const [coverId, setCoverId] = useState<ID | null>(null);
 
-  const { load, isLoading } = useRequest(apiActions.updateBoardRequest, {
-    onSuccess() {
+  const { mutate, isLoading } = useMutation({
+    mutationFn: api.editBoard.bind(api),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["boards", { boardId: board.id }],
+      });
+
       onClose();
     },
   });
@@ -46,12 +53,12 @@ export default function ChangeCoverDialog({ open, onClose, board }: Props) {
 
   const onSubmit = () => {
     if (coverId) {
-      load({
+      mutate({
         id: board.id,
         coverId: coverId,
       });
     } else {
-      load({
+      mutate({
         id: board.id,
         color: hexColorToNumber(color),
         coverId: null,

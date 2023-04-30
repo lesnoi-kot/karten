@@ -1,12 +1,22 @@
 import { Box, Typography } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
 
-import { selectLastViewedBoards } from "app/boards/selectors";
-import { useAppSelector } from "app/hooks";
-
+import { useAPI } from "context/APIProvider";
 import BoardPreviewList from "components/Board/BoardPreviewList";
+import { compareDateStrings } from "utils/selectors";
 
 function RecentlyViewed() {
-  const boards = useAppSelector(selectLastViewedBoards);
+  const api = useAPI();
+
+  const { data: projects = [] } = useQuery({
+    queryKey: ["projects", { includeBoards: true }],
+    queryFn: () => api.getProjects({ includeBoards: true }),
+  });
+
+  const boards = projects
+    .flatMap((project) => project.boards ?? [])
+    .sort((a, b) => compareDateStrings(b.dateLastViewed, a.dateLastViewed))
+    .slice(0, 4);
 
   if (boards.length === 0) {
     return null;
@@ -24,7 +34,7 @@ function RecentlyViewed() {
         Recently viewed
       </Typography>
 
-      <BoardPreviewList ids={boards} />
+      <BoardPreviewList boards={boards} />
     </Box>
   );
 }

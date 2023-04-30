@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { useAPI } from "context/APIProvider";
 import {
   RadioGroup,
   FormControlLabel,
@@ -18,26 +20,22 @@ import {
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
-import { actions } from "app/apiInteraction";
-import { ID } from "models/types";
-import { selectProjectById } from "app/projects/selectors";
-import { useAppSelector } from "app/hooks";
-import { useRequest } from "app/apiInteraction/hooks";
+import { Project } from "models/types";
 
 import BoardCoverSelect, { OnChangeArg } from "./BoardCoverSelect";
 import { hexColorToNumber } from "utils/color";
 import { ENTITY_COLOR } from "models/constants";
 
 type Props = {
-  projectId: ID;
+  project: Project;
   isOpen: boolean;
   onClose(): void;
 };
 
-export default function NewBoardDialog({ projectId, isOpen, onClose }: Props) {
+export default function NewBoardDialog({ project, isOpen, onClose }: Props) {
   return (
     <Dialog open={isOpen} onClose={onClose} maxWidth="sm">
-      <Content projectId={projectId} onClose={onClose} />
+      <Content project={project} onClose={onClose} />
     </Dialog>
   );
 }
@@ -49,17 +47,25 @@ const sxDialogContent: SxProps<Theme> = {
 };
 
 type ContentProps = {
-  projectId: ID;
+  project: Project;
   onClose(): void;
 };
 
-function Content({ projectId, onClose }: ContentProps) {
-  const { load, isLoading } = useRequest(actions.addBoardRequest, {
-    onSuccess: onClose,
+function Content({ project, onClose }: ContentProps) {
+  const api = useAPI();
+  const queryClient = useQueryClient();
+
+  const { mutate: addBoard, isLoading } = useMutation({
+    mutationFn: api.addBoard.bind(api),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["projects"],
+      });
+
+      onClose();
+    },
   });
-  const project = useAppSelector((state) =>
-    selectProjectById(state, projectId),
-  );
+
   const [boardName, setBoardName] = useState("");
   const [color, setColor] = useState<string>(ENTITY_COLOR.blue);
   const [coverId, setCoverId] = useState<string | null>(null);
@@ -76,25 +82,9 @@ function Content({ projectId, onClose }: ContentProps) {
     }
   };
 
-  const onSubmit = () => {
-    if (coverId) {
-      load({
-        projectId,
-        name: boardName,
-        coverId,
-      });
-    } else {
-      load({
-        projectId,
-        name: boardName,
-        color: hexColorToNumber(color),
-      });
-    }
-  };
-
   return (
     <>
-      <DialogTitle>New board in project "{project?.name}"</DialogTitle>
+      <DialogTitle>New board in project "{project.name}"</DialogTitle>
       <DialogContent dividers sx={sxDialogContent}>
         <DialogContentText>
           Kanban boards visually depict work at various stages of a process
@@ -144,7 +134,14 @@ function Content({ projectId, onClose }: ContentProps) {
           Cancel
         </Button>
         <LoadingButton
-          onClick={onSubmit}
+          onClick={() => {
+            addBoard({
+              projectId: project.id,
+              name: boardName,
+              coverId,
+              color: hexColorToNumber(color),
+            });
+          }}
           loading={isLoading}
           disabled={boardName.trim() === ""}
         >

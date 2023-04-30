@@ -1,11 +1,11 @@
-import { useQuery, useMutation } from "react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Box, Stack, BoxProps } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 import { useAPI } from "context/APIProvider";
 import { ColorName, ID } from "models/types";
 import { UploadImage } from "services/api";
-import { ENTITY_COLOR } from "models/constants";
+
 import { ColorTags } from "components/ui/ColorTag";
 import { useFilePicker } from "components/ui/FileInput/FileInput";
 import BoardCoverPreview from "components/Board/BoardCoverPreview";
@@ -22,9 +22,10 @@ export default function BoardCoverSelect({ color, coverURL, onChange }: Props) {
   const api = useAPI();
   const { FileInput, clearFile } = useFilePicker();
 
-  const { data: covers } = useQuery("boards.covers", () =>
-    api.getBoardCovers(),
-  );
+  const { data: covers } = useQuery({
+    queryKey: ["board-covers"],
+    queryFn: () => api.getBoardCovers(),
+  });
 
   const { mutate: uploadImage, isLoading: isUploadingImage } = useMutation({
     mutationFn: (arg: UploadImage) => api.uploadImage(arg),
@@ -33,8 +34,8 @@ export default function BoardCoverSelect({ color, coverURL, onChange }: Props) {
     },
   });
 
-  const setBoardColor = (color: ColorName) => {
-    onChange({ color: ENTITY_COLOR[color] });
+  const setBoardColor = (color: ColorName, hexColor: string) => {
+    onChange({ color: hexColor });
     clearFile();
   };
 

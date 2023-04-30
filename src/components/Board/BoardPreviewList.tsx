@@ -1,29 +1,24 @@
 import { Stack } from "@mui/material";
 
-import { ID } from "models/types";
+import { ID, Board } from "models/types";
 
 import Link from "components/Link";
 
 import BoardPreview from "./BoardPreview";
 import NewBoardStub from "./NewBoardStub";
-import { generatePath } from "react-router-dom";
 
 type Props = {
-  ids: ID[];
+  boards: Board[];
   showComposer?: boolean;
   projectId?: ID;
 };
 
-function BoardPreviewList({ ids, showComposer = false, projectId }: Props) {
+function BoardPreviewList({ boards, showComposer = false, projectId }: Props) {
   return (
     <Stack direction="row" gap={2} width="100%" flexWrap="wrap">
-      {ids.map((boardId) => (
-        <Link
-          key={boardId}
-          to={generatePath("/boards/:id", { id: boardId })}
-          underline="none"
-        >
-          <BoardPreview id={boardId} />
+      {boards.map((board) => (
+        <Link key={board.id} to={`/boards/${board.id}`} underline="none">
+          <BoardPreview board={board} />
         </Link>
       ))}
 

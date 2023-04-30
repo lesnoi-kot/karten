@@ -1,33 +1,27 @@
-import React from "react";
-import { useDispatch } from "react-redux";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { actions } from "app/apiInteraction";
-import { ID } from "models/types";
-import { selectBoard } from "app/boards/selectors";
-import { useAppSelector } from "app/hooks";
+import { useAPI } from "context/APIProvider";
+import { Board } from "models/types";
 import { EditablePageTitle } from "components/EditablePageTitle";
 
-export function BoardName({ boardId }: { boardId: ID }) {
-  const dispatch = useDispatch();
-  const board = useAppSelector((state) => selectBoard(state, boardId));
+export default function BoardName({ board }: { board: Board }) {
+  const api = useAPI();
+  const queryClient = useQueryClient();
 
-  if (!board) {
-    return null;
-  }
-
-  const onNameChange = (name: string) => {
-    if (name && name !== board.name) {
-      dispatch(actions.updateBoardRequest({ id: boardId, name }));
-    }
-  };
+  const { mutate: changeName } = useMutation({
+    mutationFn: (name: string) => api.editBoard({ id: board.id, name }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["boards", { boardId: board.id }],
+      });
+    },
+  });
 
   return (
     <EditablePageTitle
       value={board.name}
-      onChange={onNameChange}
+      onChange={changeName}
       sx={{ color: "white" }}
     />
   );
 }
-
-export default React.memo(BoardName);

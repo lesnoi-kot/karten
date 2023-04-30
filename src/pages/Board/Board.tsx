@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import { useParams, Navigate, useSearchParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import {
@@ -10,16 +10,14 @@ import {
   Typography,
 } from "@mui/material";
 
-import { actions as apiActions } from "app/apiInteraction";
-import { useRequest } from "app/apiInteraction/hooks";
 import { useAppSelector } from "app/hooks";
-import { selectBoard } from "app/boards/selectors";
-import { selectProjectById } from "app/projects/selectors";
 
 import makePage from "pages/makePageHOC";
 import { TaskModal } from "components/Task";
 import ErrorSplash from "components/ui/ErrorSplash";
 import Link from "components/Link";
+import { useAPI } from "context/APIProvider";
+import { Board } from "models/types";
 
 import { useDashboardMethods, selectShouldRedirectToProject } from "./slice";
 import ScrollableSpace from "./ScrollableSpace";
@@ -31,22 +29,38 @@ function BoardPage() {
   const { id: boardId = "" } = useParams();
   const [searchParams] = useSearchParams();
   const { colorScheme } = useColorScheme();
-  const board = useAppSelector((state) => selectBoard(state, boardId));
-  const { load, reload, isLoading, isLoaded, isFailed, error } = useRequest(
-    apiActions.boardRequest,
-  );
+  const api = useAPI();
+
+  const {
+    data: board,
+    refetch,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["boards", { boardId }],
+    queryFn: () => api.getBoard(boardId),
+  });
+
   const { onTaskClick, onTaskModalClose } = useDashboardMethods(boardId);
   const shouldRedirectToProject = useAppSelector(selectShouldRedirectToProject);
   const selectedTaskId = searchParams.get("taskId");
-
-  useEffect(() => load(boardId), [load, boardId]);
 
   if (shouldRedirectToProject) {
     return <Navigate to="/projects" />;
   }
 
+  if (isLoading) {
+    return (
+      <Box textAlign="center" pt={3}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   if (!board) {
-    return null;
+    return <ErrorSplash title="404" message="Project not found" />;
   }
 
   const sxBackground =
@@ -81,13 +95,13 @@ function BoardPage() {
           </Box>
         )}
 
-        {isFailed && <ErrorSplash message={error} retry={reload} />}
+        {isError && <ErrorSplash message={String(error)} retry={refetch} />}
 
-        {isLoaded && (
+        {isSuccess && (
           <>
             <Box pl={3} pt={1} pb={3}>
-              <PageBreadcrumbs />
-              <BoardName boardId={boardId} />
+              <PageBreadcrumbs board={board} />
+              <BoardName board={board} />
             </Box>
 
             <ScrollableSpace
@@ -101,24 +115,13 @@ function BoardPage() {
             </ScrollableSpace>
           </>
         )}
-
         <TaskModal onClose={onTaskModalClose} taskId={selectedTaskId} />
       </Box>
     </DndProvider>
   );
 }
 
-function PageBreadcrumbs() {
-  const { id: boardId = "" } = useParams();
-  const board = useAppSelector((state) => selectBoard(state, boardId));
-  const project = useAppSelector((state) =>
-    board ? selectProjectById(state, board?.projectId) : null,
-  );
-
-  if (!board || !project) {
-    return null;
-  }
-
+function PageBreadcrumbs({ board }: { board: Board }) {
   return (
     <Breadcrumbs
       aria-label="breadcrumb"
@@ -132,9 +135,9 @@ function PageBreadcrumbs() {
         underline="hover"
         color="inherit"
         fontSize="inherit"
-        to={`/projects/${project?.id}`}
+        to={`/projects/${board.projectId}`}
       >
-        {project?.name}
+        {board.projectName}
       </Link>
       <Typography fontSize="inherit" color="inherit">
         {board.name}

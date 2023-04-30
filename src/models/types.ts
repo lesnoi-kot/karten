@@ -48,6 +48,7 @@ export type Board = {
   color: Color;
   coverURL: string;
   taskLists?: TaskList[];
+  projectName: string;
 };
 
 export type Project = {

@@ -204,7 +204,7 @@ export class APIService implements DataStore {
     if (coverId) {
       body.cover_id = coverId;
     } else if (color) {
-      body.color = String(color);
+      body.color = color;
     }
 
     const res = await this.fetchJSON(

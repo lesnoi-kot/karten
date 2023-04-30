@@ -1,29 +1,21 @@
-import React from "react";
-import { useDispatch } from "react-redux";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { actions } from "app/apiInteraction";
-import { ID } from "models/types";
-import { useAppSelector } from "app/hooks";
-import { selectProjectById } from "app/projects";
+import { useAPI } from "context/APIProvider";
+import { Project } from "models/types";
 import { EditablePageTitle } from "components/EditablePageTitle";
 
-export function ProjectName({ projectId }: { projectId: ID }) {
-  const dispatch = useDispatch();
-  const project = useAppSelector((state) =>
-    selectProjectById(state, projectId),
-  );
+export default function ProjectName({ project }: { project: Project }) {
+  const api = useAPI();
+  const queryClient = useQueryClient();
 
-  if (!project) {
-    return null;
-  }
+  const { mutate: changeName } = useMutation({
+    mutationFn: (name: string) => api.editProject({ id: project.id, name }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["projects", { projectId: project.id }],
+      });
+    },
+  });
 
-  const onNameChange = (name: string) => {
-    if (name && name !== project.name) {
-      dispatch(actions.updateProject({ id: projectId, name }));
-    }
-  };
-
-  return <EditablePageTitle value={project.name} onChange={onNameChange} />;
+  return <EditablePageTitle value={project.name} onChange={changeName} />;
 }
-
-export default React.memo(ProjectName);

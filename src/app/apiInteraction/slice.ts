@@ -4,14 +4,9 @@ import { ID } from "models/types";
 import { FetchState } from "utils/types";
 
 import {
-  GetProjectsArgs,
-  AddProjectArgs,
-  AddBoardArgs,
   AddTaskArgs,
-  EditProjectArgs,
   EditCommentArgs,
   AddCommentArgs,
-  EditBoardArgs,
   EditTaskArgs,
   EditTaskListArgs,
   AddTaskListArgs,
@@ -82,17 +77,6 @@ export const {
     logInAsGuest: requestWithPayload<void>(),
 
     /*
-      Projects
-    */
-    getProjects: requestWithPayload<GetProjectsArgs>(),
-    getProject: requestWithPayload<ID>(),
-    addProject: requestWithPayload<AddProjectArgs>(),
-    updateProject: requestWithPayload<EditProjectArgs>(),
-    deleteProject: requestWithPayload<ID>(),
-    clearProject: requestWithPayload<ID>(),
-    deleteAllProjects: requestWithPayload<void>(),
-
-    /*
       Tasks
     */
     getTask: requestWithPayload<ID>(),
@@ -113,15 +97,6 @@ export const {
     updateTaskListRequest: requestWithPayload<EditTaskListArgs>(),
     clearTaskListRequest: requestWithPayload<ID>(),
     syncTaskListRequest: requestWithPayload<ID>(),
-
-    /*
-      Boards
-    */
-    boardRequest: requestWithPayload<ID>(),
-    updateBoardRequest: requestWithPayload<EditBoardArgs>(),
-    clearBoardRequest: requestWithPayload<ID>(),
-    addBoardRequest: requestWithPayload<AddBoardArgs>(),
-    deleteBoardRequest: requestWithPayload<ID>(),
 
     /*
       Comments

@@ -1,7 +1,6 @@
-import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { Helmet } from "react-helmet";
+import { useQuery } from "@tanstack/react-query";
 import {
   Box,
   Container,
@@ -11,32 +10,28 @@ import {
   Breadcrumbs,
 } from "@mui/material";
 
-import { useAppSelector } from "app/hooks";
-
-import { actions as apiActions } from "app/apiInteraction";
-import { selectBoardsIdsByProjectId } from "app/boards/selectors";
-import { selectProjectById } from "app/projects/selectors";
-import { useRequestInfo } from "app/apiInteraction/hooks";
 import makePage from "pages/makePageHOC";
+import { useAPI } from "context/APIProvider";
 import BoardPreviewList from "components/Board/BoardPreviewList";
+import ErrorSplash from "components/ui/ErrorSplash";
 import Link from "components/Link";
 
 import ProjectName from "./ProjectName";
 
 function Project() {
-  const dispatch = useDispatch();
+  const api = useAPI();
   const { id: projectId = "" } = useParams();
-  const project = useAppSelector((state) =>
-    selectProjectById(state, projectId),
-  );
-  const boards = useAppSelector((state) =>
-    selectBoardsIdsByProjectId(state, projectId),
-  );
-  const { isLoading, isLoaded } = useRequestInfo(projectId);
 
-  useEffect(() => {
-    dispatch(apiActions.getProject(projectId, projectId));
-  }, [dispatch, projectId]);
+  const {
+    data: project,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["projects", { projectId }],
+    queryFn: () => api.getProject(projectId),
+    retry: false,
+  });
 
   return (
     <>
@@ -48,9 +43,17 @@ function Project() {
         </Box>
       )}
 
-      {project && isLoaded && (
+      {isError && <ErrorSplash title="404" message="Project not found" />}
+
+      {project && (
         <Container maxWidth="lg" sx={{ pt: 1 }}>
-          <PageBreadcrumbs />
+          <Breadcrumbs aria-label="breadcrumb" separator="⧽">
+            <Link underline="hover" color="inherit" to="/projects">
+              Projects
+            </Link>
+            <Typography>{project.name}</Typography>
+          </Breadcrumbs>
+
           <Box mt={2} mb={3} display="flex" gap={4}>
             {project.avatarURL && (
               <Avatar
@@ -61,7 +64,7 @@ function Project() {
                 title="Project logo"
               />
             )}
-            <ProjectName projectId={projectId} />
+            <ProjectName project={project} />
           </Box>
           <Typography
             variant="h4"
@@ -73,30 +76,14 @@ function Project() {
           >
             Boards
           </Typography>
-          <BoardPreviewList ids={boards} showComposer projectId={projectId} />
+          <BoardPreviewList
+            boards={project.boards ?? []}
+            showComposer
+            projectId={projectId}
+          />
         </Container>
       )}
     </>
-  );
-}
-
-function PageBreadcrumbs() {
-  const { id: projectId = "" } = useParams();
-  const project = useAppSelector((state) =>
-    selectProjectById(state, projectId),
-  );
-
-  if (!project) {
-    return null;
-  }
-
-  return (
-    <Breadcrumbs aria-label="breadcrumb" separator="⧽">
-      <Link underline="hover" color="inherit" to="/projects">
-        Projects
-      </Link>
-      <Typography>{project.name}</Typography>
-    </Breadcrumbs>
   );
 }
 

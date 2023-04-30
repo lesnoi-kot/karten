@@ -1,12 +1,16 @@
 import { Stack, Typography } from "@mui/material";
 
-import { selectProjectsIds } from "app/projects/selectors";
-import { useAppSelector } from "app/hooks";
+import { Project } from "models/types";
+import { useProjects } from "app/hooks/projects";
 
 import ProjectInfo from "./ProjectInfo";
 
 export default function ProjectsList() {
-  const projects = useAppSelector(selectProjectsIds);
+  const { data: projects } = useProjects({ includeBoards: true });
+
+  if (!projects) {
+    return null;
+  }
 
   return (
     <>
@@ -26,8 +30,8 @@ export default function ProjectsList() {
       )}
 
       <Stack gap={4}>
-        {projects.map((projectId) => (
-          <ProjectInfo key={projectId} id={projectId} />
+        {projects.map((project: Project) => (
+          <ProjectInfo key={project.id} project={project} />
         ))}
       </Stack>
     </>

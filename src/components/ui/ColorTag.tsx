@@ -5,7 +5,7 @@ import { ColorName } from "models/types";
 
 type Props = Omit<BoxProps, "color" | "onClick"> & {
   color: ColorName;
-  onClick(color: ColorName): void;
+  onClick(color: ColorName, hexColor: string): void;
 };
 
 const sxColorTile: SxProps<Theme> = {
@@ -22,7 +22,7 @@ export function ColorTag({ color, onClick, ...props }: Props) {
       sx={sxColorTile}
       {...props}
       onClick={() => {
-        onClick(color);
+        onClick(color, ENTITY_COLOR[color]);
       }}
     />
   );

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoadingButton } from "@mui/lab";
 import {
   Avatar,
@@ -19,11 +19,10 @@ import {
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 import { KartenImageFile } from "models/types";
-import { UploadImage } from "services/api";
-import { actions } from "app/apiInteraction";
 import { useAPI } from "context/APIProvider";
-import { useRequest } from "app/apiInteraction/hooks";
 import { useFilePicker } from "components/ui/FileInput/FileInput";
+import { useAppDispatch } from "app/hooks";
+import { showSnackbar } from "app/snackbars";
 
 type Props = {
   isOpen: boolean;
@@ -51,24 +50,37 @@ const sxImagePreviewContainer: SxProps<Theme> = {
 
 function Content({ onClose }: Pick<Props, "onClose">) {
   const api = useAPI();
+  const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
   const [projectName, setProjectName] = useState("");
   const [avatar, setAvatar] = useState<KartenImageFile | null>(null);
   const { FileInput, clearFile } = useFilePicker();
 
-  const { load, isLoading } = useRequest(actions.addProject, {
-    onSuccess: onClose,
+  const { mutate: addProject, isLoading } = useMutation({
+    mutationFn: () =>
+      api.addProject({ name: projectName, avatarId: avatar?.id }),
+    onSuccess: (newProject) => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      onClose();
+
+      dispatch(
+        showSnackbar({
+          message: `Project "${newProject.name}" has been created`,
+          type: "success",
+        }),
+      );
+    },
+    onError: (error) => {
+      dispatch(showSnackbar({ message: String(error), type: "error" }));
+    },
   });
 
   const { mutate: uploadImage, isLoading: isUploadingImage } = useMutation({
-    mutationFn: (arg: UploadImage) => api.uploadImage(arg),
+    mutationFn: (file: File) => api.uploadImage({ file, makeThumbnail: true }),
     onSuccess: (uploadedImage) => {
       setAvatar(uploadedImage);
     },
   });
-
-  const onSubmit = () => {
-    load({ name: projectName, avatarId: avatar?.id });
-  };
 
   return (
     <>
@@ -110,7 +122,7 @@ function Content({ onClose }: Pick<Props, "onClose">) {
               }}
               onChange={(avatars) => {
                 if (avatars[0]) {
-                  uploadImage({ file: avatars[0], makeThumbnail: true });
+                  uploadImage(avatars[0]);
                 }
               }}
             />
@@ -155,7 +167,9 @@ function Content({ onClose }: Pick<Props, "onClose">) {
         <LoadingButton
           loading={isLoading}
           disabled={projectName.trim() === ""}
-          onClick={onSubmit}
+          onClick={() => {
+            addProject();
+          }}
         >
           Create project
         </LoadingButton>

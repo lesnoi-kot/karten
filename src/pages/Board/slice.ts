@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { useNavigate, generatePath } from "react-router-dom";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { actions as apiActions } from "app/apiInteraction";
 import { actions as boardsActions } from "app/boards";
 import { RootState } from "app/types";
 import { ID } from "models/types";
@@ -38,9 +37,6 @@ export const {
   },
   extraReducers: (builder) => {
     builder
-      .addCase(apiActions.boardRequest, (state, { payload: boardId }) => {
-        state.boardId = boardId;
-      })
       .addCase(boardsActions.boardDeleted, (state, { payload: deletedId }) => {
         if (deletedId === state.boardId) {
           state.shouldRedirectToProject = true;

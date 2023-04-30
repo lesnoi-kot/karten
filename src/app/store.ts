@@ -24,12 +24,11 @@ export function createStore() {
   const store = configureStore({
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        serializableCheck: {
-          ignoredActionPaths: ["meta.signal", "payload.avatar", "payload.file"],
-        },
-      }).concat(reduxLogger, epicMiddleware),
-    devTools: true,
+      getDefaultMiddleware({ serializableCheck: false }).concat(
+        reduxLogger,
+        epicMiddleware,
+      ),
+    devTools: import.meta.env.VITE_NODE_ENV !== "production",
   });
 
   epicMiddleware.run(rootEpic);

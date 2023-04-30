@@ -1,21 +1,17 @@
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Box, IconButton, Typography, SxProps, Theme } from "@mui/material";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
-import { useAppDispatch, useAppSelector } from "app/hooks";
-import { actions as apiActions } from "app/apiInteraction";
-import { ID } from "models/types";
-import { selectBoard } from "app/boards/selectors";
+import { Board } from "models/types";
 import { useAPI } from "context/APIProvider";
 
-import Stub from "components/Stub";
 import { PreviewCard } from "components/ui/PreviewCard";
 
 import styles from "./styles.module.css";
 
 type Props = {
-  id: ID;
+  board: Board;
   showFavoriteButton?: boolean;
 };
 
@@ -28,25 +24,24 @@ const sxCardToolbar: SxProps<Theme> = {
   justifyContent: "flex-end",
 };
 
-function BoardPreview({ id, showFavoriteButton = true }: Props) {
-  const dispatch = useAppDispatch();
+function BoardPreview({ board, showFavoriteButton = true }: Props) {
+  const { id, name } = board;
   const api = useAPI();
-  const board = useAppSelector((state) => selectBoard(state, id));
+  const queryClient = useQueryClient();
 
-  const setFavorite = useMutation(
-    () => (board?.favorite ? api.unfavoriteBoard(id) : api.favoriteBoard(id)),
-    {
-      onSuccess: () => {
-        dispatch(apiActions.boardRequest(id));
-      },
+  const setFavorite = useMutation({
+    mutationFn: () =>
+      board?.favorite ? api.unfavoriteBoard(id) : api.favoriteBoard(id),
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ["projects", { includeBoards: true }],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["projects", { projectId: board?.projectId }],
+      });
     },
-  );
-
-  if (!board) {
-    return <Stub />;
-  }
-
-  const { name } = board;
+  });
 
   return (
     <PreviewCard

@@ -9,13 +9,7 @@ const computeColor = (text: string) => {
   return ENTITY_COLOR[color];
 };
 
-type Props = AvatarProps & { oneLetter?: boolean };
-
-export default function ColoredAvatar({
-  oneLetter = false,
-  children,
-  ...props
-}: Props) {
+export default function ColoredAvatar({ children, ...props }: AvatarProps) {
   const childrenIsString = is(String, children);
 
   const sx: SxProps<Theme> = {
@@ -25,8 +19,8 @@ export default function ColoredAvatar({
   };
 
   return (
-    <Avatar {...props} sx={sx}>
-      {oneLetter && childrenIsString ? children.toUpperCase().at(0) : children}
+    <Avatar variant="circular" {...props} sx={sx}>
+      {childrenIsString ? children.toUpperCase().at(0) : children}
     </Avatar>
   );
 }

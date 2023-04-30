@@ -1,11 +1,8 @@
-import { useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { Box, CircularProgress, Container } from "@mui/material";
 
-import { actions as apiActions } from "app/apiInteraction";
-import { useRequest } from "app/apiInteraction/hooks";
+import { useProjects } from "app/hooks/projects";
 import makePage from "pages/makePageHOC";
-
 import ErrorSplash from "components/ui/ErrorSplash";
 
 import RecentlyViewed from "./RecentlyViewed";
@@ -14,11 +11,9 @@ import NewProjectActionButton from "./NewProjectActionButton";
 import StarredBoards from "./StarredBoards";
 
 function ProjectsPage() {
-  const { load, reload, isLoading, isLoaded, isFailed, error } = useRequest(
-    apiActions.getProjects,
-  );
-
-  useEffect(() => load({ includeBoards: true }), [load]);
+  const { isLoading, isError, isSuccess, error, refetch } = useProjects({
+    includeBoards: true,
+  });
 
   return (
     <>
@@ -30,9 +25,9 @@ function ProjectsPage() {
         </Box>
       )}
 
-      {isFailed && <ErrorSplash message={error} retry={reload} />}
+      {isError && <ErrorSplash message={error.toString()} retry={refetch} />}
 
-      {isLoaded && (
+      {isSuccess && (
         <Container maxWidth="lg" sx={{ paddingBottom: 3 }}>
           <StarredBoards />
           <RecentlyViewed />
