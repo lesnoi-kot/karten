@@ -1,6 +1,6 @@
 import React from "react";
-import { useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   List,
   ListItemButton,
@@ -14,37 +14,77 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import PhotoIcon from "@mui/icons-material/Photo";
 import AddIcon from "@mui/icons-material/Add";
 
-import { actions as apiActions } from "app/apiInteraction";
-import { useAppSelector } from "app/hooks";
-import { actions as confirmDialogActions } from "app/widgets/confirmDialog/slice";
-import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
-import { selectBoard } from "app/boards/selectors";
+import { showSnackbar } from "store/snackbars";
+import { useAPI } from "context/APIProvider";
+import { useAppDispatch } from "store/hooks";
+import { actions as confirmDialogActions } from "store/widgets/confirmDialog";
+import { actions as drawerMenuActions } from "store/widgets/drawerMenu";
+
 import Link from "components/Link";
 import useToggle from "components/hooks/useToggle";
 import ChangeCoverDialog from "components/Board/ChangeCoverDialog";
 import { BaseMenu } from "components/Navbar/DrawerMenu";
-import { selectProjectById } from "app/projects";
 
 export function BoardMenu() {
+  const api = useAPI();
+  const navigate = useNavigate();
   const { id: boardId = "" } = useParams();
-  const dispatch = useDispatch();
-  const [dialogVisible, showDialog, hideDialog] = useToggle(false);
+  const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
+  const [coverDialogVisible, showCoverDialog, hideCoverDialog] =
+    useToggle(false);
 
-  const board = useAppSelector((state) => selectBoard(state, boardId));
-  const project = useAppSelector((state) =>
-    board ? selectProjectById(state, board.projectId) : null,
-  );
+  const { data: board } = useQuery({
+    queryKey: ["boards", { boardId }],
+    queryFn: () => api.getBoard(boardId),
+    onSuccess() {},
+  });
 
-  if (!board) {
-    return null;
-  }
+  const { mutate: deleteBoard } = useMutation({
+    mutationFn: () => api.deleteBoard(boardId),
+    onSuccess: () => {
+      dispatch(
+        showSnackbar({
+          message: `Board "${board?.name}" has been deleted!`,
+          type: "info",
+        }),
+      );
+      dispatch(confirmDialogActions.closeDialog());
+
+      queryClient.invalidateQueries({
+        queryKey: ["projects", { projectId: board?.projectId }],
+      });
+      navigate("/");
+    },
+  });
+
+  const { mutate: clearBoard } = useMutation({
+    mutationFn: () => api.deleteBoard(boardId),
+    onSuccess: () => {
+      dispatch(
+        showSnackbar({
+          message: `Board "${board?.name}" has been cleared!`,
+          type: "info",
+        }),
+      );
+      dispatch(confirmDialogActions.closeDialog());
+
+      queryClient.invalidateQueries({
+        queryKey: ["boards", { boardId }],
+      });
+      navigate("/");
+    },
+  });
 
   const onBoardDelete = () => {
     dispatch(
       confirmDialogActions.showDialog({
         title: "Warning",
         text: "Delete this board?",
-        okAction: apiActions.deleteBoardRequest(boardId),
+        okCallback() {
+          dispatch(confirmDialogActions.setDialogLoading());
+          deleteBoard();
+        },
         okButtonText: "yes",
       }),
     );
@@ -56,7 +96,10 @@ export function BoardMenu() {
       confirmDialogActions.showDialog({
         title: "Warning",
         text: "Delete all lists in this board?",
-        okAction: apiActions.clearBoardRequest(boardId),
+        okCallback() {
+          dispatch(confirmDialogActions.setDialogLoading());
+          clearBoard();
+        },
         okButtonText: "yes",
       }),
     );
@@ -65,7 +108,7 @@ export function BoardMenu() {
 
   const onBackgroundChange = () => {
     dispatch(drawerMenuActions.close());
-    showDialog();
+    showCoverDialog();
   };
 
   return (
@@ -73,7 +116,7 @@ export function BoardMenu() {
       mainSectionChildren={
         <ListItemButton
           component={Link}
-          to={`/projects/${board.projectId}`}
+          to={`/projects/${board?.projectId}`}
           onClick={() => {
             dispatch(drawerMenuActions.close());
           }}
@@ -81,11 +124,11 @@ export function BoardMenu() {
           <ListItemIcon>
             <ArrowBack />
           </ListItemIcon>
-          <ListItemText primary={`Back to "${project?.name ?? ""}"`} />
+          <ListItemText primary={`Back to "${board?.projectName ?? ""}"`} />
         </ListItemButton>
       }
     >
-      <List dense subheader={<ListSubheader>{board.name}</ListSubheader>}>
+      <List dense subheader={<ListSubheader>{board?.name}</ListSubheader>}>
         <ListItemButton
           onClick={() => {
             dispatch(drawerMenuActions.close());
@@ -118,11 +161,13 @@ export function BoardMenu() {
           <ListItemText primary="Delete" />
         </ListItemButton>
       </List>
-      <ChangeCoverDialog
-        board={board}
-        open={dialogVisible}
-        onClose={hideDialog}
-      />
+      {board && (
+        <ChangeCoverDialog
+          board={board}
+          open={coverDialogVisible}
+          onClose={hideCoverDialog}
+        />
+      )}
     </BaseMenu>
   );
 }

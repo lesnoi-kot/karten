@@ -14,16 +14,15 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Logout } from "@mui/icons-material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
-import { useAppDispatch, useAppSelector } from "app/hooks";
-import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
-import { actions as apiActions } from "app/apiInteraction";
-import { selectCurrentUser } from "app/users/selectors";
+import { useAppDispatch } from "store/hooks";
+import { actions as drawerMenuActions } from "store/widgets/drawerMenu";
 
 import Heading from "components/ui/Heading";
 import Link from "components/Link";
 import ColorThemeSwitch from "components/ColorThemeSwitch";
 import useToggle from "components/hooks/useToggle";
 import ColoredAvatar from "components/ColoredAvatar";
+import { useUser } from "store/hooks/user";
 
 function NavbarTitle() {
   return (
@@ -42,7 +41,7 @@ type Props = {
 export default function Navbar({ renderMenuButton }: Props) {
   const dispatch = useAppDispatch();
   const profileRef = useRef(null);
-  const user = useAppSelector(selectCurrentUser);
+  const { user } = useUser();
   const [profileMenuIsVisible, showProfileMenu, hideProfileMenu] = useToggle();
 
   return (
@@ -80,7 +79,7 @@ export default function Navbar({ renderMenuButton }: Props) {
           size="small"
         >
           <ColoredAvatar src={user?.avatarURL}>
-            {user?.name?.[0]?.toUpperCase() ?? "G"}
+            {user?.name ?? "G"}
           </ColoredAvatar>
         </IconButton>
       </Toolbar>
@@ -99,11 +98,7 @@ type ProfileMenuProps = MenuProps & {
 };
 
 function ProfileMenu({ onClose, ...props }: ProfileMenuProps) {
-  const dispatch = useAppDispatch();
-
-  const onLogOut = () => {
-    dispatch(apiActions.logOut());
-  };
+  const { logOut } = useUser();
 
   return (
     <Menu
@@ -124,7 +119,7 @@ function ProfileMenu({ onClose, ...props }: ProfileMenuProps) {
         Profile
       </MenuItem>
       <Divider />
-      <MenuItem onClick={onLogOut} dense>
+      <MenuItem onClick={logOut} dense>
         <ListItemIcon>
           <Logout />
         </ListItemIcon>

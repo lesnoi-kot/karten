@@ -4,9 +4,7 @@ import { Box, Typography, Link, styled, BoxProps, Button } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import ScienceIcon from "@mui/icons-material/Science";
 
-import { useAppDispatch, useAppSelector } from "app/hooks";
-import { actions as apiActions } from "app/apiInteraction";
-import { selectCurrentUser } from "app/users/selectors";
+import { useUser, useLogInAsGuest } from "store/hooks/user";
 import { getGitHubOAuthURL } from "services/auth";
 
 const Wrapper = styled(Box)<BoxProps>(() => ({
@@ -18,8 +16,8 @@ const Wrapper = styled(Box)<BoxProps>(() => ({
 }));
 
 function Landing() {
-  const dispatch = useAppDispatch();
-  const user = useAppSelector(selectCurrentUser);
+  const { user } = useUser();
+  const { logIn } = useLogInAsGuest();
 
   if (user) {
     return <Navigate to="/projects" />;
@@ -57,9 +55,7 @@ function Landing() {
           <Button
             startIcon={<ScienceIcon />}
             size="large"
-            onClick={async () => {
-              dispatch(apiActions.logInAsGuest());
-            }}
+            onClick={logIn}
             variant="outlined"
             sx={{ color: "white", borderColor: "rgb(200 200 200)" }}
           >

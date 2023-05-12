@@ -21,8 +21,8 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { KartenImageFile } from "models/types";
 import { useAPI } from "context/APIProvider";
 import { useFilePicker } from "components/ui/FileInput/FileInput";
-import { useAppDispatch } from "app/hooks";
-import { showSnackbar } from "app/snackbars";
+import { useAppDispatch } from "store/hooks";
+import { showSnackbar } from "store/snackbars";
 
 type Props = {
   isOpen: boolean;

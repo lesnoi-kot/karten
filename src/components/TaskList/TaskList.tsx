@@ -1,16 +1,11 @@
-import React, { useState, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { produce } from "immer";
+import { useState, useCallback } from "react";
 import { Box, Stack, InputBaseComponentProps } from "@mui/material";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { ID } from "models/types";
-import { RootState } from "app";
-import {
-  selectTaskListById,
-  selectSortedTaskIds,
-} from "app/taskLists/selectors";
-import Stub from "components/Stub";
+import { useAPI } from "context/APIProvider";
+import * as models from "models/types";
 import EditableTextField from "components/EditableTextField";
-import { actions as apiActions } from "app/apiInteraction";
 import TaskPreview from "components/Task/TaskPreview";
 
 import { useTaskListDND } from "./hooks/taskListDragAndDrop";
@@ -19,60 +14,62 @@ import ListSlot from "./ListSlot";
 import TaskListMenu from "./TaskListMenu";
 import { DragAndDropPlaceholder } from "./DragAndDropPlaceholder";
 
-import styles from "./styles.module.css";
-
 type Props = {
-  id: ID;
-  boardId: ID;
-  onTaskClick(id: ID): void;
+  taskList: models.TaskList;
+  onTaskClick(id: models.ID): void;
 };
 
 const nameStyle: InputBaseComponentProps = { style: { fontWeight: "bold" } };
 
-export function TaskList({ id, boardId, onTaskClick }: Props) {
+export function TaskList({ taskList, onTaskClick }: Props) {
+  const { id, boardId, name, tasks } = taskList;
+  const api = useAPI();
+  const queryClient = useQueryClient();
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const [wrapperRef, setWrapperRef] = useState<HTMLDivElement | null>(null);
-  const dispatch = useDispatch();
-  const taskList = useSelector((state: RootState) =>
-    selectTaskListById(state, id),
-  );
+  const isEmpty = tasks.length === 0;
 
-  const taskIds = useSelector((state: RootState) =>
-    selectSortedTaskIds(state, id),
-  );
-  const isEmpty = taskIds.length === 0;
+  const { mutate: changeName } = useMutation({
+    mutationFn: (newName: string) => api.editTaskList({ id, name: newName }),
+    onMutate(newName) {
+      queryClient.setQueryData<models.Board>(
+        ["boards", { boardId: taskList.boardId }],
+        (board) =>
+          produce(board, (draft) => {
+            draft?.getTaskList(taskList.id)?.setName(newName);
+          }),
+      );
+    },
+  });
 
   const onNameChange = useCallback(
     (newName: string) => {
       if (taskList.name !== newName) {
-        dispatch(
-          apiActions.updateTaskListRequest({
-            id,
-            name: newName,
-          }),
-        );
+        changeName(newName);
       }
     },
-    [id, dispatch, taskList],
+    [taskList.name],
   );
 
   const { dragPreviewRef, dragRef, dropRef, isDragging } = useTaskListDND({
     taskListRef: ref,
     taskListId: id,
-    taskIds,
+    boardId: taskList.boardId,
+    taskIds: tasks.map((task) => task.id),
   });
 
   dragPreviewRef(dragRef(ref));
   dropRef(wrapperRef);
 
-  if (!taskList) {
-    return <Stub />;
-  }
-
-  const { name } = taskList;
-
   return (
-    <Box className={styles.wrapper} ref={setWrapperRef}>
+    <Box
+      position="relative"
+      minWidth="250px"
+      maxWidth="250px"
+      width="250px"
+      height="100%"
+      ref={setWrapperRef}
+    >
       <Box ref={setRef} py={1} borderRadius="2px" bgcolor="surfaces.50">
         <Box fontWeight="bold" paddingLeft={2} mb={1} display="flex">
           <EditableTextField
@@ -81,19 +78,23 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
             fullWidth
             inputProps={nameStyle}
           />
-          <TaskListMenu id={id} />
+          <TaskListMenu taskList={taskList} />
         </Box>
 
         <Stack direction="column" gap={0.5}>
-          {taskIds.map((taskId) => (
-            <ListSlot key={taskId} taskId={taskId}>
-              <TaskPreview id={taskId} onClick={() => onTaskClick(taskId)} />
+          {tasks.map((task) => (
+            <ListSlot key={task.id} taskList={taskList} taskId={task.id}>
+              <TaskPreview
+                taskList={taskList}
+                task={task}
+                onClick={() => onTaskClick(task.id)}
+              />
             </ListSlot>
           ))}
         </Stack>
 
         <Box px={1} mt={isEmpty ? 0 : 1.5}>
-          <TaskComposer taskListId={id} />
+          <TaskComposer boardId={boardId} taskListId={id} />
         </Box>
       </Box>
 
@@ -104,4 +105,4 @@ export function TaskList({ id, boardId, onTaskClick }: Props) {
   );
 }
 
-export default React.memo(TaskList);
+export default TaskList;

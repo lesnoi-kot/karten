@@ -11,10 +11,10 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AddIcon from "@mui/icons-material/Add";
 
 import { useAPI } from "context/APIProvider";
-import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
-import { useAppDispatch } from "app/hooks";
-import { showSnackbar } from "app/snackbars";
-import { actions as confirmDialogActions } from "app/widgets/confirmDialog";
+import { actions as drawerMenuActions } from "store/widgets/drawerMenu";
+import { useAppDispatch } from "store/hooks";
+import { showSnackbar } from "store/snackbars";
+import { actions as confirmDialogActions } from "store/widgets/confirmDialog";
 
 import { BaseMenu } from "components/Navbar/DrawerMenu";
 

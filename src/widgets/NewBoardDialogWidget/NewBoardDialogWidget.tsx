@@ -1,12 +1,12 @@
 import { useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { useAppDispatch, useAppSelector } from "app/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 import { NewBoardDialog } from "components/Board";
 import {
   selectNewBoardDialogWidgetState,
   actions,
-} from "app/widgets/newBoardDialog";
+} from "store/widgets/newBoardDialog";
 import { Project } from "models/types";
 
 export function NewBoardDialogWidget() {

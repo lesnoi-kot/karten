@@ -1,8 +1,7 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 
-import { useAppSelector } from "app/hooks";
-import { selectCurrentUser } from "app/users/selectors";
+import { useUser } from "store/hooks/user";
 
 type Props = {
   children: ReactNode;
@@ -10,7 +9,11 @@ type Props = {
 };
 
 export default function RequireAuth({ children, redirectTo }: Props) {
-  const user = useAppSelector(selectCurrentUser);
+  const { user, isLoading } = useUser();
+
+  if (isLoading) {
+    return null;
+  }
 
   if (!user) {
     return <Navigate to={redirectTo} />;

@@ -1,9 +1,7 @@
-import { useEffect } from "react";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 
 import { settings } from "settings";
-import { actions as apiActions } from "app/apiInteraction";
-import { useRequest } from "app/apiInteraction/hooks";
+
 import ProjectsPage from "pages/Projects";
 import ProjectPage from "pages/Project";
 import BoardPage from "pages/Board";
@@ -16,14 +14,7 @@ import LayoutWithNavbar from "components/layouts/LayoutWithNavbar";
 import RequireAuth from "components/RequireAuth";
 import { BaseMenu } from "components/Navbar/DrawerMenu";
 
-function App() {
-  const { load, isLoaded } = useRequest(apiActions.getCurrentUser);
-  useEffect(load, []);
-
-  if (!isLoaded) {
-    return null;
-  }
-
+export default function App() {
   return (
     <BrowserRouter basename={settings.baseURL}>
       <Routes>
@@ -53,5 +44,3 @@ function App() {
     </BrowserRouter>
   );
 }
-
-export default App;

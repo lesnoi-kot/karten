@@ -1,4 +1,4 @@
-import { RootState } from "app";
+import { RootState } from "store";
 
 export function extraParam<T>() {
   return (_: RootState, a: T) => a;

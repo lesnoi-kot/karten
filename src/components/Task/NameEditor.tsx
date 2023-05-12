@@ -1,11 +1,9 @@
 import { useCallback } from "react";
-import { useDispatch } from "react-redux";
 import { Box, InputAdornment } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import EditIcon from "@mui/icons-material/Edit";
 
-import { actions as apiActions } from "app/apiInteraction";
 import { Task } from "models/types";
 import EditableText, {
   Props as EditableTextProps,
@@ -13,6 +11,7 @@ import EditableText, {
 
 export type Props = {
   task: Task;
+  onChange(newName: string): void;
 };
 
 const StyledEditableText = styled(EditableText)<EditableTextProps>(
@@ -21,17 +20,16 @@ const StyledEditableText = styled(EditableText)<EditableTextProps>(
   }),
 );
 
-function NameEditor({ task }: Props) {
-  const { id: taskId, name } = task;
-  const dispatch = useDispatch();
+function NameEditor({ task, onChange }: Props) {
+  const { name } = task;
 
   const onNameChange = useCallback(
     (newName: string) => {
       if (name !== newName) {
-        dispatch(apiActions.updateTaskRequest({ id: taskId, name: newName }));
+        onChange(newName);
       }
     },
-    [taskId, dispatch, name],
+    [name],
   );
 
   return (

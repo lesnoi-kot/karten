@@ -1,9 +1,9 @@
 import { Alert } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 
-import { useAppDispatch, useAppSelector } from "app/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
-import { selectors, actions } from "app/snackbars";
+import { selectors, actions } from "store/snackbars";
 
 function Snackbars() {
   const dispatch = useAppDispatch();

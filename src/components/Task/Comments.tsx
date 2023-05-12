@@ -1,23 +1,13 @@
-import React from "react";
-import { useSelector } from "react-redux";
 import { Box, Stack, Typography } from "@mui/material";
 import CommentIcon from "@mui/icons-material/Comment";
 
-import { ID } from "models/types";
-import { selectSortedCommentsId } from "app/comments/selectors";
+import { Task } from "models/types";
 
 import Comment from "./Comment";
 import CommentComposer from "./CommentComposer";
-import { RootState } from "app";
 
-type Props = {
-  taskId: ID;
-};
-
-function Comments({ taskId }: Props) {
-  const comments = useSelector((state: RootState) =>
-    selectSortedCommentsId(state, taskId),
-  );
+function Comments({ task }: { task: Task }) {
+  const { id, comments = [] } = task;
 
   return (
     <Box>
@@ -29,13 +19,13 @@ function Comments({ taskId }: Props) {
       </Stack>
 
       <Box mt={1}>
-        <CommentComposer taskId={taskId} />
+        <CommentComposer taskId={id} />
       </Box>
 
       {comments.length > 0 && (
         <Stack spacing={3} sx={{ mt: 4 }}>
-          {comments.map((commentId) => (
-            <Comment key={commentId} commentId={commentId} />
+          {comments.map((comment) => (
+            <Comment key={comment.id} comment={comment} />
           ))}
         </Stack>
       )}
@@ -43,4 +33,4 @@ function Comments({ taskId }: Props) {
   );
 }
 
-export default React.memo(Comments);
+export default Comments;

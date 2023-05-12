@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Box,
   CircularProgress,
@@ -15,12 +15,10 @@ import AttachmentIcon from "@mui/icons-material/Attachment";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
 
+import { useTask } from "store/hooks/tasks";
 import { ID } from "models/types";
-import Stub from "components/Stub";
-import { useRequest } from "app/apiInteraction/hooks";
-import { actions as apiActions } from "app/apiInteraction";
+import ErrorSplash from "components/ui/ErrorSplash";
 
-import { useTask } from "./hooks";
 import Comments from "./Comments";
 import DescriptionEditor from "./DescriptionEditor";
 import NameEditor from "./NameEditor";
@@ -30,12 +28,10 @@ export type Props = {
 };
 
 function Task({ taskId }: Props) {
-  const { task } = useTask(taskId);
-  const { load: loadTask, isLoading } = useRequest(apiActions.getTask);
-
-  useEffect(() => {
-    loadTask(taskId);
-  }, []);
+  const {
+    query: { data: task, isLoading },
+    mutation: { mutate: editTask },
+  } = useTask(taskId);
 
   if (isLoading) {
     return (
@@ -46,21 +42,31 @@ function Task({ taskId }: Props) {
   }
 
   if (!task) {
-    return <Stub />;
+    return <ErrorSplash title="404" message="Project not found" />;
   }
 
   return (
     <Paper sx={{ paddingX: 2, paddingY: 2 }}>
       <Box>
-        <NameEditor task={task} />
+        <NameEditor
+          task={task}
+          onChange={(name: string) => {
+            editTask({ name });
+          }}
+        />
       </Box>
       <Stack direction="row" gap={2} mt={2}>
         <Box flexGrow="1" maxWidth="70%">
           <Box>
-            <DescriptionEditor task={task} />
+            <DescriptionEditor
+              task={task}
+              onChange={(text: string) => {
+                editTask({ text });
+              }}
+            />
           </Box>
           <Box mt={4}>
-            <Comments taskId={taskId} />
+            <Comments task={task} />
           </Box>
         </Box>
         <Box flexShrink="0" flexBasis="20%">
@@ -110,4 +116,4 @@ function SidePanel({ taskId }: Props) {
   );
 }
 
-export default React.memo(Task);
+export default Task;

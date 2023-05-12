@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 
 import {
   Box,
@@ -12,7 +11,6 @@ import {
 import { styled } from "@mui/material/styles";
 import NotesIcon from "@mui/icons-material/Notes";
 
-import { actions as apiActions } from "app/apiInteraction";
 import { Task } from "models/types";
 
 import { placeCaretToTheEnd, blurOnEscape } from "utils/events";
@@ -20,6 +18,7 @@ import { Markdown } from "components/Markdown";
 
 export type Props = {
   task: Task;
+  onChange(newDescription: string): void;
 };
 
 const EmptyDescriptionCard = styled(Paper)<PaperProps<"button">>(
@@ -36,9 +35,8 @@ const EmptyDescriptionCard = styled(Paper)<PaperProps<"button">>(
   }),
 );
 
-function DescriptionEditor({ task }: Props) {
-  const dispatch = useDispatch();
-  const { id, text: initialDescription } = task;
+function DescriptionEditor({ task, onChange }: Props) {
+  const { text: initialDescription } = task;
   const [readonly, setReadonly] = useState(true);
   const [description, setDescription] = useState(initialDescription);
 
@@ -48,7 +46,7 @@ function DescriptionEditor({ task }: Props) {
 
   const onDescriptionChange = () => {
     if (initialDescription !== description) {
-      dispatch(apiActions.updateTaskRequest({ id, text: description }));
+      onChange(description);
     }
     setReadonly(true);
   };

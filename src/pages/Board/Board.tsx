@@ -1,5 +1,4 @@
-import { useParams, Navigate, useSearchParams } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams, useSearchParams } from "react-router-dom";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import {
@@ -10,16 +9,14 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useAppSelector } from "app/hooks";
-
 import makePage from "pages/makePageHOC";
 import { TaskModal } from "components/Task";
 import ErrorSplash from "components/ui/ErrorSplash";
 import Link from "components/Link";
-import { useAPI } from "context/APIProvider";
 import { Board } from "models/types";
+import { useBoard } from "store/hooks/boards";
 
-import { useDashboardMethods, selectShouldRedirectToProject } from "./slice";
+import { useBoardMethods } from "./hooks";
 import ScrollableSpace from "./ScrollableSpace";
 import BoardName from "./BoardName";
 import TaskLists from "./TaskLists";
@@ -28,8 +25,8 @@ import PageTitle from "./PageTitle";
 function BoardPage() {
   const { id: boardId = "" } = useParams();
   const [searchParams] = useSearchParams();
+  const selectedTaskId = searchParams.get("taskId");
   const { colorScheme } = useColorScheme();
-  const api = useAPI();
 
   const {
     data: board,
@@ -38,18 +35,9 @@ function BoardPage() {
     isSuccess,
     isError,
     error,
-  } = useQuery({
-    queryKey: ["boards", { boardId }],
-    queryFn: () => api.getBoard(boardId),
-  });
+  } = useBoard(boardId);
 
-  const { onTaskClick, onTaskModalClose } = useDashboardMethods(boardId);
-  const shouldRedirectToProject = useAppSelector(selectShouldRedirectToProject);
-  const selectedTaskId = searchParams.get("taskId");
-
-  if (shouldRedirectToProject) {
-    return <Navigate to="/projects" />;
-  }
+  const { onTaskClick, onTaskModalClose } = useBoardMethods(boardId);
 
   if (isLoading) {
     return (
@@ -87,7 +75,7 @@ function BoardPage() {
         height="calc(100vh - 64px)"
         sx={sxBackground}
       >
-        <PageTitle boardId={boardId} selectedTaskId={selectedTaskId} />
+        <PageTitle board={board} selectedTaskId={selectedTaskId} />
 
         {isLoading && (
           <Box textAlign="center" pt={3}>
@@ -111,7 +99,7 @@ function BoardPage() {
               overflow="scroll"
               flexGrow={1}
             >
-              <TaskLists boardId={boardId} onTaskClick={onTaskClick} />
+              <TaskLists board={board} onTaskClick={onTaskClick} />
             </ScrollableSpace>
           </>
         )}

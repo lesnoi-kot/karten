@@ -6,13 +6,7 @@
 
 - sticky названия листа
 
-- авторизация через 0Auth
-
-- разные фавиконки в зависимости от страницы
-
 - i18n
-
-- Page bottom margin
 
 - <React.StrictMode>
 
@@ -20,10 +14,14 @@
 
 - Text overflow elispsis
 
-- Project logo
-
-- Soft deletes
-
-- Cancel request on unmount useEffect
-
 - Dynamic import on pages and complex components
+
+- Tree shake ramda & mui
+
+- Parse youtube links and display mini-player
+
+- "Flash" new comment when it appears
+
+- SSR
+
+- Timer in tasks to track spent time

@@ -1,5 +1,5 @@
 import "react-redux";
-import type { RootState } from "app/types";
+import type { RootState } from "store/types";
 import type { Color } from "@mui/material";
 
 type VoidFunction = () => void;

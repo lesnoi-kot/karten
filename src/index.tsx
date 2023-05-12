@@ -11,7 +11,7 @@ import type {} from "@mui/material/themeCssVarsAugmentation";
 
 import { APIContext } from "context/APIProvider";
 import { getDataStore } from "services/api";
-import { createStore } from "app/store";
+import { createStore } from "store/store";
 
 import App from "./App";
 import { appTheme } from "./theme";
@@ -22,6 +22,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      // staleTime: 1000,
     },
   },
 });

@@ -1,21 +1,31 @@
 import { useRef } from "react";
+import { produce } from "immer";
 import { useDrop, useDrag, XYCoord } from "react-dnd";
-import { useDispatch } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 
-import { actions as apiActions } from "app/apiInteraction";
-import { actions as tasksActions } from "app/tasks";
-import { ID } from "models/types";
+import { ID, Task, Board } from "models/types";
+import { useEditTask } from "store/hooks/tasks";
 
 import { DNDTaskItem, DND_TASK_TYPE } from "../constants";
 
 type UseTaskDNDArgs = {
+  boardId: ID;
   taskId: ID;
   taskRef: HTMLDivElement | null;
 };
 
-export const useTaskDND = ({ taskId, taskRef }: UseTaskDNDArgs) => {
-  const dispatch = useDispatch();
+export function useTaskDND({ boardId, taskId, taskRef }: UseTaskDNDArgs) {
   const prevOffset = useRef<XYCoord | null>(null);
+  const { mutate } = useEditTask(taskId);
+  const queryClient = useQueryClient();
+
+  function taskMoved(taskId: ID, targetId: ID, isBefore: boolean) {
+    queryClient.setQueryData<Board>(["boards", { boardId }], (board) =>
+      produce(board, (draft) => {
+        draft?.moveTask({ taskId, targetId, isBefore });
+      }),
+    );
+  }
 
   const [{ isDragging }, dragRef, dragPreviewRef] = useDrag(
     () => ({
@@ -33,7 +43,13 @@ export const useTaskDND = ({ taskId, taskRef }: UseTaskDNDArgs) => {
       accept: DND_TASK_TYPE,
       drop: (item: DNDTaskItem, monitor) => {
         if (!monitor.didDrop()) {
-          dispatch(apiActions.syncTaskRequest(item.taskId));
+          const task = queryClient
+            .getQueryData<Board>(["boards", { boardId }])
+            ?.getTask(item.taskId);
+
+          if (task) {
+            mutate({ position: task.position });
+          }
         }
       },
       hover(dragItem: DNDTaskItem, monitor) {
@@ -45,36 +61,23 @@ export const useTaskDND = ({ taskId, taskRef }: UseTaskDNDArgs) => {
           return;
         }
 
-        const rect = taskRef.getBoundingClientRect();
-        const isBefore = offset.y <= rect.y + rect.height / 2;
-
         if (hoverBegin) {
-          dispatch(
-            tasksActions.taskMoved({
-              taskId: draggedId,
-              dropTaskId: taskId,
-              isBefore,
-            }),
-          );
+          const rect = taskRef.getBoundingClientRect();
+          const isBefore = offset.y <= rect.y + rect.height / 2;
+          taskMoved(draggedId, taskId, isBefore);
         } else if (prevOffset.current) {
           const yDiff = offset.y - prevOffset.current.y;
 
           if (yDiff !== 0) {
-            dispatch(
-              tasksActions.taskMoved({
-                taskId: draggedId,
-                dropTaskId: taskId,
-                isBefore: yDiff < 0,
-              }),
-            );
+            taskMoved(draggedId, taskId, yDiff < 0);
           }
         }
 
         prevOffset.current = offset;
       },
     }),
-    [taskRef, taskId, dispatch],
+    [taskRef, taskId],
   );
 
   return { dragPreviewRef, dragRef, dropRef, isDragging };
-};
+}

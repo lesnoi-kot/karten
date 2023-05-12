@@ -1,27 +1,54 @@
-import React, { useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useRef } from "react";
+import { produce } from "immer";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { IconButton } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-import { ID } from "models/types";
+import { useAPI } from "context/APIProvider";
+import { Board, TaskList } from "models/types";
 import useToggle from "components/hooks/useToggle";
 
-import { actions } from "app/apiInteraction";
-
-export default function TaskListMenu({ id }: { id: ID }) {
-  const dispatch = useDispatch();
+export default function TaskListMenu({ taskList }: { taskList: TaskList }) {
   const [visible, show, hide] = useToggle(false);
   const anchorEl = useRef(null);
+  const api = useAPI();
+  const queryClient = useQueryClient();
+
+  const { mutate: clearTaskList } = useMutation({
+    mutationFn: () => api.clearTaskList(taskList.id),
+    onMutate() {
+      queryClient.setQueryData<Board>(
+        ["boards", { boardId: taskList.boardId }],
+        (board) =>
+          produce(board, (draft) => {
+            draft?.getTaskList(taskList.id)?.clear();
+          }),
+      );
+    },
+  });
+
+  const { mutate: deleteTaskList } = useMutation({
+    mutationFn: () => api.deleteTaskList(taskList.id),
+    onMutate() {
+      queryClient.setQueryData<Board>(
+        ["boards", { boardId: taskList.boardId }],
+        (board) =>
+          produce(board, (draft) => {
+            draft?.deleteTaskList(taskList.id);
+          }),
+      );
+    },
+  });
 
   const onClear = () => {
-    dispatch(actions.clearTaskListRequest(id));
+    clearTaskList();
     hide();
   };
 
   const onDelete = () => {
-    dispatch(actions.deleteTaskListRequest(id));
+    deleteTaskList();
     hide();
   };
 

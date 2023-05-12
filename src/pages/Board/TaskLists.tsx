@@ -1,32 +1,24 @@
-import React from "react";
-import { useSelector } from "react-redux";
 import { Stack } from "@mui/material";
 
-import { RootState } from "app";
-import { ID } from "models/types";
-import { selectSortedTaskListIds } from "app/taskLists/selectors";
+import { ID, Board } from "models/types";
 
 import TaskList from "components/TaskList";
 import NewListPlaceholder from "components/TaskList/NewListPlaceholder";
 
-export function TaskLists({
-  boardId,
-  onTaskClick,
-}: {
-  boardId: ID;
+type Props = {
+  board: Board;
   onTaskClick: (id: ID) => void;
-}) {
-  const lists = useSelector((state: RootState) =>
-    selectSortedTaskListIds(state, boardId),
-  );
+};
+
+export function TaskLists({ board, onTaskClick }: Props) {
+  const { id: boardId, taskLists } = board;
 
   return (
     <Stack gap={1} direction="row" alignItems="flex-start" height="100%">
-      {lists.map((id: ID) => (
+      {taskLists.map((taskList) => (
         <TaskList
-          key={id}
-          boardId={boardId}
-          id={id}
+          key={taskList.id}
+          taskList={taskList}
           onTaskClick={onTaskClick}
         />
       ))}
@@ -36,4 +28,4 @@ export function TaskLists({
   );
 }
 
-export default React.memo(TaskLists);
+export default TaskLists;

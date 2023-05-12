@@ -1,30 +1,25 @@
 import { useDispatch } from "react-redux";
 import { Helmet } from "react-helmet";
 import {
-  Box,
-  Paper,
-  Container,
-  Button,
   Avatar,
-  Typography,
+  Box,
+  Button,
+  CircularProgress,
+  Container,
   Link,
+  Paper,
+  Typography,
 } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
-import { useAppSelector } from "app/hooks";
-import { actions as apiActions } from "app/apiInteraction";
-import { actions as confirmDialogActions } from "app/widgets/confirmDialog";
-import { selectCurrentUser } from "app/users/selectors";
+import { actions as confirmDialogActions } from "store/widgets/confirmDialog";
+import { useUser } from "store/hooks/user";
 import { GUEST_USER_ID } from "models/constants";
 import makePage from "pages/makePageHOC";
 
 function Profile() {
   const dispatch = useDispatch();
-  const user = useAppSelector(selectCurrentUser);
-
-  if (!user) {
-    return null;
-  }
+  const { user, isLoading, logOut, deleteUser } = useUser();
 
   return (
     <>
@@ -41,12 +36,18 @@ function Profile() {
           Profile
         </Typography>
 
+        {isLoading && (
+          <Box textAlign="center" mt={3}>
+            <CircularProgress />
+          </Box>
+        )}
+
         <Paper
           sx={{ p: 3, mt: 3, display: "flex", gap: 3, flexDirection: "column" }}
         >
           <Box display="flex" gap={3}>
             <Avatar
-              src={user.avatarURL}
+              src={user?.avatarURL}
               variant="circular"
               sx={{ width: 64, height: 64 }}
               alt="User avatar"
@@ -54,10 +55,10 @@ function Profile() {
             />
             <Box>
               <Typography variant="h4" component="h2">
-                {user.name}
+                {user?.name}
               </Typography>
 
-              {!!user.url && (
+              {!!user?.url && (
                 <Link
                   target="_blank"
                   rel="noopener"
@@ -74,16 +75,11 @@ function Profile() {
           </Box>
 
           <Box display="flex" gap={2}>
-            <Button
-              variant="outlined"
-              onClick={() => {
-                dispatch(apiActions.logOut());
-              }}
-            >
+            <Button variant="outlined" onClick={logOut}>
               Log Out
             </Button>
 
-            {user.id !== GUEST_USER_ID && (
+            {user?.id !== GUEST_USER_ID && (
               <Button
                 variant="outlined"
                 color="error"
@@ -92,7 +88,9 @@ function Profile() {
                     confirmDialogActions.showDialog({
                       title: "Warning",
                       text: "Do you want to delete your account?",
-                      okAction: apiActions.deleteUser(),
+                      okCallback() {
+                        deleteUser();
+                      },
                       okButtonText: "Delete",
                     }),
                   );

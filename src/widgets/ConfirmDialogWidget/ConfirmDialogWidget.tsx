@@ -1,8 +1,6 @@
-import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { actions, selectState } from "app/widgets/confirmDialog";
-import { useRequestInfoOfAction } from "app/apiInteraction/hooks";
+import { actions, selectState } from "store/widgets/confirmDialog";
 import ConfirmDialog from "components/ConfirmDialog";
 
 export function ConfirmDialogWidget() {
@@ -16,11 +14,8 @@ export function ConfirmDialogWidget() {
     cancelButtonText,
     closeOnOk,
     okCallback,
-    isLoading: isLoading,
+    isLoading,
   } = useSelector(selectState);
-  const { isLoaded, isLoading: isRequestLoading } =
-    useRequestInfoOfAction(okAction);
-
   const onClose = () => dispatch(actions.closeDialog());
 
   const onOK = () => {
@@ -37,16 +32,10 @@ export function ConfirmDialogWidget() {
     }
   };
 
-  useEffect(() => {
-    if (isLoaded) {
-      onClose();
-    }
-  }, [dispatch, isLoaded]);
-
   return (
     <ConfirmDialog
       isOpen={isOpen}
-      isLoading={isLoading || isRequestLoading}
+      isLoading={isLoading}
       title={title}
       text={text}
       onOK={onOK}

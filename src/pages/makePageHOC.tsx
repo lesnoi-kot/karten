@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-import { pageLoaded, pageUnloaded } from "app/actions";
+import { pageLoaded, pageUnloaded } from "store/actions";
 
 export function makePage(Page: React.ComponentType) {
   function InheritedLayer(props: any) {

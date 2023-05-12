@@ -227,7 +227,7 @@ export class APIService implements DataStore {
 
   /* ------------ */
 
-  async getTaskList(id: string): Promise<TaskList> {
+  async getTaskList(id: ID): Promise<TaskList> {
     const res = await this.fetchJSON(`/task-lists/${id}`);
     return convertTaskListDTO(await this.unwrapResponse<TaskListDTO>(res));
   }
@@ -241,7 +241,12 @@ export class APIService implements DataStore {
     return convertTaskListDTO(await this.unwrapResponse<TaskListDTO>(res));
   }
 
-  async deleteTaskList(id: string) {
+  async clearTaskList(id: ID) {
+    const res = await this.fetchJSON(`/task-lists/${id}/tasks`, "DELETE");
+    await this.checkResponseError(res);
+  }
+
+  async deleteTaskList(id: ID) {
     const res = await this.fetchJSON(`/task-lists/${id}`, "DELETE");
     await this.checkResponseError(res);
   }
@@ -257,7 +262,7 @@ export class APIService implements DataStore {
 
   /* ------------ */
 
-  async getTask(id: string): Promise<Task> {
+  async getTask(id: ID): Promise<Task> {
     const res = await this.fetchJSON(`/tasks/${id}`);
     return convertTaskDTO(await this.unwrapResponse<TaskDTO>(res));
   }
@@ -273,13 +278,9 @@ export class APIService implements DataStore {
     return convertTaskDTO(await this.unwrapResponse<TaskDTO>(res));
   }
 
-  async deleteTask(id: string): Promise<void> {
+  async deleteTask(id: ID): Promise<void> {
     const res = await this.fetchJSON(`/tasks/${id}`, "DELETE");
     await this.checkResponseError(res);
-  }
-
-  async deleteTasks(args: ID[]): Promise<void> {
-    throw new Error("Not implemented!");
   }
 
   async addTask(args: AddTaskArgs): Promise<Task> {
@@ -310,7 +311,7 @@ export class APIService implements DataStore {
     return convertCommentDTO(await this.unwrapResponse<CommentDTO>(res));
   }
 
-  async deleteComment(id: string): Promise<void> {
+  async deleteComment(id: ID): Promise<void> {
     const res = await this.fetchJSON(`/comments/${id}`, "DELETE");
     await this.checkResponseError(res);
   }

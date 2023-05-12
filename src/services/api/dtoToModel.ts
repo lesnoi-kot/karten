@@ -1,4 +1,3 @@
-import { ENTITY_COLOR } from "models/constants";
 import {
   Board,
   Project,
@@ -9,6 +8,7 @@ import {
   User,
   KartenImageFile,
 } from "models/types";
+
 import {
   ProjectDTO,
   BoardDTO,
@@ -31,32 +31,32 @@ export function convertProjectDTO(dto: ProjectDTO): Project {
 }
 
 export function convertBoardDTO(dto: BoardDTO): Board {
-  return {
-    id: dto.id,
-    projectId: dto.project_id,
-    archived: dto.archived,
-    favorite: dto.favorite,
-    name: dto.name,
-    dateCreated: dto.date_created,
-    dateLastViewed: dto.date_last_viewed,
-    color: convertNumberToColor(dto.color),
-    coverURL: dto.cover_url ?? "",
-    projectName: "TODO",
-    taskLists: dto.task_lists ? dto.task_lists.map(convertTaskListDTO) : [],
-  };
+  return new Board(
+    dto.id,
+    dto.project_id,
+    dto.archived,
+    dto.favorite,
+    dto.name,
+    dto.date_created,
+    dto.date_last_viewed,
+    convertNumberToColor(dto.color),
+    dto.cover_url ?? "",
+    dto.task_lists ? dto.task_lists.map(convertTaskListDTO) : [],
+    dto.project_name,
+  );
 }
 
 export function convertTaskListDTO(dto: TaskListDTO): TaskList {
-  return {
-    id: dto.id,
-    boardId: dto.board_id,
-    position: dto.position,
-    archived: dto.archived,
-    name: dto.name,
-    dateCreated: dto.date_created,
-    color: convertNumberToColor(dto.color),
-    tasks: dto.tasks ? dto.tasks.map(convertTaskDTO) : [],
-  };
+  return new TaskList(
+    dto.id,
+    dto.board_id,
+    dto.archived,
+    dto.position,
+    dto.name,
+    dto.date_created,
+    convertNumberToColor(dto.color),
+    dto.tasks ? dto.tasks.map(convertTaskDTO) : [],
+  );
 }
 
 export function convertTaskDTO(dto: TaskDTO): Task {

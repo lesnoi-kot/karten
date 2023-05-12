@@ -16,7 +16,7 @@ export default function usePressAndMoveScroll<
   const pressed = useRef<boolean>(false);
 
   const onMouseDown: MouseEventHandler = useCallback((e) => {
-    if (!scrollable.current) return;
+    if (!scrollable.current || e.button !== 0) return;
 
     if ((e.target as HTMLElement).closest('[draggable="true"]') === null) {
       pressed.current = true;

@@ -1,12 +1,12 @@
 import { useState, useRef, KeyboardEventHandler } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { styled } from "@mui/material/styles";
 import { Box, TextField, Collapse, Card, CardProps } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { LoadingButton } from "@mui/lab";
 
+import { useAPI } from "context/APIProvider";
 import { ID } from "models/types";
-import { useRequest } from "app/apiInteraction/hooks";
-import { actions } from "app/apiInteraction";
 
 const StyledCard = styled(Card)<CardProps>(({ theme }) => ({
   padding: theme.spacing(1),
@@ -18,6 +18,8 @@ const StyledCard = styled(Card)<CardProps>(({ theme }) => ({
 }));
 
 function NewListPlaceholder({ boardId }: { boardId: ID }) {
+  const api = useAPI();
+  const queryClient = useQueryClient();
   const [isFieldVisible, setFieldVisible] = useState(false);
   const [taskListName, setTaskListName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -41,15 +43,21 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
     setTaskListName("");
   };
 
-  const { load, isLoading } = useRequest(actions.addTaskListRequest, {
-    onSuccess() {
+  const { mutate: addTaskList, isLoading } = useMutation({
+    mutationFn: () =>
+      api.addTaskList({ boardId, name: taskListName, position: Date.now() }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["boards", { boardId }],
+      });
+
       openField();
     },
   });
 
   const submit = () => {
     if (taskListName) {
-      load({ boardId, name: taskListName });
+      addTaskList();
     } else {
       closeField();
     }

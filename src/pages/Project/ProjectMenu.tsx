@@ -15,13 +15,13 @@ import ClearAllIcon from "@mui/icons-material/ClearAll";
 import AddIcon from "@mui/icons-material/Add";
 import PhotoIcon from "@mui/icons-material/Photo";
 
-import { showSnackbar } from "app/snackbars";
-import { useAppDispatch } from "app/hooks";
+import { showSnackbar } from "store/snackbars";
+import { useAppDispatch } from "store/hooks";
 import { useAPI } from "context/APIProvider";
-import { actions as confirmDialogActions } from "app/widgets/confirmDialog";
-import { actions as drawerMenuActions } from "app/widgets/drawerMenu";
-import { actions as newBoardDialogActions } from "app/widgets/newBoardDialog";
-import { useClearProject, useDeleteProject } from "app/hooks/projects";
+import { actions as confirmDialogActions } from "store/widgets/confirmDialog";
+import { actions as drawerMenuActions } from "store/widgets/drawerMenu";
+import { actions as newBoardDialogActions } from "store/widgets/newBoardDialog";
+import { useClearProject, useDeleteProject } from "store/hooks/projects";
 
 import { BaseMenu } from "components/Navbar/DrawerMenu";
 

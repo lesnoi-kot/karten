@@ -9,16 +9,16 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-import { actions as confirmDialogActions } from "app/widgets/confirmDialog";
-import { useAppDispatch } from "app/hooks";
+import { actions as confirmDialogActions } from "store/widgets/confirmDialog";
+import { useAppDispatch } from "store/hooks";
 import { Project } from "models/types";
-import { showSnackbar } from "app/snackbars";
+import { showSnackbar } from "store/snackbars";
 
 import BoardPreviewList from "components/Board/BoardPreviewList";
 import useToggle from "components/hooks/useToggle";
 import Link from "components/Link";
 import ColoredAvatar from "components/ColoredAvatar";
-import { useClearProject, useDeleteProject } from "app/hooks/projects";
+import { useClearProject, useDeleteProject } from "store/hooks/projects";
 
 function ProjectInfo({ project }: { project: Project }) {
   const { id, boards = [] } = project;

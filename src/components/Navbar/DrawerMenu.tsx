@@ -21,13 +21,13 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useQuery } from "@tanstack/react-query";
 
 import { useAPI } from "context/APIProvider";
-import { useAppDispatch, useAppSelector } from "app/hooks";
-import { selectCurrentUser } from "app/users/selectors";
-import { actions, selectIsOpen } from "app/widgets/drawerMenu";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { useUser } from "store/hooks/user";
+import { actions, selectIsOpen } from "store/widgets/drawerMenu";
+
 import ColorThemeSwitch from "components/ColorThemeSwitch";
 import ColoredAvatar from "components/ColoredAvatar";
 import Link from "components/Link";
-import { useEffect } from "react";
 
 type Props = {
   children: React.ReactNode;
@@ -48,7 +48,7 @@ const sxCloseIcon = {
 export default function DrawerMenu({ children }: Props) {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector(selectIsOpen);
-  const user = useAppSelector(selectCurrentUser);
+  const { user } = useUser();
 
   const onClose = () => {
     dispatch(actions.close());

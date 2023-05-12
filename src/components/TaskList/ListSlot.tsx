@@ -9,12 +9,14 @@ import { DragAndDropPlaceholder } from "./DragAndDropPlaceholder";
 type Props = {
   children: React.ReactNode;
   taskId: models.ID;
+  taskList: models.TaskList;
 };
 
-const ListSlot = ({ children, taskId }: Props) => {
+const ListSlot = ({ children, taskId, taskList }: Props) => {
   const [taskRef, setTaskRef] = useState<HTMLDivElement | null>(null);
 
   const { isDragging, dragPreviewRef, dragRef, dropRef } = useTaskDND({
+    boardId: taskList.boardId,
     taskId,
     taskRef,
   });

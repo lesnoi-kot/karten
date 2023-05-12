@@ -1,43 +1,23 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Box, Paper, Typography, Avatar, Button, Stack } from "@mui/material";
 
-import { ID } from "models/types";
+import { useComment } from "store/hooks/comments";
+import * as models from "models/types";
 import Stub from "components/Stub";
-import { actions as apiActions } from "app/apiInteraction";
-import { selectCommentById } from "app/comments/selectors";
-import { useRequest } from "app/apiInteraction/hooks";
-import { useAppDispatch, useAppSelector } from "app/hooks";
-
-import CommentEditor from "./CommentEditor";
 import { Markdown } from "components/Markdown";
 
-type Props = {
-  commentId: ID;
-};
+import CommentEditor from "./CommentEditor";
 
-export default function Comment({ commentId }: Props) {
+export default function Comment({ comment }: { comment: models.Comment }) {
   const [editMode, setEditMode] = useState(false);
-  const dispatch = useAppDispatch();
-  const comment = useAppSelector((state) =>
-    selectCommentById(state, commentId),
-  );
-
-  const { load: updateComment, isLoading } = useRequest(
-    apiActions.updateCommentRequest,
-    {
-      onSuccess() {
-        setEditMode(false);
-      },
-    },
-  );
+  const {
+    mutation: { mutate: editComment, isLoading },
+    deletion: { mutate: deleteComment },
+  } = useComment(comment.id);
 
   if (!comment) {
     return <Stub />;
   }
-
-  const onDelete = () => {
-    dispatch(apiActions.deleteCommentRequest(commentId));
-  };
 
   return (
     <Stack
@@ -66,7 +46,11 @@ export default function Comment({ commentId }: Props) {
             text={comment.text}
             onClose={() => setEditMode(false)}
             onSubmit={(text: string) => {
-              updateComment({ id: commentId, text });
+              editComment(text, {
+                onSuccess() {
+                  setEditMode(false);
+                },
+              });
             }}
             isLoading={isLoading}
           />
@@ -81,7 +65,12 @@ export default function Comment({ commentId }: Props) {
             <Button size="small" onClick={() => setEditMode(true)}>
               Edit
             </Button>
-            <Button size="small" onClick={onDelete}>
+            <Button
+              size="small"
+              onClick={() => {
+                deleteComment();
+              }}
+            >
               Delete
             </Button>
           </Box>

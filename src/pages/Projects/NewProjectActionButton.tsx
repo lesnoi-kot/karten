@@ -3,7 +3,7 @@ import { Fab, SxProps, Theme } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 import NewProjectDialog from "components/Project/NewProjectDialog";
-import { useAppDispatch, useAppSelector } from "app/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 import { actions, selectIsNewProjectDialogOpened } from "./slice";
 

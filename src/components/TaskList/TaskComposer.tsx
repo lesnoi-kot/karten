@@ -1,5 +1,5 @@
 import React, { useState, useRef, KeyboardEventHandler } from "react";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Box,
   Button,
@@ -10,21 +10,34 @@ import {
   Grid,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
 import CheckIcon from "@mui/icons-material/Check";
 
 import { ID } from "models/types";
-import { actions as apiActions } from "app/apiInteraction";
-import { useRequest } from "app/apiInteraction/hooks";
+import { useAPI } from "context/APIProvider";
 
-function TaskComposer({ taskListId }: { taskListId: ID }) {
+type Props = { taskListId: ID; boardId: ID };
+
+function TaskComposer({ taskListId, boardId }: Props) {
   const textFieldRef = useRef<HTMLTextAreaElement>(null);
   const [formIsVisible, toggleForm] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
-  const { isLoading, load } = useRequest(apiActions.addTaskRequest, {
-    onSuccess() {
+  const api = useAPI();
+  const queryClient = useQueryClient();
+
+  const { mutate, isLoading } = useMutation({
+    mutationFn: () =>
+      api.addTask({
+        name: taskTitle.trim(),
+        position: Date.now(),
+        taskListId,
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["boards", { boardId }],
+      });
+
       setTaskTitle("");
       textFieldRef?.current?.select();
     },
@@ -46,11 +59,7 @@ function TaskComposer({ taskListId }: { taskListId: ID }) {
     const normalizedTitle = taskTitle.trim();
 
     if (normalizedTitle) {
-      load({
-        name: normalizedTitle,
-        position: Date.now(),
-        taskListId,
-      });
+      mutate();
     } else {
       textFieldRef?.current?.select();
     }
@@ -83,6 +92,7 @@ function TaskComposer({ taskListId }: { taskListId: ID }) {
           inputRef={textFieldRef}
           disabled={isLoading}
           onBlur={onBlur}
+          autoFocus
           placeholder="Enter title for this card..."
           fullWidth
           minRows={2}

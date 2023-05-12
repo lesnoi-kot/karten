@@ -1,11 +1,9 @@
 import { useDrop, useDrag } from "react-dnd";
-import { useDispatch } from "react-redux";
+import { produce } from "immer";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 
-import { TaskMovedPayload } from "app/tasks";
-import { actions as taskListsActions } from "app/taskLists";
-import { actions as tasksActions } from "app/tasks";
-import { actions as apiActions } from "app/apiInteraction";
-import { ID } from "models/types";
+import { ID, Board, TaskList, Task } from "models/types";
+import { useAPI } from "context/APIProvider";
 
 import {
   DNDTaskItem,
@@ -14,21 +12,29 @@ import {
   DND_TASK_TYPE,
 } from "../constants";
 
-export type TaskMover = (args: TaskMovedPayload, commit: boolean) => void;
-export type TaskListMover = (args: TaskMovedPayload) => void;
-
 type UseTaskListDNDArgs = {
+  boardId: ID;
   taskListId: ID;
   taskIds: ID[];
   taskListRef: HTMLDivElement | null;
 };
 
 export const useTaskListDND = ({
+  boardId,
   taskListId,
   taskIds,
   taskListRef,
 }: UseTaskListDNDArgs) => {
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+  const api = useAPI();
+
+  const { mutate: syncTask } = useMutation({
+    mutationFn: (data: Task) => api.editTask({ ...data }),
+  });
+
+  const { mutate: syncTaskList } = useMutation({
+    mutationFn: (data: TaskList) => api.editTaskList({ ...data }),
+  });
 
   const [{ isDragging }, dragRef, dragPreviewRef] = useDrag(
     () => ({
@@ -41,6 +47,26 @@ export const useTaskListDND = ({
     [taskListId],
   );
 
+  function taskMoved(taskId: ID, targetTaskListId: ID, isBefore: boolean) {
+    queryClient.setQueryData<Board>(["boards", { boardId }], (board) =>
+      produce(board, (draft) => {
+        draft?.moveTask({ taskId, targetTaskListId, isBefore });
+      }),
+    );
+  }
+
+  function taskListMoved(
+    taskListId: ID,
+    targetTaskListId: ID,
+    isBefore: boolean,
+  ) {
+    queryClient.setQueryData<Board>(["boards", { boardId }], (board) =>
+      produce(board, (draft) => {
+        draft?.moveTaskList({ taskListId, targetTaskListId, isBefore });
+      }),
+    );
+  }
+
   const [, dropRef] = useDrop(
     () => ({
       accept: [DND_TASK_TYPE, DND_LIST_TYPE],
@@ -50,17 +76,26 @@ export const useTaskListDND = ({
         }
 
         if (monitor.getItemType() === DND_TASK_TYPE) {
-          dispatch(apiActions.syncTaskRequest((item as DNDTaskItem).taskId));
+          const task = queryClient
+            .getQueryData<Board>(["boards", { boardId }])
+            ?.getTask((item as DNDTaskItem).taskId);
+
+          if (task) {
+            syncTask(task);
+          }
         } else {
-          dispatch(
-            apiActions.syncTaskListRequest(
-              (item as DNDTaskListItem).taskListId,
-            ),
-          );
+          const taskList = queryClient
+            .getQueryData<Board>(["boards", { boardId }])
+            ?.getTaskList((item as DNDTaskListItem).taskListId);
+
+          if (taskList) {
+            syncTaskList(taskList);
+          }
         }
       },
       hover(item: DNDTaskItem | DNDTaskListItem, monitor) {
         const offset = monitor.getClientOffset();
+        const type = monitor.getItemType();
 
         if (!taskListRef || !offset) {
           return;
@@ -68,50 +103,21 @@ export const useTaskListDND = ({
 
         const rect = taskListRef.getBoundingClientRect();
 
-        if (monitor.getItemType() === DND_TASK_TYPE) {
+        if (type === DND_TASK_TYPE) {
           const { taskId } = item as DNDTaskItem;
 
           if (monitor.isOver({ shallow: true }) && !taskIds.includes(taskId)) {
-            console.log("HOVER LIST", { taskListId, taskId });
-
-            if (rect.y + rect.height - offset.y <= 32) {
-              dispatch(
-                tasksActions.taskMoved({
-                  taskId,
-                  dropTaskId: taskIds[taskIds.length - 1],
-                  dropTaskListId: taskListId,
-                  isBefore: false,
-                }),
-              );
-              return;
-            }
-
-            dispatch(
-              tasksActions.taskMoved({
-                taskId,
-                dropTaskId: taskIds[0],
-                dropTaskListId: taskListId,
-                isBefore: true,
-              }),
-            );
+            taskMoved(taskId, taskListId, rect.y + rect.height - offset.y > 32);
           }
-        } else if (monitor.getItemType() === DND_LIST_TYPE) {
-          const dragTaskListId = (item as DNDTaskListItem).taskListId;
-          if (
-            monitor.isOver() &&
-            taskListId !== (item as DNDTaskListItem).taskListId
-          ) {
-            console.log("HOVER LIST", { taskListId });
-            const rect = taskListRef.getBoundingClientRect();
-            const before = offset.x <= rect.x + rect.width / 2;
+        }
 
-            dispatch(
-              taskListsActions.taskListMoved({
-                taskListId: dragTaskListId,
-                dropTaskListId: taskListId,
-                before,
-              }),
-            );
+        if (type === DND_LIST_TYPE) {
+          const dragTaskListId = (item as DNDTaskListItem).taskListId;
+
+          if (monitor.isOver() && taskListId !== dragTaskListId) {
+            const rect = taskListRef.getBoundingClientRect();
+            const isBefore = offset.x <= rect.x + rect.width / 2;
+            taskListMoved(dragTaskListId, taskListId, isBefore);
           }
         }
       },

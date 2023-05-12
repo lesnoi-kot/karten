@@ -1,17 +1,14 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { produce } from "immer";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardHeader, IconButton, CardProps } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { styled } from "@mui/material/styles";
 
-import { RootState } from "app";
-import { ID } from "models/types";
-import { selectTaskById } from "app/tasks/selectors";
-import { actions as apiActions } from "app/apiInteraction";
+import { useAPI } from "context/APIProvider";
+import { Board, TaskList, Task } from "models/types";
 
-import Stub from "../Stub";
-
-export type Props = CardProps & { id: ID };
+export type Props = CardProps & { taskList: TaskList; task: Task };
 
 const TaskCard = styled(Card)<CardProps>(() => ({
   width: "100%",
@@ -20,20 +17,28 @@ const TaskCard = styled(Card)<CardProps>(() => ({
   userSelect: "none",
 }));
 
-function TaskPreview({ id, ...cardProps }: Props) {
-  const dispatch = useDispatch();
-  const task = useSelector((state: RootState) => selectTaskById(state, id));
+export default function TaskPreview({ task, taskList, ...cardProps }: Props) {
+  const { name } = task;
+  const api = useAPI();
+  const queryClient = useQueryClient();
 
-  if (!task) {
-    return <Stub source="TaskPreview" />;
-  }
+  const { mutate: deleteTask } = useMutation({
+    mutationFn: () => api.deleteTask(task.id),
+    onMutate() {
+      queryClient.setQueryData<Board>(
+        ["boards", { boardId: taskList.boardId }],
+        (board) =>
+          produce(board, (draft) => {
+            draft?.deleteTask(task.id);
+          }),
+      );
+    },
+  });
 
   const onDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    dispatch(apiActions.deleteTaskRequest(id));
+    deleteTask();
   };
-
-  const { name } = task;
 
   return (
     <TaskCard variant="outlined" {...cardProps}>
@@ -54,5 +59,3 @@ function TaskPreview({ id, ...cardProps }: Props) {
     </TaskCard>
   );
 }
-
-export default React.memo(TaskPreview);

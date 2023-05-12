@@ -1,33 +1,39 @@
-import React from "react";
-import { useSelector } from "react-redux";
 import { Helmet } from "react-helmet";
 
-import { RootState } from "app";
-import { ID } from "models/types";
-import { selectBoardName } from "app/boards/selectors";
-import { selectTaskNameById } from "app/tasks/selectors";
+import { ID, Board } from "models/types";
+import { useTask } from "store/hooks/tasks";
 
 type Props = {
-  boardId: ID;
+  board: Board;
   selectedTaskId: ID | null;
 };
 
-export function PageTitle({ boardId, selectedTaskId }: Props) {
-  const taskName = useSelector((state: RootState) =>
-    selectedTaskId ? selectTaskNameById(state, selectedTaskId) : null,
-  );
-  const boardName = useSelector((state: RootState) =>
-    selectBoardName(state, boardId),
-  );
+export default function PageTitle({ board, selectedTaskId }: Props) {
+  if (selectedTaskId) {
+    return <PageTitleWithTask board={board} selectedTaskId={selectedTaskId} />;
+  }
 
   return (
     <Helmet>
-      <title>
-        {taskName ? `${taskName} | ` : ""}
-        {boardName ? `${boardName} | ` : ""}Karten
-      </title>
+      <title>{board.name ? `${board.name} | ` : ""}Karten</title>
     </Helmet>
   );
 }
 
-export default React.memo(PageTitle);
+function PageTitleWithTask({
+  board,
+  selectedTaskId,
+}: Props & { selectedTaskId: ID }) {
+  const {
+    query: { data: task },
+  } = useTask(selectedTaskId);
+
+  return (
+    <Helmet>
+      <title>
+        {task?.name ? `${task.name} | ` : ""}
+        {board.name ? `${board.name} | ` : ""}Karten
+      </title>
+    </Helmet>
+  );
+}

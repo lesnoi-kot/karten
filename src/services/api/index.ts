@@ -4,7 +4,6 @@ import { settings } from "settings";
 import { DataStore } from "./types";
 import { APIService } from "./api";
 
-export { default as MockAPI } from "./mockAPI";
 export * from "./types";
 
 export const getDataStore = once(

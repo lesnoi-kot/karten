@@ -1,34 +1,28 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Box, Stack, TextField } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
+import { useAPI } from "context/APIProvider";
 import { ID } from "models/types";
-import { actions as apiActions } from "app/apiInteraction";
-import { useRequest } from "app/apiInteraction/hooks";
 import { blurOnEscape } from "utils/events";
 import UserAvatar from "components/UserAvatar";
 
-type Props = {
-  taskId: ID;
-};
-
-function CommentComposer({ taskId }: Props) {
+function CommentComposer({ taskId }: { taskId: ID }) {
   const [text, setText] = useState("");
   const [focused, setFocused] = useState(false);
+  const queryClient = useQueryClient();
+  const api = useAPI();
 
-  const { load: addComment, isLoading } = useRequest(
-    apiActions.addCommentRequest,
-    {
-      onSuccess() {
-        setText("");
-        setFocused(false);
-      },
+  const { mutate: addComment, isLoading } = useMutation({
+    mutationFn: () => api.addComment({ taskId, text }),
+    onSuccess() {
+      setText("");
+      setFocused(false);
+
+      queryClient.invalidateQueries({ queryKey: ["tasks", { taskId }] });
     },
-  );
-
-  const onSubmit = () => {
-    addComment({ taskId, text });
-  };
+  });
 
   return (
     <Stack direction="row" gap={1}>
@@ -53,7 +47,9 @@ function CommentComposer({ taskId }: Props) {
             <Box mt={1} />
             <LoadingButton
               loading={isLoading}
-              onClick={onSubmit}
+              onClick={() => {
+                addComment();
+              }}
               disabled={text.trim() === ""}
               variant="outlined"
             >

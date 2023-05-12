@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { RootState } from "app";
+import { RootState } from "store";
 
 export const {
   actions,

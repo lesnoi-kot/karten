@@ -64,6 +64,7 @@ export type BoardDTO = {
   date_created: string;
   date_last_viewed: string;
   color: number;
+  project_name: string;
   cover_url?: string;
   task_lists?: TaskListDTO[];
 };
@@ -198,13 +199,13 @@ export interface DataStore {
   getTaskList(id: ID): Promise<TaskList>;
   addTaskList(args: AddTaskListArgs): Promise<TaskList>;
   editTaskList(args: EditTaskListArgs): Promise<TaskList>;
+  clearTaskList(id: ID): Promise<void>;
   deleteTaskList(id: ID): Promise<void>;
 
   getTask(id: ID): Promise<Task>;
   addTask(args: AddTaskArgs): Promise<Task>;
   editTask(args: EditTaskArgs): Promise<Task>;
   deleteTask(id: ID): Promise<void>;
-  deleteTasks(args: ID[]): Promise<void>;
 
   addComment(args: AddCommentArgs): Promise<Comment>;
   editComment(args: EditCommentArgs): Promise<Comment>;
