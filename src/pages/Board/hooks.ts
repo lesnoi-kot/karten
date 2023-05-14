@@ -10,7 +10,7 @@ export const useBoardMethods = (boardId: ID) => {
     (taskId: ID) => {
       navigate({ search: `?taskId=${taskId}` }, { replace: false });
     },
-    [navigate, boardId],
+    [navigate],
   );
 
   const onTaskModalClose = useCallback(() => {

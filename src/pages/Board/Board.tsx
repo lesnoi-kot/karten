@@ -14,7 +14,7 @@ import { TaskModal } from "components/Task";
 import ErrorSplash from "components/ui/ErrorSplash";
 import Link from "components/Link";
 import { Board } from "models/types";
-import { useBoard } from "store/hooks/boards";
+import { useBoard } from "queries/boards";
 
 import { useBoardMethods } from "./hooks";
 import ScrollableSpace from "./ScrollableSpace";

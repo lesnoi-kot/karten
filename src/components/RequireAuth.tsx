@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 
-import { useUser } from "store/hooks/user";
+import { useUser } from "queries/user";
 
 type Props = {
   children: ReactNode;

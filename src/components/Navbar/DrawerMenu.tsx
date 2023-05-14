@@ -22,7 +22,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { useAPI } from "context/APIProvider";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { useUser } from "store/hooks/user";
+import { useUser } from "queries/user";
 import { actions, selectIsOpen } from "store/widgets/drawerMenu";
 
 import ColorThemeSwitch from "components/ColorThemeSwitch";

@@ -1,20 +1,12 @@
-import React, { useState, useRef, KeyboardEventHandler } from "react";
+import { memo, useState, useRef, KeyboardEventHandler } from "react";
+import { produce } from "immer";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  Box,
-  Button,
-  TextField,
-  IconButton,
-  Collapse,
-  Fade,
-  Grid,
-} from "@mui/material";
+import { Box, TextField, IconButton, Collapse, Stack } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
-import CheckIcon from "@mui/icons-material/Check";
 
-import { ID } from "models/types";
+import { ID, Board } from "models/types";
 import { useAPI } from "context/APIProvider";
 
 type Props = { taskListId: ID; boardId: ID };
@@ -22,52 +14,46 @@ type Props = { taskListId: ID; boardId: ID };
 function TaskComposer({ taskListId, boardId }: Props) {
   const textFieldRef = useRef<HTMLTextAreaElement>(null);
   const [formIsVisible, toggleForm] = useState(false);
-  const [taskTitle, setTaskTitle] = useState("");
   const api = useAPI();
   const queryClient = useQueryClient();
 
   const { mutate, isLoading } = useMutation({
     mutationFn: () =>
       api.addTask({
-        name: taskTitle.trim(),
+        name: textFieldRef.current?.value.trim() || "",
         position: Date.now(),
         taskListId,
       }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: ["boards", { boardId }],
-      });
+    onSuccess: (newTask) => {
+      queryClient.setQueryData<Board>(["boards", { boardId }], (board) =>
+        produce(board, (draft) => {
+          draft?.getTaskList(taskListId)?.addTask(newTask);
+        }),
+      );
 
-      setTaskTitle("");
-      textFieldRef?.current?.select();
+      if (textFieldRef.current) {
+        textFieldRef.current.value = "";
+      }
+
+      setTimeout(() => {
+        textFieldRef.current?.focus();
+      }, 100);
     },
   });
 
-  const showForm = () => {
-    toggleForm(true);
-  };
-
-  const hideForm = () => {
-    toggleForm(false);
-    setTaskTitle("");
-  };
-
-  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
-    setTaskTitle(e.target.value);
-
   const submit = () => {
-    const normalizedTitle = taskTitle.trim();
+    const normalizedTitle = textFieldRef.current?.value.trim();
 
     if (normalizedTitle) {
       mutate();
     } else {
-      textFieldRef?.current?.select();
+      textFieldRef.current?.select();
     }
   };
 
   const onBlur = () => {
-    if (!taskTitle) {
-      hideForm();
+    if (!textFieldRef.current?.value) {
+      toggleForm(false);
     }
   };
 
@@ -75,7 +61,7 @@ function TaskComposer({ taskListId, boardId }: Props) {
     if (e.key === "Enter" && e.shiftKey) {
       submit();
     } else if (e.key === "Escape") {
-      hideForm();
+      toggleForm(false);
       e.stopPropagation();
     }
   };
@@ -84,11 +70,14 @@ function TaskComposer({ taskListId, boardId }: Props) {
     <Box>
       <Collapse
         in={formIsVisible}
-        onEntered={() => textFieldRef.current?.focus()}
+        onAnimationEnd={() => {
+          if (textFieldRef.current) {
+            textFieldRef.current.value = "";
+          }
+        }}
+        unmountOnExit
       >
         <TextField
-          value={taskTitle}
-          onChange={onChange}
           inputRef={textFieldRef}
           disabled={isLoading}
           onBlur={onBlur}
@@ -103,46 +92,39 @@ function TaskComposer({ taskListId, boardId }: Props) {
           onKeyDown={onKeyDown}
         />
         <Box mt={1} />
-        <Grid container spacing={1} direction="row">
-          <Grid item>
-            <LoadingButton
-              variant="contained"
-              size="small"
-              loading={isLoading}
-              onClick={(event) => {
-                event.stopPropagation();
-                submit();
-              }}
-              disabled={!taskTitle}
-              startIcon={<CheckIcon />}
-            >
-              Add card
-            </LoadingButton>
-          </Grid>
-          <Grid item>
-            <IconButton size="small" onClick={hideForm}>
-              <ClearIcon />
-            </IconButton>
-          </Grid>
-        </Grid>
       </Collapse>
+      <Stack spacing={1} direction="row">
+        <LoadingButton
+          variant="contained"
+          size="small"
+          loading={isLoading}
+          onClick={(event) => {
+            if (formIsVisible) {
+              event.stopPropagation();
+              submit();
+            } else {
+              toggleForm(true);
+            }
+          }}
+          disableElevation
+          startIcon={formIsVisible ? null : <AddIcon />}
+        >
+          {formIsVisible ? "Add card" : "Add a card"}
+        </LoadingButton>
 
-      {!formIsVisible && (
-        <Fade in timeout={500}>
-          <Button
-            variant="contained"
-            color="primary"
+        {formIsVisible && (
+          <IconButton
             size="small"
-            startIcon={<AddIcon fontSize="small" />}
-            onClick={showForm}
-            disableElevation
+            onClick={() => {
+              toggleForm(false);
+            }}
           >
-            Add a card
-          </Button>
-        </Fade>
-      )}
+            <ClearIcon />
+          </IconButton>
+        )}
+      </Stack>
     </Box>
   );
 }
 
-export default TaskComposer;
+export default memo(TaskComposer);

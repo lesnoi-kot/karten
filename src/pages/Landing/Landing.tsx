@@ -4,7 +4,7 @@ import { Box, Typography, Link, styled, BoxProps, Button } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import ScienceIcon from "@mui/icons-material/Science";
 
-import { useUser, useLogInAsGuest } from "store/hooks/user";
+import { useUser, useLogInAsGuest } from "queries/user";
 import { getGitHubOAuthURL } from "services/auth";
 
 const Wrapper = styled(Box)<BoxProps>(() => ({

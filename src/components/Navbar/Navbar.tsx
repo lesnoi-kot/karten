@@ -22,7 +22,7 @@ import Link from "components/Link";
 import ColorThemeSwitch from "components/ColorThemeSwitch";
 import useToggle from "components/hooks/useToggle";
 import ColoredAvatar from "components/ColoredAvatar";
-import { useUser } from "store/hooks/user";
+import { useUser } from "queries/user";
 
 function NavbarTitle() {
   return (

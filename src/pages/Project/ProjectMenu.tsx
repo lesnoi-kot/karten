@@ -21,7 +21,7 @@ import { useAPI } from "context/APIProvider";
 import { actions as confirmDialogActions } from "store/widgets/confirmDialog";
 import { actions as drawerMenuActions } from "store/widgets/drawerMenu";
 import { actions as newBoardDialogActions } from "store/widgets/newBoardDialog";
-import { useClearProject, useDeleteProject } from "store/hooks/projects";
+import { useClearProject, useDeleteProject } from "queries/projects";
 
 import { BaseMenu } from "components/Navbar/DrawerMenu";
 

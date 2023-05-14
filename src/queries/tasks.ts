@@ -7,7 +7,7 @@ import {
 
 import { useAPI } from "context/APIProvider";
 import { Task, ID } from "models/types";
-import { useAppDispatch } from ".";
+import { useAppDispatch } from "store/hooks";
 
 export function useTask(taskId: ID) {
   const api = useAPI();

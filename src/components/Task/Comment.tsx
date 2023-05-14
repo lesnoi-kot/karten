@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Box, Paper, Typography, Avatar, Button, Stack } from "@mui/material";
 
-import { useComment } from "store/hooks/comments";
+import { useComment } from "queries/comments";
 import * as models from "models/types";
 import Stub from "components/Stub";
 import { Markdown } from "components/Markdown";

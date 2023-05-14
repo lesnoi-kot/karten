@@ -13,7 +13,7 @@ import {
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import { actions as confirmDialogActions } from "store/widgets/confirmDialog";
-import { useUser } from "store/hooks/user";
+import { useUser } from "queries/user";
 import { GUEST_USER_ID } from "models/constants";
 import makePage from "pages/makePageHOC";
 

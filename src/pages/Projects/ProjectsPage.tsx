@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 import { Box, CircularProgress, Container } from "@mui/material";
 
-import { useProjects } from "store/hooks/projects";
+import { useProjects } from "queries/projects";
 import makePage from "pages/makePageHOC";
 import ErrorSplash from "components/ui/ErrorSplash";
 

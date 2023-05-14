@@ -179,9 +179,13 @@ export class Board {
     const taskList = this.getTaskList(task.taskListId);
 
     if ("targetTaskListId" in args) {
-      taskList?.deleteTask(task.id);
       const targetTaskList = this.getTaskList(args.targetTaskListId);
 
+      if (targetTaskList?.getTask(taskId)) {
+        return;
+      }
+
+      taskList?.deleteTask(task.id);
       if (isBefore) {
         targetTaskList?.unshiftTask(task);
       } else {

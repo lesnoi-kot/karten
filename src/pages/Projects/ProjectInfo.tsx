@@ -18,7 +18,7 @@ import BoardPreviewList from "components/Board/BoardPreviewList";
 import useToggle from "components/hooks/useToggle";
 import Link from "components/Link";
 import ColoredAvatar from "components/ColoredAvatar";
-import { useClearProject, useDeleteProject } from "store/hooks/projects";
+import { useClearProject, useDeleteProject } from "queries/projects";
 
 function ProjectInfo({ project }: { project: Project }) {
   const { id, boards = [] } = project;

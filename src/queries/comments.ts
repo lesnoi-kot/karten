@@ -7,23 +7,21 @@ import {
 
 import { useAPI } from "context/APIProvider";
 import { Comment, ID } from "models/types";
-import { useAppDispatch } from ".";
 
 export function useComment(commentId: ID) {
   const api = useAPI();
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
 
   const mutation = useMutation({
     mutationFn: (text: string) => api.editComment({ id: commentId, text }),
-    onSuccess(updatedComment) {
+    onMutate(updatedComment) {
       // queryClient.setQueryData(["tasks", { taskId: commentId }], updatedTask);
     },
   });
 
   const deletion = useMutation({
     mutationFn: () => api.deleteComment(commentId),
-    onSuccess() {
+    onMutate() {
       // queryClient.setQueryData(["tasks", { taskId: commentId }], updatedTask);
     },
   });

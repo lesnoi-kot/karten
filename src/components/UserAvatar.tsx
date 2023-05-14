@@ -1,6 +1,6 @@
 import { Avatar, AvatarProps } from "@mui/material";
 
-import { useUser } from "store/hooks/user";
+import { useUser } from "queries/user";
 
 export default function UserAvatar(props: AvatarProps) {
   const { user } = useUser();

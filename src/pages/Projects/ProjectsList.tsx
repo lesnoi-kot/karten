@@ -1,7 +1,7 @@
 import { Stack, Typography } from "@mui/material";
 
 import { Project } from "models/types";
-import { useProjects } from "store/hooks/projects";
+import { useProjects } from "queries/projects";
 
 import ProjectInfo from "./ProjectInfo";
 

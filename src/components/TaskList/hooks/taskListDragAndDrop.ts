@@ -15,14 +15,12 @@ import {
 type UseTaskListDNDArgs = {
   boardId: ID;
   taskListId: ID;
-  taskIds: ID[];
   taskListRef: HTMLDivElement | null;
 };
 
 export const useTaskListDND = ({
   boardId,
   taskListId,
-  taskIds,
   taskListRef,
 }: UseTaskListDNDArgs) => {
   const queryClient = useQueryClient();
@@ -35,17 +33,6 @@ export const useTaskListDND = ({
   const { mutate: syncTaskList } = useMutation({
     mutationFn: (data: TaskList) => api.editTaskList({ ...data }),
   });
-
-  const [{ isDragging }, dragRef, dragPreviewRef] = useDrag(
-    () => ({
-      type: DND_LIST_TYPE,
-      item: () => ({ taskListId } as DNDTaskListItem),
-      collect: (monitor) => ({
-        isDragging: monitor.getItem()?.taskListId === taskListId,
-      }),
-    }),
-    [taskListId],
-  );
 
   function taskMoved(taskId: ID, targetTaskListId: ID, isBefore: boolean) {
     queryClient.setQueryData<Board>(["boards", { boardId }], (board) =>
@@ -66,6 +53,17 @@ export const useTaskListDND = ({
       }),
     );
   }
+
+  const [{ isDragging }, dragRef, dragPreviewRef] = useDrag(
+    () => ({
+      type: DND_LIST_TYPE,
+      item: () => ({ taskListId } as DNDTaskListItem),
+      collect: (monitor) => ({
+        isDragging: monitor.getItem()?.taskListId === taskListId,
+      }),
+    }),
+    [taskListId],
+  );
 
   const [, dropRef] = useDrop(
     () => ({
@@ -106,7 +104,7 @@ export const useTaskListDND = ({
         if (type === DND_TASK_TYPE) {
           const { taskId } = item as DNDTaskItem;
 
-          if (monitor.isOver({ shallow: true }) && !taskIds.includes(taskId)) {
+          if (monitor.isOver({ shallow: true })) {
             taskMoved(taskId, taskListId, rect.y + rect.height - offset.y > 32);
           }
         }
@@ -122,7 +120,7 @@ export const useTaskListDND = ({
         }
       },
     }),
-    [taskListRef, taskListId, taskIds],
+    [taskListRef, boardId, taskListId],
   );
 
   return { isDragging, dragRef, dropRef, dragPreviewRef };

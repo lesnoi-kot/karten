@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 
 import { ID, Board } from "models/types";
-import { useTask } from "store/hooks/tasks";
+import { useTask } from "queries/tasks";
 
 type Props = {
   board: Board;

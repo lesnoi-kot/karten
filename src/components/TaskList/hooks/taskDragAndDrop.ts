@@ -4,7 +4,7 @@ import { useDrop, useDrag, XYCoord } from "react-dnd";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { ID, Task, Board } from "models/types";
-import { useEditTask } from "store/hooks/tasks";
+import { useEditTask } from "queries/tasks";
 
 import { DNDTaskItem, DND_TASK_TYPE } from "../constants";
 

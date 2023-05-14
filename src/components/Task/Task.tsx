@@ -15,7 +15,7 @@ import AttachmentIcon from "@mui/icons-material/Attachment";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { useTask } from "store/hooks/tasks";
+import { useTask } from "queries/tasks";
 import { ID } from "models/types";
 import ErrorSplash from "components/ui/ErrorSplash";
 
