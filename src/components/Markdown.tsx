@@ -10,8 +10,9 @@ const Content = styled(Box)<BoxProps>(({ theme }) => ({
   maxWidth: "100%",
 
   "& p, pre": {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
+    marginTop: theme.spacing(1.5),
+    marginBottom: theme.spacing(1.5),
+    lineHeight: 1,
   },
   "& code": {
     marginTop: theme.spacing(1),

@@ -6,6 +6,8 @@ import { LoadingButton } from "@mui/lab";
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
 
+import { useAppDispatch } from "store/hooks";
+import { showSnackbar } from "store/snackbars";
 import { ID, Board } from "models/types";
 import { useAPI } from "context/APIProvider";
 
@@ -16,8 +18,9 @@ function TaskComposer({ taskListId, boardId }: Props) {
   const [formIsVisible, toggleForm] = useState(false);
   const api = useAPI();
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
 
-  const { mutate, isLoading } = useMutation({
+  const { mutate: addTask, isLoading } = useMutation({
     mutationFn: () =>
       api.addTask({
         name: textFieldRef.current?.value.trim() || "",
@@ -39,13 +42,21 @@ function TaskComposer({ taskListId, boardId }: Props) {
         textFieldRef.current?.focus();
       }, 100);
     },
+    onError(error) {
+      dispatch(
+        showSnackbar({
+          message: String(error),
+          type: "error",
+        }),
+      );
+    },
   });
 
   const submit = () => {
     const normalizedTitle = textFieldRef.current?.value.trim();
 
     if (normalizedTitle) {
-      mutate();
+      addTask();
     } else {
       textFieldRef.current?.select();
     }
@@ -90,6 +101,9 @@ function TaskComposer({ taskListId, boardId }: Props) {
           variant="outlined"
           size="small"
           onKeyDown={onKeyDown}
+          sx={{
+            lineHeight: "1.3",
+          }}
         />
         <Box mt={1} />
       </Collapse>

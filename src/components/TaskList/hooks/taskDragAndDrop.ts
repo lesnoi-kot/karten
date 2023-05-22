@@ -3,8 +3,8 @@ import { produce } from "immer";
 import { useDrop, useDrag, XYCoord } from "react-dnd";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { ID, Task, Board } from "models/types";
-import { useEditTask } from "queries/tasks";
+import { ID, Board } from "models/types";
+import { useTask } from "queries/tasks";
 
 import { DNDTaskItem, DND_TASK_TYPE } from "../constants";
 
@@ -16,7 +16,9 @@ type UseTaskDNDArgs = {
 
 export function useTaskDND({ boardId, taskId, taskRef }: UseTaskDNDArgs) {
   const prevOffset = useRef<XYCoord | null>(null);
-  const { mutate } = useEditTask(taskId);
+  const {
+    mutation: { mutate: editTask },
+  } = useTask(taskId, { queryEnabled: false });
   const queryClient = useQueryClient();
 
   function taskMoved(taskId: ID, targetId: ID, isBefore: boolean) {
@@ -48,7 +50,7 @@ export function useTaskDND({ boardId, taskId, taskRef }: UseTaskDNDArgs) {
             ?.getTask(item.taskId);
 
           if (task) {
-            mutate({ position: task.position });
+            editTask({ position: task.position });
           }
         }
       },

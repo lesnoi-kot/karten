@@ -5,6 +5,7 @@ import { ENTITY_COLOR } from "./constants";
 export type UUID = string;
 export type Color = string;
 export type ID = UUID;
+export type UserID = number;
 export type DateString = string;
 export type ColorName = keyof typeof ENTITY_COLOR;
 
@@ -13,20 +14,42 @@ export type Comment = {
   taskId: UUID;
   author: string;
   text: string;
-  dateCreated: DateString;
+  html: string;
+  dateCreated: Date;
+  attachments: KartenFile[];
 };
 
-export type Task = {
-  id: UUID;
-  taskListId: UUID;
-  name: string;
-  text: string;
-  html: string;
-  position: number;
-  dateCreated: DateString;
-  dueDate: DateString;
-  comments: Comment[];
-};
+export class Task {
+  [immerable] = true;
+
+  constructor(
+    public id: UUID,
+    public taskListId: UUID,
+    public name: string,
+    public text: string,
+    public html: string,
+    public position: number,
+    public dateCreated: DateString,
+    public dateStartedTracking: Date | null,
+    public spentTime: number,
+    public dueDate: DateString | null,
+    public comments: Comment[],
+    public attachments: KartenFile[],
+    public labels: Label[],
+  ) {}
+
+  getComment(commentId: ID) {
+    return this.comments.find((comment) => comment.id === commentId);
+  }
+
+  deleteComment(commentId: ID) {
+    const idx = this.comments.findIndex((comment) => comment.id === commentId);
+
+    if (idx !== -1) {
+      this.comments.splice(idx, 1);
+    }
+  }
+}
 
 export class TaskList {
   [immerable] = true;
@@ -127,7 +150,14 @@ export class Board {
     public coverURL: string,
     public taskLists: TaskList[],
     public projectName: string,
+    public labels: Label[],
   ) {
+    this.sortTaskLists();
+  }
+
+  addTaskList(taskList: TaskList) {
+    taskList.boardId = this.id;
+    this.taskLists.push(taskList);
     this.sortTaskLists();
   }
 
@@ -280,4 +310,12 @@ export type User = {
   url: string;
   avatarURL: string;
   dateCreated: string;
+};
+
+export type Label = {
+  id: number;
+  boardId: string;
+  userId: UserID;
+  name: string;
+  color: string;
 };

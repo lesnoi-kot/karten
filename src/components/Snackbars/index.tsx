@@ -14,7 +14,7 @@ function Snackbars() {
   };
 
   return (
-    <Snackbar open={isOpen} onClose={onClose}>
+    <Snackbar open={isOpen} onClose={onClose} autoHideDuration={5000}>
       <Alert severity={type}>{message}</Alert>
     </Snackbar>
   );

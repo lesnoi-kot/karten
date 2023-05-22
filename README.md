@@ -2,8 +2,6 @@
 
 ## TODO
 
-- комменты и описания с эмоджи и md
-
 - sticky названия листа
 
 - i18n
@@ -24,4 +22,6 @@
 
 - SSR
 
-- Timer in tasks to track spent time
+- Syntax highlight
+
+- Threaded comments with reply

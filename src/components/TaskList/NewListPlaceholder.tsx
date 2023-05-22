@@ -1,5 +1,5 @@
 import { useState, useRef, KeyboardEventHandler } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { styled } from "@mui/material/styles";
 import { Box, TextField, Collapse, Card, CardProps } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -7,6 +7,8 @@ import { LoadingButton } from "@mui/lab";
 
 import { useAPI } from "context/APIProvider";
 import { ID } from "models/types";
+import { useOptimisticBoardMutation } from "queries/boards";
+import { useScrollableSpace } from "components/ScrollableSpace";
 
 const StyledCard = styled(Card)<CardProps>(({ theme }) => ({
   padding: theme.spacing(1),
@@ -19,10 +21,11 @@ const StyledCard = styled(Card)<CardProps>(({ theme }) => ({
 
 function NewListPlaceholder({ boardId }: { boardId: ID }) {
   const api = useAPI();
-  const queryClient = useQueryClient();
   const [isFieldVisible, setFieldVisible] = useState(false);
   const [taskListName, setTaskListName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const { scrollToRight } = useScrollableSpace();
+  const updateBoard = useOptimisticBoardMutation();
 
   const openField = () => {
     setTaskListName("");
@@ -30,11 +33,7 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
 
     setTimeout(() => {
       inputRef.current?.focus();
-      document.getElementById("scrollable_space")?.scroll({
-        top: 0,
-        left: 1e9,
-        behavior: "smooth",
-      });
+      scrollToRight();
     }, 100);
   };
 
@@ -46,9 +45,9 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
   const { mutate: addTaskList, isLoading } = useMutation({
     mutationFn: () =>
       api.addTaskList({ boardId, name: taskListName, position: Date.now() }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["boards", { boardId }],
+    onSuccess: (newTaskList) => {
+      updateBoard((draft) => {
+        draft.addTaskList(newTaskList);
       });
 
       openField();
@@ -101,7 +100,6 @@ function NewListPlaceholder({ boardId }: { boardId: ID }) {
             onChange={(e) => setTaskListName(e.target.value)}
             onKeyDown={onKeyDown}
             autoComplete="off"
-            autoFocus
             variant="standard"
           />
         </Box>

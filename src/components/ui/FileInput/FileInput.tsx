@@ -41,7 +41,7 @@ export function FilesPreview({ files }: { files: File[] }) {
 
 type Props = {
   label?: string;
-  buttonProps: Partial<LoadingButtonProps<"label">>;
+  buttonProps?: Partial<LoadingButtonProps<"label">>;
   onChange: (files: File[]) => void;
 } & Omit<HTMLProps<HTMLInputElement>, "onChange">;
 
