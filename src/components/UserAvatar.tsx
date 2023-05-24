@@ -7,7 +7,7 @@ export default function UserAvatar(props: AvatarProps) {
 
   return (
     <Avatar src={user?.avatarURL} {...props}>
-      {user?.name?.[0] ?? ""}
+      {user?.name?.[0]?.toUpperCase() ?? ""}
     </Avatar>
   );
 }

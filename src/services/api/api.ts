@@ -1,23 +1,27 @@
 import cookies from "js-cookie";
+import { filter } from "ramda";
 
+import { hexColorToNumber } from "utils/color";
 import {
   Board,
   Comment,
   ID,
   KartenFile,
   KartenImageFile,
+  Label,
   Project,
   Task,
   TaskList,
   User,
 } from "models/types";
-import { filter } from "ramda";
 
 import {
   convertBoardDTO,
   convertCommentDTO,
-  convertImageFileDTO,
+  convertFileDTO,
   convertFilesDTO,
+  convertImageFileDTO,
+  convertLabelDTO,
   convertProjectDTO,
   convertTaskDTO,
   convertTaskListDTO,
@@ -25,28 +29,34 @@ import {
 } from "./dtoToModel";
 
 import {
-  GetProjectsArgs,
   AddBoardArgs,
   AddCommentArgs,
+  AddLabelArgs,
   AddProjectArgs,
   AddTaskArgs,
   AddTaskListArgs,
   APIError,
+  AttachFileArgs,
   BoardDTO,
   CommentDTO,
   DataStore,
   EditBoardArgs,
   EditCommentArgs,
+  EditLabelArgs,
   EditProjectArgs,
   EditTaskArgs,
   EditTaskListArgs,
   FileDTO,
+  GetProjectsArgs,
   ImageFileDTO,
+  LabelDTO,
   ProjectDTO,
   ResponseError,
   ResponseOK,
   TaskDTO,
+  TaskLabel,
   TaskListDTO,
+  UploadFile,
   UploadImage,
   UserDTO,
 } from "./types";
@@ -63,8 +73,10 @@ type FormBody = {
   [field: string]: string | null | Blob;
 };
 
+type PlainData = string | number;
+
 type JSONBody = {
-  [field: string]: string | number | undefined | null | JSONBody;
+  [field: string]: PlainData | PlainData[] | undefined | null | JSONBody;
 };
 
 export class APIService implements DataStore {
@@ -296,23 +308,70 @@ export class APIService implements DataStore {
     return convertTaskDTO(await this.unwrapResponse<TaskDTO>(res));
   }
 
+  async attachFileToTask({ id, filesId }: AttachFileArgs) {
+    const res = await this.fetchJSON(`/tasks/${id}/attachments`, "POST", {
+      files_id: filesId,
+    });
+    await this.checkResponseError(res);
+  }
+
+  async addLabelToTask({ taskId, labelId }: TaskLabel) {
+    const res = await this.fetchJSON(`/tasks/${taskId}/labels`, "POST", {
+      label_id: labelId,
+    });
+    await this.checkResponseError(res);
+  }
+
+  async deleteLabelFromTask({ taskId, labelId }: TaskLabel) {
+    const res = await this.fetchJSON(`/tasks/${taskId}/labels`, "DELETE", {
+      label_id: labelId,
+    });
+    await this.checkResponseError(res);
+  }
+
+  async startTaskTracking(id: ID) {
+    const res = await this.fetchJSON(`/tasks/${id}/tracking`, "POST");
+    await this.checkResponseError(res);
+  }
+
+  async stopTaskTracking(id: ID) {
+    const res = await this.fetchJSON(`/tasks/${id}/tracking`, "DELETE");
+    await this.checkResponseError(res);
+  }
+
   /* ------------ */
 
-  async addComment({ taskId, text }: AddCommentArgs): Promise<Comment> {
+  async getComment(id: ID): Promise<Comment> {
+    const res = await this.fetchJSON(`/comments/${id}`);
+    return convertCommentDTO(await this.unwrapResponse<CommentDTO>(res));
+  }
+
+  async addComment({
+    taskId,
+    text,
+    attachments,
+  }: AddCommentArgs): Promise<Comment> {
     const res = await this.fetchJSON(`/tasks/${taskId}/comments`, "POST", {
       text,
+      attachments,
     });
     return convertCommentDTO(await this.unwrapResponse<CommentDTO>(res));
   }
 
   async editComment({ id, text }: EditCommentArgs): Promise<Comment> {
     const res = await this.fetchJSON(`/comments/${id}`, "PATCH", { text });
-
     return convertCommentDTO(await this.unwrapResponse<CommentDTO>(res));
   }
 
   async deleteComment(id: ID): Promise<void> {
     const res = await this.fetchJSON(`/comments/${id}`, "DELETE");
+    await this.checkResponseError(res);
+  }
+
+  async attachFileToComment({ id, filesId }: AttachFileArgs) {
+    const res = await this.fetchJSON(`/comments/${id}/attachments`, "POST", {
+      files_id: filesId,
+    });
     await this.checkResponseError(res);
   }
 
@@ -352,6 +411,13 @@ export class APIService implements DataStore {
 
   /* ------------ */
 
+  async uploadFile(args: UploadFile): Promise<KartenFile> {
+    const res = await this.fetchMultipart(`/files`, "POST", {
+      file: args.file,
+    });
+    return convertFileDTO(await this.unwrapResponse<FileDTO>(res));
+  }
+
   async uploadImage(args: UploadImage): Promise<KartenImageFile> {
     const queryParams = args.makeThumbnail ? "?thumb=yes" : "";
     const res = await this.fetchMultipart(
@@ -362,5 +428,33 @@ export class APIService implements DataStore {
       },
     );
     return convertImageFileDTO(await this.unwrapResponse<ImageFileDTO>(res));
+  }
+
+  async deleteFile(id: ID) {
+    const res = await this.fetchJSON(`/files/${id}`, "DELETE");
+    await this.checkResponseError(res);
+  }
+
+  /* ------------ */
+
+  async addLabel({ boardId, name, color }: AddLabelArgs): Promise<Label> {
+    const res = await this.fetchJSON(`/boards/${boardId}/labels`, "POST", {
+      name,
+      color: hexColorToNumber(color),
+    });
+    return convertLabelDTO(await this.unwrapResponse<LabelDTO>(res));
+  }
+
+  async deleteLabel(id: number): Promise<void> {
+    const res = await this.fetchJSON(`/labels/${id}`, "DELETE");
+    await this.checkResponseError(res);
+  }
+
+  async editLabel({ labelId, name, color }: EditLabelArgs): Promise<Label> {
+    const res = await this.fetchJSON(`/labels/${labelId}`, "PATCH", {
+      name,
+      color: color && hexColorToNumber(color),
+    });
+    return convertLabelDTO(await this.unwrapResponse<LabelDTO>(res));
   }
 }

@@ -1,22 +1,34 @@
 import { useState } from "react";
 import { Box, Paper, Typography, Avatar, Button, Stack } from "@mui/material";
+import format from "date-fns/format";
 
 import { useComment } from "queries/comments";
+import { useUser } from "queries/user";
 import * as models from "models/types";
-import Stub from "components/Stub";
+
 import { Markdown } from "components/Markdown";
+import Attachments from "components/Attachments";
 
 import CommentEditor from "./CommentEditor";
 
-export default function Comment({ comment }: { comment: models.Comment }) {
+export default function Comment(props: { comment: models.Comment }) {
   const [editMode, setEditMode] = useState(false);
   const {
+    query: { data: comment },
     mutation: { mutate: editComment, isLoading },
     deletion: { mutate: deleteComment },
-  } = useComment(comment.id);
+    attach: { mutate: attachFiles },
+    unattach: { mutate: unattachFiles },
+  } = useComment({
+    enabled: true,
+    initialData: props.comment,
+    commentId: props.comment.id,
+    taskId: props.comment.taskId,
+  });
+  const { user } = useUser();
 
   if (!comment) {
-    return <Stub />;
+    return null;
   }
 
   return (
@@ -29,15 +41,22 @@ export default function Comment({ comment }: { comment: models.Comment }) {
     >
       <Box width="40px" flexShrink="0">
         <Avatar sx={{ position: "sticky", top: (theme) => theme.spacing(2) }}>
-          Y
+          {comment.author?.name?.length
+            ? comment.author.name[0].toUpperCase()
+            : undefined}
         </Avatar>
       </Box>
 
       <Box flexGrow="1">
-        <Stack gap={2} direction="row" alignItems="center">
-          <Typography fontWeight="bold">Yuko</Typography>
-          <Typography variant="body2">
-            {new Date(comment.dateCreated).toLocaleString()}
+        <Stack gap={1} direction="row" alignItems="baseline">
+          <Typography fontWeight="bold" variant="body1">
+            {comment.author?.name}
+          </Typography>
+          <Typography
+            color={(theme) => theme.palette.text.secondary}
+            variant="body2"
+          >
+            {format(comment.dateCreated, "PPP p")}
           </Typography>
         </Stack>
 
@@ -45,7 +64,10 @@ export default function Comment({ comment }: { comment: models.Comment }) {
           <CommentEditor
             text={comment.text}
             onClose={() => setEditMode(false)}
-            onSubmit={(text: string) => {
+            onAttach={(filesId) => {
+              attachFiles(filesId);
+            }}
+            onSubmit={(text) => {
               editComment(text, {
                 onSuccess() {
                   setEditMode(false);
@@ -56,16 +78,29 @@ export default function Comment({ comment }: { comment: models.Comment }) {
           />
         ) : (
           <Paper variant="outlined" sx={{ paddingX: 1 }}>
-            <Markdown html={comment.text} />
+            <Markdown html={comment.html} />
           </Paper>
         )}
 
-        {!editMode && (
+        <Attachments
+          deletable={comment.userId === user?.id}
+          attachments={comment.attachments}
+          onDelete={(fileId) => {
+            unattachFiles(fileId);
+          }}
+        />
+
+        {!editMode && comment.userId === user?.id && (
           <Box mt={1} display="flex" gap={1}>
-            <Button size="small" onClick={() => setEditMode(true)}>
+            <Button
+              variant="text"
+              size="small"
+              onClick={() => setEditMode(true)}
+            >
               Edit
             </Button>
             <Button
+              variant="text"
               size="small"
               onClick={() => {
                 deleteComment();

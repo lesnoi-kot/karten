@@ -15,3 +15,5 @@ export const ENTITY_COLOR_NAMES: Array<keyof typeof ENTITY_COLOR> = Object.keys(
 ) as any;
 
 export const GUEST_USER_ID = 1;
+export const DEFAULT_COLOR = ENTITY_COLOR.blue;
+export const DEFAULT_COLOR_NAME = "blue";

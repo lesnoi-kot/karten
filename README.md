@@ -25,3 +25,5 @@
 - Syntax highlight
 
 - Threaded comments with reply
+
+- Optimistic updates in task modal

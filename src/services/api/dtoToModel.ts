@@ -7,7 +7,9 @@ import {
   KartenFile,
   User,
   KartenImageFile,
+  Label,
 } from "models/types";
+import { numberToHexColor } from "utils/color";
 
 import {
   ProjectDTO,
@@ -18,11 +20,13 @@ import {
   FileDTO,
   UserDTO,
   ImageFileDTO,
+  LabelDTO,
 } from "./types";
 
 export function convertProjectDTO(dto: ProjectDTO): Project {
   return {
     id: dto.id,
+    userId: dto.user_id,
     name: dto.name,
     avatarURL: dto.avatar_url ?? "",
     avatarThumbnailURL: dto.avatar_thumbnail_url ?? "",
@@ -34,15 +38,17 @@ export function convertBoardDTO(dto: BoardDTO): Board {
   return new Board(
     dto.id,
     dto.project_id,
+    dto.user_id,
     dto.archived,
     dto.favorite,
     dto.name,
     dto.date_created,
     dto.date_last_viewed,
-    convertNumberToColor(dto.color),
+    numberToHexColor(dto.color),
     dto.cover_url ?? "",
     dto.task_lists ? dto.task_lists.map(convertTaskListDTO) : [],
     dto.project_name,
+    dto.labels ? dto.labels.map(convertLabelDTO) : [],
   );
 }
 
@@ -50,41 +56,63 @@ export function convertTaskListDTO(dto: TaskListDTO): TaskList {
   return new TaskList(
     dto.id,
     dto.board_id,
+    dto.user_id,
     dto.archived,
     dto.position,
     dto.name,
     dto.date_created,
-    convertNumberToColor(dto.color),
+    numberToHexColor(dto.color),
     dto.tasks ? dto.tasks.map(convertTaskDTO) : [],
   );
 }
 
-export function convertTaskDTO(dto: TaskDTO): Task {
+export function convertLabelDTO(dto: LabelDTO): Label {
   return {
     id: dto.id,
-    taskListId: dto.task_list_id,
-    position: dto.position,
+    boardId: dto.board_id,
+    userId: dto.user_id,
     name: dto.name,
-    text: dto.text,
-    html: dto.html,
-    dateCreated: dto.date_created,
-    dueDate: dto.due_date,
-    comments: dto.comments ? dto.comments.map(convertCommentDTO) : [],
+    color: numberToHexColor(dto.color),
   };
+}
+
+export function convertTaskDTO(dto: TaskDTO): Task {
+  return new Task(
+    dto.id,
+    dto.task_list_id,
+    dto.user_id,
+    dto.name,
+    dto.text,
+    dto.html,
+    dto.position,
+    dto.date_created,
+    dto.date_started_tracking ? new Date(dto.date_started_tracking) : null,
+    dto.spent_time,
+    dto.due_date,
+    dto.comments ? dto.comments.map(convertCommentDTO) : [],
+    dto.attachments ? dto.attachments.map(convertFileDTO) : [],
+    dto.labels ? dto.labels.map(convertLabelDTO) : [],
+  );
 }
 
 export function convertCommentDTO(dto: CommentDTO): Comment {
   return {
     id: dto.id,
     taskId: dto.task_id,
+    userId: dto.user_id,
     text: dto.text,
-    author: dto.author,
-    dateCreated: dto.date_created,
+    html: dto.html,
+    author: dto.author
+      ? {
+          id: dto.author.id,
+          name: dto.author.name,
+          avatarURL: dto.author.avatar_url,
+          dateCreated: new Date(dto.author.date_created),
+        }
+      : null,
+    dateCreated: new Date(dto.date_created),
+    attachments: dto.attachments ? dto.attachments.map(convertFileDTO) : [],
   };
-}
-
-function convertNumberToColor(color: number): string {
-  return "#" + color.toString(16).padStart(6, "0");
 }
 
 export function convertFileDTO(dto: FileDTO): KartenFile {

@@ -1,6 +1,8 @@
 import {
   Board,
   Comment,
+  DateString,
+  UserID,
   ID,
   KartenFile,
   KartenImageFile,
@@ -8,6 +10,7 @@ import {
   Task,
   TaskList,
   User,
+  Label,
 } from "models/types";
 
 export type ResponseOK<T> = {
@@ -26,26 +29,48 @@ export type RequestOptions = {
 export type CommentDTO = {
   id: ID;
   task_id: ID;
-  author: string;
+  user_id: UserID;
+  author?: {
+    id: ID;
+    name: string;
+    avatar_url: string;
+    date_created: string;
+  };
   text: string;
+  html: string;
   date_created: string;
+  attachments?: FileDTO[];
+};
+
+export type LabelDTO = {
+  id: number;
+  board_id: string;
+  user_id: UserID;
+  name: string;
+  color: number;
 };
 
 export type TaskDTO = {
   id: ID;
   task_list_id: ID;
+  user_id: UserID;
   name: string;
   text: string;
   html: string;
   position: number;
   date_created: string;
+  date_started_tracking: string;
+  spent_time: number;
   due_date: string;
   comments?: CommentDTO[];
+  attachments?: FileDTO[];
+  labels?: LabelDTO[];
 };
 
 export type TaskListDTO = {
   id: ID;
   board_id: ID;
+  user_id: UserID;
   archived: boolean;
   position: number;
   name: string;
@@ -57,6 +82,7 @@ export type TaskListDTO = {
 export type BoardDTO = {
   id: ID;
   short_id: ID;
+  user_id: UserID;
   project_id: ID;
   archived: boolean;
   favorite: boolean;
@@ -67,10 +93,12 @@ export type BoardDTO = {
   project_name: string;
   cover_url?: string;
   task_lists?: TaskListDTO[];
+  labels?: LabelDTO[];
 };
 
 export type ProjectDTO = {
   id: ID;
+  user_id: UserID;
   short_id: ID;
   name: string;
   avatar: ID | null;
@@ -128,13 +156,15 @@ export type AddTaskListArgs = {
 export type AddTaskArgs = {
   taskListId: ID;
   name: string;
-  text?: string;
   position: number;
+  text?: string;
+  dueDate?: DateString | null;
 };
 
 export type AddCommentArgs = {
   taskId: ID;
   text: string;
+  attachments?: ID[];
 };
 
 export type EditProjectArgs = {
@@ -165,14 +195,40 @@ export type EditTaskArgs = {
   dueDate?: string;
 };
 
+export type AttachFileArgs = {
+  id: ID;
+  filesId: ID[];
+};
+
 export type EditCommentArgs = {
   id: ID;
   text: string;
 };
 
+export type UploadFile = {
+  file: File;
+};
+
 export type UploadImage = {
   file: File;
   makeThumbnail: boolean;
+};
+
+export type TaskLabel = {
+  taskId: ID;
+  labelId: number;
+};
+
+export type AddLabelArgs = {
+  boardId: ID;
+  name: string;
+  color: string;
+};
+
+export type EditLabelArgs = {
+  labelId: number;
+  name?: string;
+  color?: string;
 };
 
 export interface DataStore {
@@ -206,13 +262,26 @@ export interface DataStore {
   addTask(args: AddTaskArgs): Promise<Task>;
   editTask(args: EditTaskArgs): Promise<Task>;
   deleteTask(id: ID): Promise<void>;
+  attachFileToTask(args: AttachFileArgs): Promise<void>;
+  startTaskTracking(id: ID): Promise<void>;
+  stopTaskTracking(id: ID): Promise<void>;
+  addLabelToTask(args: TaskLabel): Promise<void>;
+  deleteLabelFromTask(args: TaskLabel): Promise<void>;
 
+  getComment(id: ID): Promise<Comment>;
   addComment(args: AddCommentArgs): Promise<Comment>;
   editComment(args: EditCommentArgs): Promise<Comment>;
   deleteComment(id: ID): Promise<void>;
+  attachFileToComment(args: AttachFileArgs): Promise<void>;
 
   getBoardCovers(): Promise<KartenFile[]>;
   uploadImage(args: UploadImage): Promise<KartenImageFile>;
+  uploadFile(args: UploadFile): Promise<KartenFile>;
+  deleteFile(id: ID): Promise<void>;
+
+  addLabel(args: AddLabelArgs): Promise<Label>;
+  editLabel(args: EditLabelArgs): Promise<Label>;
+  deleteLabel(id: number): Promise<void>;
 }
 
 export const ERROR_CODES = {

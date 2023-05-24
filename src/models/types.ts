@@ -12,7 +12,13 @@ export type ColorName = keyof typeof ENTITY_COLOR;
 export type Comment = {
   id: UUID;
   taskId: UUID;
-  author: string;
+  userId: UserID;
+  author: {
+    id: UUID;
+    name: string;
+    avatarURL: string;
+    dateCreated: Date;
+  } | null;
   text: string;
   html: string;
   dateCreated: Date;
@@ -25,6 +31,7 @@ export class Task {
   constructor(
     public id: UUID,
     public taskListId: UUID,
+    public userId: UserID,
     public name: string,
     public text: string,
     public html: string,
@@ -57,6 +64,7 @@ export class TaskList {
   constructor(
     public id: UUID,
     public boardId: UUID,
+    public userId: UserID,
     public archived: boolean,
     public position: number,
     public name: string,
@@ -141,6 +149,7 @@ export class Board {
   constructor(
     public id: UUID,
     public projectId: UUID,
+    public userId: UserID,
     public archived: boolean,
     public favorite: boolean,
     public name: string,
@@ -283,6 +292,7 @@ export class Board {
 
 export type Project = {
   id: UUID;
+  userId: UserID;
   name: string;
   avatarURL: string;
   avatarThumbnailURL: string;

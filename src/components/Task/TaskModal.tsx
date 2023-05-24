@@ -1,4 +1,10 @@
-import { Box, IconButton, Modal, ModalProps } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Modal,
+  ModalProps,
+  CircularProgress,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import ClearIcon from "@mui/icons-material/Clear";
 
@@ -26,14 +32,19 @@ const StyledModal = styled(Modal)<ModalProps>(({ theme }) => ({
 export function TaskModal({ onClose, taskId }: TaskModalProps) {
   return (
     <StyledModal open={!!taskId} disableScrollLock onClose={onClose}>
-      <Box>
-        <Box position="absolute" mt={1} mr={1} right={0}>
-          <IconButton size="small" onClick={onClose}>
-            <ClearIcon />
-          </IconButton>
+      {taskId ? (
+        <Box position="relative">
+          <Box position="absolute" mt={1} mr={1} right={0} zIndex={1}>
+            <IconButton size="small" onClick={onClose}>
+              <ClearIcon />
+            </IconButton>
+          </Box>
+
+          <Task taskId={taskId} onDelete={onClose} />
         </Box>
-        {taskId && <Task taskId={taskId} />}
-      </Box>
+      ) : (
+        <CircularProgress />
+      )}
     </StyledModal>
   );
 }

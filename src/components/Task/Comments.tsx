@@ -2,12 +2,12 @@ import { Box, Stack, Typography } from "@mui/material";
 import CommentIcon from "@mui/icons-material/Comment";
 
 import { Task } from "models/types";
+import Comment from "components/Comment/Comment";
 
-import Comment from "./Comment";
 import CommentComposer from "./CommentComposer";
 
 function Comments({ task }: { task: Task }) {
-  const { id, comments = [] } = task;
+  const { id, comments } = task;
 
   return (
     <Box>

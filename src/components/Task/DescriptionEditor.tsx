@@ -12,8 +12,9 @@ import { styled } from "@mui/material/styles";
 import NotesIcon from "@mui/icons-material/Notes";
 
 import { Task } from "models/types";
-
 import { placeCaretToTheEnd, blurOnEscape } from "utils/events";
+import { useTask } from "queries/tasks";
+import { useFileUploaderOnPaste } from "queries/files";
 import { Markdown } from "components/Markdown";
 
 export type Props = {
@@ -37,8 +38,22 @@ const EmptyDescriptionCard = styled(Paper)<PaperProps<"button">>(
 
 function DescriptionEditor({ task, onChange }: Props) {
   const { text: initialDescription } = task;
+  const {
+    attach: { mutate: attachFile },
+    invalidate,
+  } = useTask(task.id, { queryEnabled: false });
   const [readonly, setReadonly] = useState(true);
   const [description, setDescription] = useState(initialDescription);
+
+  const { onPaste } = useFileUploaderOnPaste((files) => {
+    files.forEach((file) => {
+      attachFile(file.id, {
+        onSuccess() {
+          invalidate();
+        },
+      });
+    });
+  });
 
   useEffect(() => {
     setDescription(initialDescription);
@@ -56,10 +71,8 @@ function DescriptionEditor({ task, onChange }: Props) {
     setReadonly(true);
   };
 
-  console.log("rerender");
-
   return (
-    <>
+    <Box>
       <Box display="flex" alignItems="center" flexDirection="row" gap={1}>
         <NotesIcon />
         <Typography variant="h6" component="h3">
@@ -116,9 +129,10 @@ function DescriptionEditor({ task, onChange }: Props) {
               }}
               InputProps={{
                 style: {
-                  fontSize: "0.9rem",
+                  fontSize: "1rem",
                 },
               }}
+              onPaste={onPaste}
             />
             <Box mt={1} display="flex" gap={1}>
               <Button
@@ -135,7 +149,7 @@ function DescriptionEditor({ task, onChange }: Props) {
           </>
         )}
       </Box>
-    </>
+    </Box>
   );
 }
 
