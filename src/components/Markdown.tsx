@@ -1,4 +1,5 @@
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
+import hljs from "highlight.js";
 import { Box, BoxProps } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
@@ -8,57 +9,39 @@ type Props = BoxProps & {
 
 const Content = styled(Box)<BoxProps>(({ theme }) => ({
   maxWidth: "100%",
-
-  "& p, pre": {
-    marginTop: theme.spacing(1.5),
-    marginBottom: theme.spacing(1.5),
-    lineHeight: 1,
-  },
-  "& code": {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-  "& pre": {
-    overflow: "scroll",
-  },
-  "& img": {
-    maxWidth: "100%",
-  },
-
-  "& h1": {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(3),
-    ...theme.typography.h3,
-  },
-  "& h2": {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(3),
-    ...theme.typography.h4,
-  },
-  "& h3": {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(2),
-    ...theme.typography.h5,
-  },
-  "& h4": {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(2),
-    ...theme.typography.h6,
-  },
-  "& h5": {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-    ...theme.typography.h6,
-  },
-  "& h6": {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-    ...theme.typography.h6,
-  },
+  fontSize: "1rem",
+  tabSize: "4",
 }));
 
 export function Markdown({ html, ...boxProps }: Props) {
-  return <Content {...boxProps} dangerouslySetInnerHTML={{ __html: html }} />;
+  const ref = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    if (!ref.current) {
+      return;
+    }
+
+    ref.current.querySelectorAll<HTMLElement>("pre code").forEach((code) => {
+      hljs.highlightElement(code);
+    });
+
+    ref.current
+      .querySelectorAll<HTMLAnchorElement>(
+        'a[href^="https://youtu.be/"], a[href^="https://www.youtube.com/"]',
+      )
+      .forEach((link) => {
+        link.classList.add("youtube-link");
+      });
+  }, [html, ref.current]);
+
+  return (
+    <Content
+      {...boxProps}
+      className="markdown-body"
+      ref={ref}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
 }
 
 export default memo(Markdown);

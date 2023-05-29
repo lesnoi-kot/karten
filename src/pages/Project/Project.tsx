@@ -47,7 +47,7 @@ function Project() {
 
       {project && (
         <Container maxWidth="lg" sx={{ pt: 1 }}>
-          <Breadcrumbs aria-label="breadcrumb" separator="⧽">
+          <Breadcrumbs aria-label="breadcrumb">
             <Link underline="hover" color="inherit" to="/projects">
               Projects
             </Link>

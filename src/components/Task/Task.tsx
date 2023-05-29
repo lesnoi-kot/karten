@@ -71,23 +71,20 @@ function Task({ taskId, onDelete }: Props) {
         />
       </Box>
       <Stack direction="row" gap={2} mt={2}>
-        <Stack flexGrow="1" maxWidth="70%" gap={2}>
+        <Stack flexGrow="1" gap={2} minWidth="0">
           <Labels task={task} />
-
           <DescriptionEditor
             task={task}
             onChange={(text: string) => {
               editTask({ text });
             }}
           />
-
           <Attachments taskId={taskId} attachments={task.attachments} />
-
           <Box mt={2}>
             <Comments task={task} />
           </Box>
         </Stack>
-        <Box flexShrink="0" flexBasis="20%">
+        <Box flexShrink="0" flexBasis="25%">
           <SidePanel taskId={taskId} onDelete={onDelete} />
         </Box>
       </Stack>
@@ -116,7 +113,7 @@ function SidePanel({ taskId, onDelete }: Props) {
   } = useTask(taskId);
 
   return (
-    <Stack gap={2} sx={{ position: "sticky", top: "32px" }}>
+    <Stack gap={2} sx={{ position: "sticky", top: "0px" }}>
       <List dense subheader={<ListSubheader>Add to card</ListSubheader>}>
         <ListItemButton
           ref={labelsButtonRef}

@@ -1,3 +1,4 @@
+import { useDeferredValue, useMemo } from "react";
 import { Box, Stack, Typography } from "@mui/material";
 import CommentIcon from "@mui/icons-material/Comment";
 
@@ -8,6 +9,24 @@ import CommentComposer from "./CommentComposer";
 
 function Comments({ task }: { task: Task }) {
   const { id, comments } = task;
+
+  const latestCommentDateCreated = useDeferredValue(
+    useMemo(() => {
+      if (comments.length === 0) {
+        return new Date();
+      }
+
+      let dateCreated = comments[0].dateCreated;
+
+      comments.forEach((c) => {
+        if (c.dateCreated > dateCreated) {
+          dateCreated = c.dateCreated;
+        }
+      });
+
+      return dateCreated;
+    }, [comments]),
+  );
 
   return (
     <Box>
@@ -25,7 +44,11 @@ function Comments({ task }: { task: Task }) {
       {comments.length > 0 && (
         <Stack spacing={3} sx={{ mt: 4 }}>
           {comments.map((comment) => (
-            <Comment key={comment.id} comment={comment} />
+            <Comment
+              key={comment.id}
+              comment={comment}
+              flash={comment.dateCreated > latestCommentDateCreated}
+            />
           ))}
         </Stack>
       )}

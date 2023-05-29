@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { produce } from "immer";
+import { Draft, produce } from "immer";
 
 import { useAPI } from "context/APIProvider";
-import { Task, ID } from "models/types";
+import { Task, ID, Label } from "models/types";
 import { useAppDispatch } from "store/hooks";
 import { showSnackbar } from "store/snackbars";
 
@@ -10,6 +10,7 @@ import { useOptimisticBoardMutation } from "./boards";
 
 type UseTaskArgs = {
   queryEnabled?: boolean;
+  initialData?: Task;
 };
 
 export const taskKeys = {
@@ -19,14 +20,16 @@ export const taskKeys = {
 };
 
 export function useTask(taskId: ID, args: UseTaskArgs = {}) {
-  const { queryEnabled = true } = args;
+  const { queryEnabled = true, initialData } = args;
   const dispatch = useAppDispatch();
   const api = useAPI();
   const queryClient = useQueryClient();
   const updateBoard = useOptimisticBoardMutation();
+  const updateTask = useOptimisticTaskMutation(taskId);
   const queryKey = taskKeys.task(taskId);
 
   const query = useQuery({
+    initialData,
     enabled: queryEnabled,
     queryFn: () => api.getTask(taskId),
     queryKey,
@@ -105,7 +108,13 @@ export function useTask(taskId: ID, args: UseTaskArgs = {}) {
   });
 
   const addLabel = useMutation({
-    mutationFn: (labelId: number) => api.addLabelToTask({ taskId, labelId }),
+    mutationFn: (label: Label) =>
+      api.addLabelToTask({ taskId, labelId: label.id }),
+    onMutate(label) {
+      updateTask((task) => {
+        task.addLabel(label);
+      });
+    },
     onSuccess() {
       invalidate();
     },
@@ -114,6 +123,11 @@ export function useTask(taskId: ID, args: UseTaskArgs = {}) {
   const deleteLabel = useMutation({
     mutationFn: (labelId: number) =>
       api.deleteLabelFromTask({ taskId, labelId }),
+    onMutate(labelId) {
+      updateTask((task) => {
+        task.deleteLabel(labelId);
+      });
+    },
     onSuccess() {
       invalidate();
     },
@@ -134,5 +148,17 @@ export function useTask(taskId: ID, args: UseTaskArgs = {}) {
     addLabel,
     deleteLabel,
     invalidate,
+  };
+}
+
+type TaskDraftMutator = (taskDraft: Draft<Task>) => void;
+
+export function useOptimisticTaskMutation(taskId: ID) {
+  const queryClient = useQueryClient();
+
+  return function (mutation: TaskDraftMutator) {
+    queryClient.setQueryData<Task>(taskKeys.task(taskId), (task) =>
+      task ? produce(task, mutation) : task,
+    );
   };
 }

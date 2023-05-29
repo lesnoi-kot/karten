@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Box, Stack, TextField, IconButton } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
@@ -13,14 +13,15 @@ import { useFileUploader, useFileUploaderOnPaste } from "queries/files";
 import UserAvatar from "components/UserAvatar";
 import { useFilePicker } from "components/ui/FileInput/FileInput";
 import Attachments from "components/Attachments";
+import { useOptimisticTaskMutation } from "queries/tasks";
 
 function CommentComposer({ taskId }: { taskId: ID }) {
   const [text, setText] = useState("");
   const [focused, setFocused] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState(new Array<KartenFile>());
   const { mutateAsync: uploadFile } = useFileUploader();
-  const queryClient = useQueryClient();
   const api = useAPI();
+  const mutateTask = useOptimisticTaskMutation(taskId);
 
   const {
     FileInput,
@@ -35,12 +36,14 @@ function CommentComposer({ taskId }: { taskId: ID }) {
         text,
         attachments: attachedFiles.map((file) => file.id),
       }),
-    onSuccess() {
+    onSuccess(newComment) {
       setText("");
       setFocused(false);
       setAttachedFiles([]);
 
-      queryClient.invalidateQueries({ queryKey: ["tasks", { taskId }] });
+      mutateTask((task) => {
+        task.addComment(newComment);
+      });
     },
   });
 

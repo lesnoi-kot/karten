@@ -7,6 +7,18 @@ import {
 export const appTheme = responsiveFontSizes(
   experimental_extendTheme({
     components: {
+      MuiBreadcrumbs: {
+        defaultProps: {
+          separator: "•",
+        },
+      },
+      MuiListSubheader: {
+        styleOverrides: {
+          root: {
+            backgroundColor: "inherit",
+          },
+        },
+      },
       MuiFormLabel: {
         styleOverrides: {
           asterisk: {

@@ -49,7 +49,7 @@ function CommentEditor({
         autoFocus
         onFocus={placeCaretToTheEnd}
         onKeyDown={blurOnEscape}
-        margin="dense"
+        margin="none"
         size="small"
         placeholder="Write a comment"
         variant="outlined"

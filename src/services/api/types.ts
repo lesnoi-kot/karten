@@ -192,7 +192,7 @@ export type EditTaskArgs = {
   name?: string;
   position?: number;
   text?: string;
-  dueDate?: string;
+  dueDate?: string | null;
 };
 
 export type AttachFileArgs = {

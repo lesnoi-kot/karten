@@ -25,3 +25,11 @@ button {
 #root {
   height: 100%;
 }
+
+a.youtube-link {
+  padding-inline-start: 40px;
+  background-image: url('/public/youtube_icon.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: left;
+}

@@ -9,6 +9,9 @@ import {
 import CssBaseline from "@mui/material/CssBaseline";
 import type {} from "@mui/material/themeCssVarsAugmentation";
 
+import "highlight.js/styles/github.css";
+import "github-markdown-css/github-markdown.css";
+
 import { APIContext } from "context/APIProvider";
 import { getDataStore } from "services/api";
 import { createStore } from "store/store";

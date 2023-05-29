@@ -43,18 +43,49 @@ export class Task {
     public comments: Comment[],
     public attachments: KartenFile[],
     public labels: Label[],
-  ) {}
-
-  getComment(commentId: ID) {
-    return this.comments.find((comment) => comment.id === commentId);
+  ) {
+    this.sortComments();
+    this.sortLabels();
   }
 
-  deleteComment(commentId: ID) {
+  addComment(comment: Comment): void {
+    this.comments.push(comment);
+    this.sortComments();
+  }
+
+  getComment(commentId: ID): Comment | null {
+    return this.comments.find((comment) => comment.id === commentId) ?? null;
+  }
+
+  deleteComment(commentId: ID): void {
     const idx = this.comments.findIndex((comment) => comment.id === commentId);
 
     if (idx !== -1) {
       this.comments.splice(idx, 1);
     }
+  }
+
+  sortComments(): void {
+    this.comments.sort(
+      (a, b) => b.dateCreated.getTime() - a.dateCreated.getTime(),
+    );
+  }
+
+  addLabel(label: Label): void {
+    this.labels.push(label);
+    this.sortLabels();
+  }
+
+  deleteLabel(labelId: number): void {
+    const idx = this.labels.findIndex((label) => label.id === labelId);
+
+    if (idx !== -1) {
+      this.labels.splice(idx, 1);
+    }
+  }
+
+  sortLabels(): void {
+    this.labels.sort((a, b) => a.name.localeCompare(b.name));
   }
 }
 

@@ -101,9 +101,6 @@ function TaskComposer({ taskListId, boardId }: Props) {
           variant="outlined"
           size="small"
           onKeyDown={onKeyDown}
-          sx={{
-            lineHeight: "1.3",
-          }}
         />
         <Box mt={1} />
       </Collapse>

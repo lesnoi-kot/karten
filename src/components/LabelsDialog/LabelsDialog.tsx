@@ -84,7 +84,7 @@ export function LabelsDialog({
                   checked={checkedLabels.has(label.id)}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      addLabel.mutate(label.id, {
+                      addLabel.mutate(label, {
                         onSuccess() {
                           invalidate();
                         },

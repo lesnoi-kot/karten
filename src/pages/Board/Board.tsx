@@ -130,7 +130,6 @@ function PageBreadcrumbs({ board }: { board: Board }) {
   return (
     <Breadcrumbs
       aria-label="breadcrumb"
-      separator="⧽"
       sx={{ color: "white", fontSize: "1rem" }}
     >
       <Link underline="hover" color="inherit" fontSize="inherit" to="/projects">

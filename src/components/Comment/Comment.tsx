@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Paper, Typography, Avatar, Button, Stack } from "@mui/material";
 import format from "date-fns/format";
 
@@ -11,7 +11,13 @@ import Attachments from "components/Attachments";
 
 import CommentEditor from "./CommentEditor";
 
-export default function Comment(props: { comment: models.Comment }) {
+type Props = {
+  comment: models.Comment;
+  flash?: boolean;
+};
+
+export default function Comment(props: Props) {
+  const { flash } = props;
   const [editMode, setEditMode] = useState(false);
   const {
     query: { data: comment },
@@ -26,6 +32,15 @@ export default function Comment(props: { comment: models.Comment }) {
     taskId: props.comment.taskId,
   });
   const { user } = useUser();
+  const [backgroundColor, setBackgroundColor] = useState(
+    flash ? "#fffde4" : undefined,
+  );
+
+  useEffect(() => {
+    if (flash) {
+      setBackgroundColor(undefined);
+    }
+  }, [flash]);
 
   if (!comment) {
     return null;
@@ -37,7 +52,15 @@ export default function Comment(props: { comment: models.Comment }) {
       direction="row"
       gap={1}
       alignItems="stretch"
-      fontSize="1rem"
+      borderRadius="5px"
+      sx={{
+        transition: (theme) =>
+          theme.transitions.create("background-color", {
+            duration: 1000,
+            delay: 1000,
+          }),
+        backgroundColor,
+      }}
     >
       <Box width="40px" flexShrink="0">
         <Avatar sx={{ position: "sticky", top: (theme) => theme.spacing(2) }}>
@@ -47,8 +70,8 @@ export default function Comment(props: { comment: models.Comment }) {
         </Avatar>
       </Box>
 
-      <Box flexGrow="1">
-        <Stack gap={1} direction="row" alignItems="baseline">
+      <Box flexGrow="1" maxWidth="calc(100% - 40px)">
+        <Stack gap={1} mb={1} direction="row" alignItems="baseline">
           <Typography fontWeight="bold" variant="body1">
             {comment.author?.name}
           </Typography>
@@ -77,7 +100,7 @@ export default function Comment(props: { comment: models.Comment }) {
             isLoading={isLoading}
           />
         ) : (
-          <Paper variant="outlined" sx={{ paddingX: 1 }}>
+          <Paper variant="outlined" sx={{ padding: 2, background: "inherit" }}>
             <Markdown html={comment.html} />
           </Paper>
         )}
