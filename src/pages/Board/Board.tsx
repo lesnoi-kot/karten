@@ -5,6 +5,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import {
   useColorScheme,
   Box,
+  Stack,
   CircularProgress,
   Breadcrumbs,
   Typography,
@@ -13,18 +14,18 @@ import {
 import { Board } from "models/types";
 import { useBoard } from "queries/boards";
 import { CurrentBoardContext } from "context/CurrentBoardProvider";
-import makePage from "pages/makePageHOC";
 import { TaskModal } from "components/Task";
 import ErrorSplash from "components/ui/ErrorSplash";
 import Link from "components/Link";
 import ScrollableSpace from "components/ScrollableSpace";
+import TaskList from "components/TaskList";
+import NewListPlaceholder from "components/TaskList/NewListPlaceholder";
 
 import { useBoardMethods } from "./hooks";
 import BoardName from "./BoardName";
-import TaskLists from "./TaskLists";
 import PageTitle from "./PageTitle";
 
-function BoardPage() {
+export default function BoardPage() {
   const { id: boardId = "" } = useParams();
   const [searchParams] = useSearchParams();
   const selectedTaskId = searchParams.get("taskId");
@@ -82,7 +83,22 @@ function BoardPage() {
                 overflow="scroll"
                 flexGrow={1}
               >
-                <TaskLists board={board} onTaskClick={onTaskClick} />
+                <Stack
+                  gap={1}
+                  direction="row"
+                  alignItems="flex-start"
+                  height="100%"
+                >
+                  {board.taskLists.map((taskList) => (
+                    <TaskList
+                      key={taskList.id}
+                      taskList={taskList}
+                      onTaskClick={onTaskClick}
+                    />
+                  ))}
+
+                  <NewListPlaceholder boardId={boardId} />
+                </Stack>
               </ScrollableSpace>
             </>
           )}
@@ -149,5 +165,3 @@ function PageBreadcrumbs({ board }: { board: Board }) {
     </Breadcrumbs>
   );
 }
-
-export default makePage(BoardPage);

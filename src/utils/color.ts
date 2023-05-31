@@ -14,7 +14,7 @@ export function getColorName(
   defaultColor: ColorName = "blue",
 ): ColorName {
   const entry = Object.entries(ENTITY_COLOR).find(
-    ([name, value]) => value === hexColor,
+    ([, value]) => value === hexColor,
   );
   return entry ? (entry[0] as ColorName) : defaultColor;
 }

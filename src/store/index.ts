@@ -1,1 +1,1 @@
-export type { RootState, Epic } from "./types";
+export type { RootState } from "./types";

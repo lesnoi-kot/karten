@@ -10,9 +10,9 @@ export const ENTITY_COLOR = {
   black: "#000000",
 } as const;
 
-export const ENTITY_COLOR_NAMES: Array<keyof typeof ENTITY_COLOR> = Object.keys(
+export const ENTITY_COLOR_NAMES = Object.keys(
   ENTITY_COLOR,
-) as any;
+) as (keyof typeof ENTITY_COLOR)[];
 
 export const GUEST_USER_ID = 1;
 export const DEFAULT_COLOR = ENTITY_COLOR.blue;

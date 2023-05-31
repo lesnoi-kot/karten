@@ -15,7 +15,7 @@ const Wrapper = styled(Box)<BoxProps>(() => ({
     "linear-gradient(to right top, #a747d1, #9151da, #7659e2, #5461e7, #1267eb)",
 }));
 
-function Landing() {
+export default function Landing() {
   const { user } = useUser();
   const { logIn } = useLogInAsGuest();
 
@@ -66,5 +66,3 @@ function Landing() {
     </Wrapper>
   );
 }
-
-export default Landing;

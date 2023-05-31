@@ -25,16 +25,7 @@ import {
   sliceName as newBoardDialogSliceName,
 } from "store/widgets/newBoardDialog";
 
-import {
-  reducer as commentsReducer,
-  sliceName as commentsSliceName,
-} from "./comments";
-
 export const rootReducer = combineReducers({
-  entities: combineReducers({
-    [commentsSliceName]: commentsReducer,
-  }),
-
   pages: combineReducers({
     [projectsPageSliceName]: projectsPageReducer,
   }),

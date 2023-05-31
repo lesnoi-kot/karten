@@ -15,9 +15,8 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { actions as confirmDialogActions } from "store/widgets/confirmDialog";
 import { useUser } from "queries/user";
 import { GUEST_USER_ID } from "models/constants";
-import makePage from "pages/makePageHOC";
 
-function Profile() {
+export default function Profile() {
   const dispatch = useDispatch();
   const { user, isLoading, logOut, deleteUser } = useUser();
 
@@ -105,5 +104,3 @@ function Profile() {
     </>
   );
 }
-
-export default makePage(Profile);

@@ -1,3 +1,5 @@
-export { default } from "./Profile";
-// export { actions, reducer, sliceName } from "./slice";
-export const epics = {};
+import { lazy } from "react";
+
+const ProfilePage = lazy(() => import("./Profile"));
+
+export default ProfilePage;

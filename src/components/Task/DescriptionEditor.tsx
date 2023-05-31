@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import {
   Box,
@@ -15,7 +15,7 @@ import { Task } from "models/types";
 import { placeCaretToTheEnd, blurOnEscape } from "utils/events";
 import { useTask } from "queries/tasks";
 import { useFileUploaderOnPaste } from "queries/files";
-import { Markdown } from "components/Markdown";
+import Markdown from "components/Markdown";
 
 export type Props = {
   task: Task;
@@ -91,9 +91,12 @@ function DescriptionEditor({ task, onChange }: Props) {
       <Box pl={4} mt={1}>
         {readonly &&
           (description ? (
-            <Markdown html={task.html} />
+            <Suspense>
+              <Markdown html={task.html} />
+            </Suspense>
           ) : (
             <EmptyDescriptionCard
+              // @ts-expect-error Paper as button
               component="button"
               onClick={() => setReadonly(false)}
               elevation={0}

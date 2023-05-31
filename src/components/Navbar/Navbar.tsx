@@ -11,7 +11,7 @@ import {
   MenuProps,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Logout } from "@mui/icons-material";
+import Logout from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import { useAppDispatch } from "store/hooks";

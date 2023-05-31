@@ -1,3 +1,5 @@
-export { default } from "./Project";
-export { actions, reducer, sliceName } from "./slice";
-export const epics = {};
+import { lazy } from "react";
+
+const ProjectPage = lazy(() => import("./Project"));
+
+export default ProjectPage;

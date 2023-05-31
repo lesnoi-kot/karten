@@ -2,7 +2,6 @@ import { Helmet } from "react-helmet";
 import { Box, CircularProgress, Container } from "@mui/material";
 
 import { useProjects } from "queries/projects";
-import makePage from "pages/makePageHOC";
 import ErrorSplash from "components/ui/ErrorSplash";
 
 import RecentlyViewed from "./RecentlyViewed";
@@ -10,7 +9,7 @@ import ProjectsList from "./ProjectsList";
 import NewProjectActionButton from "./NewProjectActionButton";
 import StarredBoards from "./StarredBoards";
 
-function ProjectsPage() {
+export default function ProjectsPage() {
   const { isLoading, isError, isSuccess, error, refetch } = useProjects({
     includeBoards: true,
   });
@@ -38,5 +37,3 @@ function ProjectsPage() {
     </>
   );
 }
-
-export default makePage(ProjectsPage);

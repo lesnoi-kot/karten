@@ -9,6 +9,7 @@ import { UploadImage } from "services/api";
 import { ColorTags } from "components/ui/ColorTag";
 import { useFilePicker } from "components/ui/FileInput/FileInput";
 import BoardCoverPreview from "components/Board/BoardCoverPreview";
+import { getColorName } from "utils/color";
 
 export type OnChangeArg = { color: string } | { coverId: ID; coverURL: string };
 
@@ -44,7 +45,10 @@ export default function BoardCoverSelect({ color, coverURL, onChange }: Props) {
       <Box display="flex" flexDirection="row">
         <Box display="flex" flexDirection="column" gap={1}>
           <Stack direction="row" gap={1} flexWrap="wrap">
-            <ColorTags onClick={setBoardColor} />
+            <ColorTags
+              checkedColor={getColorName(color)}
+              onClick={setBoardColor}
+            />
           </Stack>
 
           <Stack direction="row" gap={1}>

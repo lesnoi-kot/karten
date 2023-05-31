@@ -55,7 +55,9 @@ export default function TaskDropZone({ taskId, children }: Props) {
               });
             });
           })
-          .catch((error) => {});
+          .catch((error) => {
+            console.error(error);
+          });
       }}
       onDragEnter={(e) => {
         e.preventDefault();

@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 type DrawerMenuSlice = {
   isOpen: boolean;
@@ -26,5 +26,4 @@ export const {
       state.isOpen = !state.isOpen;
     },
   },
-  extraReducers: (builder) => {},
 });

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Box, Paper, Typography, Avatar, Button, Stack } from "@mui/material";
 import format from "date-fns/format";
 
@@ -6,7 +6,7 @@ import { useComment } from "queries/comments";
 import { useUser } from "queries/user";
 import * as models from "models/types";
 
-import { Markdown } from "components/Markdown";
+import Markdown from "components/Markdown";
 import Attachments from "components/Attachments";
 
 import CommentEditor from "./CommentEditor";
@@ -101,7 +101,9 @@ export default function Comment(props: Props) {
           />
         ) : (
           <Paper variant="outlined" sx={{ padding: 2, background: "inherit" }}>
-            <Markdown html={comment.html} />
+            <Suspense>
+              <Markdown html={comment.html} />
+            </Suspense>
           </Paper>
         )}
 

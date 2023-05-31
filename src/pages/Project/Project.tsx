@@ -10,7 +10,6 @@ import {
   Breadcrumbs,
 } from "@mui/material";
 
-import makePage from "pages/makePageHOC";
 import { useAPI } from "context/APIProvider";
 import BoardPreviewList from "components/Board/BoardPreviewList";
 import ErrorSplash from "components/ui/ErrorSplash";
@@ -18,7 +17,7 @@ import Link from "components/Link";
 
 import ProjectName from "./ProjectName";
 
-function Project() {
+export default function Project() {
   const api = useAPI();
   const { id: projectId = "" } = useParams();
 
@@ -86,5 +85,3 @@ function Project() {
     </>
   );
 }
-
-export default makePage(Project);
