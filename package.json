@@ -6,6 +6,15 @@
   "engines": {
     "node": ">=16"
   },
+  "scripts": {
+    "build": "vite build",
+    "start": "vite dev --open",
+    "preview": "vite preview",
+    "optimize": "vite optimize",
+    "test": "vitest",
+    "lint": "eslint . --ext .ts,.tsx",
+    "typing": "tsc --noEmit"
+  },
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
@@ -22,75 +31,44 @@
     "@types/react-helmet": "^6.1.5",
     "@types/react-redux": "^7.1.24",
     "@types/redux-logger": "^3.0.9",
-    "@vitejs/plugin-react": "^3.1.0",
-    "classnames": "^2.3.1",
+    "@vitejs/plugin-react": "^4.0.0",
     "date-fns": "^2.30.0",
     "github-markdown-css": "^5.2.0",
     "highlight.js": "^11.8.0",
-    "history": "^5.2.0",
     "immer": "^10.0.2",
     "js-cookie": "^3.0.1",
-    "micromark": "^3.1.0",
-    "normalizr": "^3.6.1",
     "pretty-bytes": "^6.0.0",
     "ramda": "^0.28.0",
-    "re-reselect": "^4.0.0",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
+    "react-error-boundary": "^4.0.8",
     "react-helmet": "^6.1.0",
     "react-redux": "^8.0.2",
     "react-router-dom": "^6.7.0",
     "redux-logger": "^3.0.6",
-    "redux-observable": "^2.0.0",
-    "rxjs": "^7.5.6",
     "typescript": "4.9.5",
-    "use-immer": "^0.9.0",
-    "vite": "^4.1.4",
-    "vite-plugin-svgr": "^2.4.0",
-    "vite-tsconfig-paths": "^4.0.5"
+    "vite": "^4.3.9",
+    "vite-tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^14.4.3",
-    "@types/jest": "^28.1.8",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.6.0",
     "eslint-config-standard-with-typescript": "^34.0.0",
     "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-react": "^7.32.2",
     "prettier": "2.8.4",
-    "source-map-explorer": "^2.5.2",
+    "rollup-plugin-visualizer": "^5.9.0",
     "stylelint": "^14.11.0",
     "stylelint-config-prettier": "^9.0.3",
     "stylelint-config-standard": "^28.0.0",
-    "vitest": "^0.29.2"
-  },
-  "scripts": {
-    "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "analyze-json": "source-map-explorer 'build/static/js/*.js' --json",
-    "build": "vite build",
-    "start": "vite dev --open",
-    "preview": "vite preview",
-    "test": "vitest",
-    "lint": "eslint . --ext .ts,.tsx"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "vite-plugin-checker": "^0.6.0",
+    "vitest": "^0.31.1"
   }
 }
