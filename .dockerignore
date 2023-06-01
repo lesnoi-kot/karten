@@ -1,0 +1,10 @@
+.github
+.vscode
+dist
+node_modules
+*.log
+Dockerfile
+.env
+.env.example
+stats.html
+.editorconfig
