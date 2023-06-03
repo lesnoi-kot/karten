@@ -29,6 +29,12 @@ jobs:
       - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
 
+      - name: Build args info
+        run: |
+          echo "KARTEN_BASE_URL=${{ vars.KARTEN_BASE_URL }}"
+          echo "API_URL=${{ vars.KARTEN_API_URL }}"
+          echo "GITHUB_CLIENT_ID=${{ vars.KARTEN_GH_CLIENT_ID }}"
+
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
@@ -38,3 +44,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/karten:master
           target: app
           platforms: "linux/amd64,linux/arm/v7"
+          build-args: |
+            BASE_URL=${{ vars.KARTEN_BASE_URL }}
+            API_URL=${{ vars.KARTEN_API_URL }}
+            GITHUB_CLIENT_ID=${{ vars.KARTEN_GH_CLIENT_ID }}
