@@ -31,7 +31,7 @@ jobs:
 
       - name: Build args info
         run: |
-          echo "KARTEN_BASE_URL=${{ vars.KARTEN_BASE_URL }}"
+          echo "KARTEN_BASE_PATH=${{ vars.KARTEN_BASE_PATH }}"
           echo "API_URL=${{ vars.KARTEN_API_URL }}"
           echo "GITHUB_CLIENT_ID=${{ vars.KARTEN_GH_CLIENT_ID }}"
 
@@ -45,6 +45,7 @@ jobs:
           target: app
           platforms: "linux/amd64,linux/arm/v7"
           build-args: |
-            BASE_URL=${{ vars.KARTEN_BASE_URL }}
+            BASE_PATH=${{ vars.KARTEN_BASE_PATH }}
             API_URL=${{ vars.KARTEN_API_URL }}
             GITHUB_CLIENT_ID=${{ vars.KARTEN_GH_CLIENT_ID }}
+            ENABLE_GUEST=${{ vars.KARTEN_ENABLE_GUEST }}

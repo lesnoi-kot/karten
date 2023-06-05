@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
       checker({ typescript: true }),
       visualizer(),
     ],
-    base: env.VITE_PUBLIC_URL || "/",
+    base: env.VITE_BASE_PATH || "/",
     build: {
       target: "modules",
       modulePreload: false,

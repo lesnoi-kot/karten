@@ -52,15 +52,17 @@ export default function Landing() {
           >
             Log in with GitHub
           </Button>
-          <Button
-            startIcon={<ScienceIcon />}
-            size="large"
-            onClick={logIn}
-            variant="outlined"
-            sx={{ color: "white", borderColor: "rgb(200 200 200)" }}
-          >
-            Log in as a guest
-          </Button>
+          {import.meta.env.VITE_ENABLE_GUEST === "true" && (
+            <Button
+              startIcon={<ScienceIcon />}
+              size="large"
+              onClick={logIn}
+              variant="outlined"
+              sx={{ color: "white", borderColor: "rgb(200 200 200)" }}
+            >
+              Log in as a guest
+            </Button>
+          )}
         </Box>
       </Box>
     </Wrapper>

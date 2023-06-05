@@ -2,8 +2,6 @@ import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
 
-import { settings } from "settings";
-
 import ProjectsPage from "pages/Projects";
 import ProjectPage from "pages/Project";
 import BoardPage from "pages/Board";
@@ -22,7 +20,7 @@ export default function App() {
     <ErrorBoundary
       fallbackRender={({ error }) => <ErrorSplash message={String(error)} />}
     >
-      <BrowserRouter basename={settings.baseURL}>
+      <BrowserRouter basename={import.meta.env.VITE_BASE_PATH}>
         <Routes>
           <Route index path="/welcome" element={<LandingPage />} />
 
